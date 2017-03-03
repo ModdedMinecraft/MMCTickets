@@ -33,10 +33,12 @@ public class Messages {
 
     //errors
     public static String errorGeneral = "&4An error occurred. {0}";
+    public static String errorIncorrectUsage = "&cIncorrect Usage: {0}";
     public static String errorBanned = "&4You are not allowed to open new ticket.";
     public static String errorBanUser = "&4Cannot ban {0} from opening new ticket.";
     public static String errorUnbanUser = "&4Cannot unban {0} from opening new ticket.";
     public static String errorPermission = "&eYou need permission \"{0}\" to do that.";
+    public static String errorTicketPermission = "&eYou need permission\"{0}\" to view ticket #{1}.";
     public static String errorTicketStatus = "&4Unable to set ticket status. Check that the status of the ticket does not collide.";
     public static String errorTicketNotClosed = "&4Ticket #{0} is not closed or on hold.";
     public static String errorTicketNan = "&4Ticket ID must be a number, provided: &e{0}";
@@ -58,22 +60,23 @@ public class Messages {
     public static String ticketClaimUser = "&6{0} is now handling your ticket.";
     public static String ticketClose = "&6Ticket #{0} was closed by {1}.";
     public static String ticketCloseOffline = "&6A ticket has been closed while you were offline.";
-    public static String ticketCloseOfflineMulti = "&6While you were gone, {0} ticket were closed. Use /{1} to see your currently open ticket.";
+    public static String ticketCloseOfflineMulti = "&6While you were gone, {0} tickets were closed. Use /{1} to see your currently open tickets.";
     public static String ticketCloseText = "&6Ticket text: &e{0}";
     public static String ticketCloseUser = "&6Ticket #{0} has been closed by {1}.";
     public static String ticketDuplicate = "&4Your ticket has not been opened because it was detected as a duplicate.";
     public static String ticketOpen = "&aA new ticket has been opened by {0}, id assigned #{1}.";
     public static String ticketOpenUser = "&6You opened a ticket, it has been assigned ID #{0}. A staff member should be with you soon.";
     public static String ticketTitleNotification = "A new ticket has been opened by {0}, id assigned #{1}.";
+    public static String ticketOnHoverTeleportTo = "Click here to teleport to this tickets location.";
     public static String ticketReadNone = "&6There are no open tickets.";
-    public static String ticketReadNoneSelf = "&6You have no open ticket.";
+    public static String ticketReadNoneSelf = "&6You have no open tickets.";
     public static String ticketReadNoneClosed = "&6There are no closed tickets.";
     public static String ticketReadNoneHeld = "&6There are no tickets currently on hold.";
     public static String ticketHold = "&6Ticket #{0} was put on hold by {1}";
     public static String ticketHoldUser = "&6Your ticket #{0} was put on hold by {1}";
     public static String ticketHoldText = "&6Ticket text: &e{0} &6Reason: &e{1}";
-    public static String ticketUnresolved = "&aThere are {0} open ticket. Type /{1} to see them.";
-    public static String ticketUnresolvedHeld = "&aThere are {0} open ticket and {1} ticket on hold. Type /{2} to see them.";
+    public static String ticketUnresolved = "&aThere are {0} open tickets. Type /{1} to see them.";
+    public static String ticketUnresolvedHeld = "&aThere are {0} open tickets and {1} ticket on hold. Type /{2} to see them.";
     public static String ticketUnclaim = "&6{0} is no longer handling ticket #{1}.";
     public static String ticketUnclaimUser = "&6{0} is no longer handling your ticket #{1}.";
     public static String ticketNotExist = "&4Ticket #{0} does not exist.";
@@ -97,6 +100,7 @@ public class Messages {
 
         //errors
         errorGeneral = check(messages.getNode("error", "general"), errorGeneral).getString();
+        errorIncorrectUsage = check(messages.getNode("error", "general"), errorIncorrectUsage).getString();
         errorBanned = check(messages.getNode("error", "banned"), errorBanned).getString();
         errorBanUser = check(messages.getNode("error", "ban-user"), errorBanUser).getString();
         errorUnbanUser = check(messages.getNode("error", "unban-user"), errorUnbanUser).getString();
@@ -129,6 +133,7 @@ public class Messages {
         ticketOpen = check(messages.getNode("ticket", "open"), ticketOpen).getString();
         ticketOpenUser = check(messages.getNode("ticket", "open-user"), ticketOpenUser).getString();
         ticketTitleNotification = check(messages.getNode("ticket", "open-title-notification"), ticketTitleNotification).getString();
+        ticketOnHoverTeleportTo = check(messages.getNode("ticket", "on-hover-teleport-to"), ticketOnHoverTeleportTo).getString();
         ticketReadNone = check(messages.getNode("ticket", "read-none"), ticketReadNone).getString();
         ticketReadNoneSelf = check(messages.getNode("ticket", "read-none-self"), ticketReadNoneSelf).getString();
         ticketReadNoneClosed = check(messages.getNode("ticket", "read-none-closed"), ticketReadNoneClosed).getString();

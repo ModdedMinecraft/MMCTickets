@@ -5,8 +5,10 @@ import com.google.inject.Inject;
 import net.moddedminecraft.mmctickets.commands.*;
 import net.moddedminecraft.mmctickets.commands.subcommands.readClosed;
 import net.moddedminecraft.mmctickets.commands.subcommands.readHeld;
+import net.moddedminecraft.mmctickets.commands.subcommands.readSelf;
 import net.moddedminecraft.mmctickets.config.Config;
 import net.moddedminecraft.mmctickets.config.Messages;
+import net.moddedminecraft.mmctickets.config.Permissions;
 import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.PlayerData.PlayerDataSerializer;
 import net.moddedminecraft.mmctickets.data.TicketData;
@@ -18,7 +20,6 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
@@ -60,11 +61,13 @@ public class Main {
 
     private CommandManager cmdManager = Sponge.getCommandManager();
 
+    private ArrayList<String> notifications;
     private Map<Integer, TicketData> tickets;
     private Map<UUID, PlayerData> playersData;
 
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
+        Sponge.getEventManager().registerListeners(this, new EventListener(this));
 
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(TicketData.class), new TicketSerializer());
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(PlayerData.class), new PlayerDataSerializer());
@@ -78,6 +81,8 @@ public class Main {
     @Listener
     public void onServerStart(GameStartedServerEvent event) throws IOException {
         logger.info("MMCTickets Loaded");
+        logger.info("Tickets loaded: " + tickets.size());
+        logger.info("Notifications loaded: " + notifications.size());
     }
 
     @Listener
@@ -95,16 +100,24 @@ public class Main {
                 .executor(new staff(this))
                 .build();
 
+        // /ticket read self
+        CommandSpec readSelf = CommandSpec.builder()
+                .description(Text.of("Display a list of all tickets the player owns"))
+                .executor(new readSelf(this))
+                .build();
+
         // /ticket read closed
         CommandSpec readClosed = CommandSpec.builder()
                 .description(Text.of("Display a list of all closed tickets"))
                 .executor(new readClosed(this))
+                .permission(Permissions.COMMAND_TICKET_READ_ALL)
                 .build();
 
         // /ticket read held
         CommandSpec readHeld = CommandSpec.builder()
                 .description(Text.of("Display a list of all held tickets"))
                 .executor(new readHeld(this))
+                .permission(Permissions.COMMAND_TICKET_READ_ALL)
                 .build();
 
         // /ticket read (ticketID)
@@ -113,6 +126,7 @@ public class Main {
                 .executor(new read(this))
                 .child(readClosed, "closed")
                 .child(readHeld, "held")
+                .child(readSelf, "self")
                 .arguments(GenericArguments.optional(GenericArguments.integer(Text.of("ticketID"))))
                 .build();
 
@@ -129,6 +143,7 @@ public class Main {
                 .description(Text.of("Open a ticket"))
                 .executor(new open(this))
                 .arguments(GenericArguments.remainingJoinedStrings(Text.of("message")))
+                .permission(Permissions.COMMAND_TICKET_OPEN)
                 .build();
 
         // /ticket
@@ -156,8 +171,10 @@ public class Main {
 
         List<TicketData> ticketList = rootNode.getNode("Tickets").getList(TypeToken.of(TicketData.class));
         this.tickets = new HashMap<Integer, TicketData>();
+        this.notifications = new ArrayList<String>();
         for (TicketData ticket : ticketList) {
             this.tickets.put(ticket.getTicketID(), ticket);
+            if (ticket.getNotified() == 0 && ticket.getStatus() == 3) this.notifications.add(ticket.getName());
         }
 
         List<PlayerData> playersDataList = rootNode.getNode("PlayersData").getList(TypeToken.of(PlayerData.class));
@@ -185,21 +202,22 @@ public class Main {
         return this.tickets.get(ticketID);
     }
 
-    public TicketData addTicket(TicketData ticket) {
-        return this.tickets.put(ticket.getTicketID(), ticket);
-    }
-
     public Collection<TicketData> getTickets() {
         return Collections.unmodifiableCollection(this.tickets.values());
     }
 
-    public void sendMessage(CommandSource sender, Text message) {
-        sender.sendMessage(fromLegacy(message));
+    public ArrayList<String> getNotifications() {
+        return this.notifications;
     }
 
-    public Text fromLegacy(Text legacy) {
-        return TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy.toPlain());
+    public void removeNotification(String name) {
+        this.notifications.remove(name);
     }
+
+    public TicketData addTicket(TicketData ticket) {
+        return this.tickets.put(ticket.getTicketID(), ticket);
+    }
+
     public Text fromLegacy(String legacy) {
         return TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy);
     }

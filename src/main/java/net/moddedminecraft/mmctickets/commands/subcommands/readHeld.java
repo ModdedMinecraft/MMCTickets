@@ -17,7 +17,6 @@ import org.spongepowered.api.text.action.TextActions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class readHeld implements CommandExecutor {
 
@@ -29,8 +28,6 @@ public class readHeld implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final Optional<Integer> ticketIDOp = args.<Integer>getOne("ticketID");
-
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
 
         if (src instanceof Player) {

@@ -47,6 +47,7 @@ public class teleport implements CommandExecutor {
                     Location loc = new Location(world, ticket.getX(), ticket.getY(), ticket.getZ());
                     Vector3d vect = new Vector3d(ticket.getPitch(), ticket.getYaw(), 0);
                     player.setLocationAndRotation(loc, vect);
+                    player.sendMessage(Messages.parse(Messages.teleportToTicket, ticketID));
                 }
             }
             if (!ticketExist) {

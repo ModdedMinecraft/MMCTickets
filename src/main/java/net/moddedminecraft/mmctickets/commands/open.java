@@ -52,7 +52,7 @@ public class open implements CommandExecutor {
 
         try {
             plugin.saveData();
-            plugin.sendMessage(player, Messages.parse(Messages.ticketOpenUser, ticketID));
+            player.sendMessage(Messages.parse(Messages.ticketOpenUser, ticketID));
             if (Config.staffNotification) {
                 CommonUtil.notifyOnlineStaff(Messages.parse(Messages.ticketOpen, player.getName() , ticketID));
             }
@@ -63,7 +63,7 @@ public class open implements CommandExecutor {
                 CommonUtil.notifyOnlineStaffSound();
             }
         } catch (Exception e) {
-            plugin.sendMessage(player, Messages.parse(Messages.errorGeneral, "Data was not saved correctly."));
+            player.sendMessage(Messages.parse(Messages.errorGeneral, "Data was not saved correctly."));
             e.printStackTrace();
         }
         return CommandResult.success();

@@ -3,6 +3,7 @@ package net.moddedminecraft.mmctickets.commands.subcommands;
 import com.google.common.collect.Lists;
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Messages;
+import net.moddedminecraft.mmctickets.config.Permissions;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
 import org.spongepowered.api.Sponge;
@@ -19,11 +20,11 @@ import org.spongepowered.api.text.action.TextActions;
 import java.util.ArrayList;
 import java.util.List;
 
-public class readClosed implements CommandExecutor {
+public class readSelf implements CommandExecutor {
 
     private final Main plugin;
 
-    public readClosed(Main plugin) {
+    public readSelf(Main plugin) {
         this.plugin = plugin;
     }
 
@@ -31,9 +32,13 @@ public class readClosed implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
 
-        if (src instanceof Player) {
-            Player player = (Player) src;
+        if (!src.hasPermission(Permissions.COMMAND_TICKET_READ_ALL) || !src.hasPermission(Permissions.COMMAND_TICKET_READ_SELF)) {
+            throw new CommandException(Messages.parse(Messages.errorPermission, Permissions.COMMAND_TICKET_READ_SELF));
         }
+        if (!(src instanceof Player)) {
+            throw new CommandException(Messages.parse(Messages.errorGeneral, "Console users cannot use this command."));
+        }
+        Player player = (Player) src;
 
         if (tickets.isEmpty()) {
             throw new CommandException(Messages.parse(Messages.errorGeneral, "Tickets list is empty."));
@@ -41,25 +46,30 @@ public class readClosed implements CommandExecutor {
             PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
             List<Text> contents = new ArrayList<>();
             for (TicketData ticket : tickets) {
-                if (ticket.getStatus() == 3) {
+                if (ticket.getName().equals(player.getName())) {
                     String online = CommonUtil.isUserOnline(ticket.getName());
                     Text.Builder send = Text.builder();
-                    send.append(plugin.fromLegacy("&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
+                    String status = "";
+                    if (ticket.getStatus() == 0) status = "&aOpen &e- ";
+                    if (ticket.getStatus() == 2) status = "&6Held &e- ";
+                    if (ticket.getStatus() == 3) status = "&cClosed &e- ";
+                    send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                     send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                     send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
                     contents.add(send.build());
+
                 }
             }
 
             if (contents.isEmpty()) {
-                contents.add(Messages.parse(Messages.ticketReadNoneClosed));
+                contents.add(Messages.parse(Messages.ticketReadNoneHeld));
             }
             paginationService.builder()
-                    .title(plugin.fromLegacy("&6Closed Tickets"))
+                    .title(plugin.fromLegacy("&6Your Tickets"))
                     .contents(Lists.reverse(contents))
                     .padding(Text.of("-"))
                     .sendTo(src);
-            return CommandResult.success();
         }
+        return CommandResult.success();
     }
 }
