@@ -2,6 +2,7 @@ package net.moddedminecraft.mmctickets;
 
 import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.config.Permissions;
+import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -23,10 +24,33 @@ public class EventListener {
 
     @Listener
     public void onPlayerLogin(ClientConnectionEvent.Join event, @Root Player player) {
+        //TODO Add check for plugin version on login
 
+        //Save the players data as they login for the first time, If the player already exists, Check if they have changed their name.
+        if (!plugin.playersData.containsKey(player.getUniqueId())) {
+            plugin.addPlayerData(new PlayerData(player.getUniqueId(), player.getName(), 0));
+            try {
+                plugin.saveData();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
+            for (PlayerData pData : playerData) {
+                if (pData.getPlayerUUID().equals(player.getUniqueId()) && !pData.getPlayerName().equals(player.getName())) {
+                    pData.setPlayerName(player.getName());
+                    try {
+                        plugin.saveData();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        //Notify a player if a ticket they created was closed while they were offline
         if (plugin.getNotifications().contains(player.getName())) {
             final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
-
             int totalTickets = 0;
             for (TicketData ticket : tickets) {
                 if (ticket.getName().equals(player.getName()) && ticket.getNotified() == 0) {
@@ -34,15 +58,12 @@ public class EventListener {
                     ticket.setNotified(1);
                 }
             }
-
             try {
                 plugin.saveData();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
             plugin.getNotifications().removeAll(Collections.singleton(player.getName()));
-
             final int finalTotalTickets = totalTickets;
             Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
                 public void run() {
@@ -53,9 +74,9 @@ public class EventListener {
                     }
                 }
             }).delay(5, TimeUnit.SECONDS).name("mmctickets-s-sendUserNotifications").submit(this.plugin);
-
         }
 
+        //Notify staff of the current open tickets when they login
         if (player.hasPermission(Permissions.STAFF)) {
             final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
             int openTickets = 0;
@@ -80,8 +101,5 @@ public class EventListener {
                 }
             }).delay(3, TimeUnit.SECONDS).name("mmctickets-s-sendStaffNotifications").submit(this.plugin);
         }
-        //TODO Add login notification for staff
-
-        //TODO Add login notification for users for when the ticket has been closed while offline
     }
 }

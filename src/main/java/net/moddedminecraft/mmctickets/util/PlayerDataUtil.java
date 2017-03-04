@@ -24,4 +24,12 @@ public class PlayerDataUtil {
     public int getBannedStatus() {
         return bannedStatus;
     }
+
+    public void setBannedStatus(int bannedStatus) {
+        this.bannedStatus = bannedStatus;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
 }

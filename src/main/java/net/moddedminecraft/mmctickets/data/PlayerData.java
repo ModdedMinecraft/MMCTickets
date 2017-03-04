@@ -21,7 +21,10 @@ public class PlayerData extends PlayerDataUtil {
 
         @Override
         public PlayerData deserialize(TypeToken<?> token, ConfigurationNode node) throws ObjectMappingException {
-            return new PlayerData(UUID.fromString(node.getNode("uuid").getString()), node.getNode("name").getString(), node.getNode("bannedstatus").getInt());
+            return new PlayerData(
+                    UUID.fromString(node.getNode("uuid").getString()),
+                    node.getNode("name").getString(),
+                    node.getNode("bannedstatus").getInt());
         }
 
         @Override

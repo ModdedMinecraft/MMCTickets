@@ -38,45 +38,53 @@ public class close implements CommandExecutor {
 
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
 
-
         if (tickets.isEmpty()) {
             throw new CommandException(Messages.parse(Messages.errorGeneral, "Tickets list is empty."));
         } else {
+            boolean ticketExist = false;
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
-                    if (ticket.getStatus() == 3) {
-                        throw new CommandException(Messages.parse(Messages.errorTicketStatus));
-                    } else {
-                        if (ticket.getStatus() == 1 && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
-                            throw new CommandException(Messages.parse(Messages.errorTicketClaim, ticket.getTicketID(), ticket.getStaffName()));
-                        }
-                        if (commentOP.isPresent()) {
-                            String comment = commentOP.get();
-                            plugin.getTicket(ticketID).setComment(comment);
-                        }
-                        plugin.getTicket(ticketID).setStatus(3);
-                        ticket.setStaffName(src.getName());
-
-                        CommonUtil.notifyOnlineStaff(Messages.parse(Messages.ticketClose, ticketID, src.getName()));
-                        Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getName());
-                        if (ticketPlayerOP.isPresent()) {
-                            Player ticketPlayer = ticketPlayerOP.get();
-                            ticketPlayer.sendMessage(Messages.parse(Messages.ticketCloseUser, ticket.getTicketID(), src.getName()));
-                            ticket.setNotified(1);
-                        } else {
-
-                        }
-
-                        try {
-                            plugin.saveData();
-                        } catch (Exception e) {
-                            src.sendMessage(Messages.parse(Messages.errorGeneral, "Unable to close ticket"));
-                            e.printStackTrace();
-                        }
-
-                        //TODO Set inform for player if offline
+                    if (ticket.getName().equals(src.getName()) && !src.hasPermission(Permissions.COMMAND_TICKET_CLOSE_SELF)) {
+                        throw new CommandException(Messages.parse(Messages.errorPermission, Permissions.COMMAND_TICKET_CLOSE_SELF));
                     }
+                    if (!ticket.getName().equals(src.getName()) && !src.hasPermission(Permissions.COMMAND_TICKET_CLOSE_ALL)) {
+                        throw new CommandException(Messages.parse(Messages.errorTicketOwner));
+                    }
+                    if (ticket.getStatus() == 3) {
+                        throw new CommandException(Messages.parse(Messages.errorTicketAlreadyClosed));
+                    }
+                    if (ticket.getStatus() == 1 && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
+                        throw new CommandException(Messages.parse(Messages.errorTicketClaim, ticket.getTicketID(), ticket.getStaffName()));
+                    }
+                    if (commentOP.isPresent()) {
+                        String comment = commentOP.get();
+                        plugin.getTicket(ticketID).setComment(comment);
+                    }
+                    plugin.getTicket(ticketID).setStatus(3);
+                    ticket.setStaffName(src.getName());
+
+                    CommonUtil.notifyOnlineStaff(Messages.parse(Messages.ticketClose, ticketID, src.getName()));
+                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getName());
+                    if (ticketPlayerOP.isPresent()) {
+                        Player ticketPlayer = ticketPlayerOP.get();
+                        ticketPlayer.sendMessage(Messages.parse(Messages.ticketCloseUser, ticket.getTicketID(), src.getName()));
+                        ticket.setNotified(1);
+                    } else {
+                        plugin.getNotifications().add(ticketPlayerOP.get().getName());
+                    }
+                    ticketExist = true;
+
+                    try {
+                        plugin.saveData();
+                    } catch (Exception e) {
+                        src.sendMessage(Messages.parse(Messages.errorGeneral, "Unable to close ticket"));
+                        e.printStackTrace();
+                    }
+
                 }
+            }
+            if (!ticketExist) {
+                throw new CommandException(Messages.parse(Messages.ticketNotExist));
             }
             return CommandResult.success();
         }

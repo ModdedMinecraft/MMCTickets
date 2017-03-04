@@ -56,14 +56,14 @@ public class Main {
 
     private static SimpleDateFormat sdf = new SimpleDateFormat("MMM.dd kk:mm z");
 
-    private Config config;
-    private Messages messages;
+    public Config config;
+    public Messages messages;
 
     private CommandManager cmdManager = Sponge.getCommandManager();
 
     private ArrayList<String> notifications;
     private Map<Integer, TicketData> tickets;
-    private Map<UUID, PlayerData> playersData;
+    public Map<UUID, PlayerData> playersData;
 
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
@@ -83,6 +83,7 @@ public class Main {
         logger.info("MMCTickets Loaded");
         logger.info("Tickets loaded: " + tickets.size());
         logger.info("Notifications loaded: " + notifications.size());
+        logger.info("PlayerData loaded: " + playersData.size());
     }
 
     @Listener
@@ -146,13 +147,39 @@ public class Main {
                 .permission(Permissions.COMMAND_TICKET_OPEN)
                 .build();
 
+        // /ticket ban (username)
+        CommandSpec ticketBan = CommandSpec.builder()
+                .description(Text.of("Ban a player from being able to create new tickets"))
+                .executor(new ban(this))
+                .arguments(GenericArguments.player(Text.of("playername")))
+                .permission(Permissions.COMMAND_TICKET_BAN)
+                .build();
+
+        // /ticket unban (username)
+        CommandSpec ticketUnban = CommandSpec.builder()
+                .description(Text.of("Unban a player from being able to create new tickets"))
+                .executor(new unban(this))
+                .arguments(GenericArguments.player(Text.of("playername")))
+                .permission(Permissions.COMMAND_TICKET_BAN)
+                .build();
+
+        // /ticket reload
+        CommandSpec ticketReload = CommandSpec.builder()
+                .description(Text.of("Reload ticket and player data."))
+                .executor(new reload(this))
+                .permission(Permissions.COMMAND_RELOAD)
+                .build();
+
         // /ticket
         CommandSpec ticketBase = CommandSpec.builder()
                 .description(Text.of("Ticket base command, Displays help"))
                 .executor(new ticket(this))
                 .child(ticketOpen, "open")
                 .child(ticketRead, "read", "check")
-                .child(ticketClose, "close")
+                .child(ticketClose, "close", "complete")
+                .child(ticketBan, "ban")
+                .child(ticketUnban, "unban")
+                .child(ticketReload, "reloaddata", "reload")
                 .build();
 
         cmdManager.register(this, ticketOpen, "modreq");
@@ -166,7 +193,7 @@ public class Main {
     }
 
     synchronized public void loadData() throws IOException, ObjectMappingException {
-        HoconConfigurationLoader loader = getDataLoader();
+        HoconConfigurationLoader loader = getTicketDataLoader();
         ConfigurationNode rootNode = loader.load();
 
         List<TicketData> ticketList = rootNode.getNode("Tickets").getList(TypeToken.of(TicketData.class));
@@ -177,7 +204,10 @@ public class Main {
             if (ticket.getNotified() == 0 && ticket.getStatus() == 3) this.notifications.add(ticket.getName());
         }
 
-        List<PlayerData> playersDataList = rootNode.getNode("PlayersData").getList(TypeToken.of(PlayerData.class));
+        HoconConfigurationLoader playerloader = getPlayerDataLoader();
+        ConfigurationNode playerrootNode = playerloader.load();
+
+        List<PlayerData> playersDataList = playerrootNode.getNode("PlayersData").getList(TypeToken.of(PlayerData.class));
         this.playersData = new HashMap<UUID, PlayerData>();
         for (PlayerData pd : playersDataList) {
             this.playersData.put(pd.getPlayerUUID(), pd);
@@ -185,17 +215,26 @@ public class Main {
     }
 
     synchronized public void saveData() throws IOException, ObjectMappingException {
-        HoconConfigurationLoader loader = getDataLoader();
+        HoconConfigurationLoader loader = getTicketDataLoader();
         ConfigurationNode rootNode = loader.load();
 
         rootNode.getNode("Tickets").setValue(TicketSerializer.token, new ArrayList<TicketData>(this.tickets.values()));
-        rootNode.getNode("PlayersData").setValue(PlayerDataSerializer.token, new ArrayList<PlayerData>(this.playersData.values()));
-
         loader.save(rootNode);
+
+        HoconConfigurationLoader playerloader = getPlayerDataLoader();
+        ConfigurationNode playerrootNode = playerloader.load();
+
+        playerrootNode.getNode("PlayersData").setValue(PlayerDataSerializer.token, new ArrayList<PlayerData>(this.playersData.values()));
+        playerloader.save(playerrootNode);
+
     }
 
-    public HoconConfigurationLoader getDataLoader() {
+    public HoconConfigurationLoader getTicketDataLoader() {
         return HoconConfigurationLoader.builder().setPath(this.ConfigDir.resolve("TicketData.conf")).build();
+    }
+
+    public HoconConfigurationLoader getPlayerDataLoader() {
+        return HoconConfigurationLoader.builder().setPath(this.ConfigDir.resolve("PlayerData.conf")).build();
     }
 
     public TicketData getTicket(int ticketID) {
@@ -206,16 +245,21 @@ public class Main {
         return Collections.unmodifiableCollection(this.tickets.values());
     }
 
+    public Collection<PlayerData> getPlayerData() {
+        return Collections.unmodifiableCollection(this.playersData.values());
+    }
+
     public ArrayList<String> getNotifications() {
         return this.notifications;
     }
 
-    public void removeNotification(String name) {
-        this.notifications.remove(name);
-    }
 
     public TicketData addTicket(TicketData ticket) {
         return this.tickets.put(ticket.getTicketID(), ticket);
+    }
+
+    public PlayerData addPlayerData(PlayerData pData) {
+        return this.playersData.put(pData.getPlayerUUID(), pData);
     }
 
     public Text fromLegacy(String legacy) {

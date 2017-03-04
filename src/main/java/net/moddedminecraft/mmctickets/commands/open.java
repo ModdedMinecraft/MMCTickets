@@ -3,6 +3,7 @@ package net.moddedminecraft.mmctickets.commands;
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Config;
 import net.moddedminecraft.mmctickets.config.Messages;
+import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
 import org.spongepowered.api.command.CommandException;
@@ -11,6 +12,9 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class open implements CommandExecutor {
 
@@ -32,6 +36,12 @@ public class open implements CommandExecutor {
             throw new CommandException(Messages.parse(Messages.errorGeneral, "Only players can run this command"));
         }
 
+        final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
+        for (PlayerData pData : playerData) {
+            if (pData.getPlayerName().equals(src.getName()) && pData.getBannedStatus() == 1) {
+                throw new CommandException(Messages.parse(Messages.errorBanned));
+            }
+        }
         Player player = (Player) src;
         int ticketID = plugin.getTickets().size() + 1;
 

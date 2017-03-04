@@ -34,14 +34,17 @@ public class ticket implements CommandExecutor {
         List<Text> contents = new ArrayList<>();
         if (sender.hasPermission(Permissions.COMMAND_STAFFLIST)) contents.add(formatHelp("/stafflist", "Display a list of online staff members."));
         if (sender.hasPermission(Permissions.COMMAND_TICKET_OPEN)) contents.add(formatHelp("/ticket", "open [reason for opening]", "Open a ticket."));
-        if (sender.hasPermission(Permissions.COMMAND_TICKET_CLOSE_ALL) || sender.hasPermission(Permissions.COMMAND_TICKET_CLOSE_SELF)) contents.add(formatHelp("/ticket", "close [ticketID]", "Close an open ticket."));
+        if (sender.hasPermission(Permissions.COMMAND_TICKET_CLOSE_ALL) || sender.hasPermission(Permissions.COMMAND_TICKET_CLOSE_SELF)) contents.add(formatHelp("/ticket", "close [ticketID] (comment)", "Close an open ticket."));
         if (sender.hasPermission(Permissions.COMMAND_TICKET_ASSIGN)) contents.add(formatHelp("/ticket", "assign [ticketID] [user]", "Assign an open ticket to a specified user."));
         if (sender.hasPermission(Permissions.COMMAND_TICKET_HOLD)) contents.add(formatHelp("/ticket", "hold [ticketID]", "Put an open ticket on hold."));
-        if (sender.hasPermission(Permissions.COMMAND_TICKET_READ_ALL) || sender.hasPermission(Permissions.COMMAND_TICKET_READ_SELF)) contents.add(formatHelp("/ticket", "check (ticketID)", "Display a list of open TicketData / Give more detail of a ticketID."));
+        if (sender.hasPermission(Permissions.COMMAND_TICKET_READ_ALL) || sender.hasPermission(Permissions.COMMAND_TICKET_READ_SELF)) contents.add(formatHelp("/ticket", "check (ticketID)", "Display a list of open tickets / Give more detail of a ticketID."));
         if (sender.hasPermission(Permissions.COMMAND_TICKET_REOPEN)) contents.add(formatHelp("/ticket", "reopen", "Reopen's a closed ticket."));
         if (sender.hasPermission(Permissions.COMMAND_TICKET_TELEPORT)) contents.add(formatHelp("/ticket", "tp [ticketID]", "Teleport to where a ticket was created."));
         if (sender.hasPermission(Permissions.COMMAND_TICKET_CLAIM)) contents.add(formatHelp("/ticket", "claim [ticketID]", "Claim an open ticket to let people know you are working on it."));
         if (sender.hasPermission(Permissions.COMMAND_TICKET_UNCLAIM)) contents.add(formatHelp("/ticket", "unclaim [ticketID]", "Unclaim a claimed ticket"));
+        if (sender.hasPermission(Permissions.COMMAND_TICKET_BAN)) contents.add(formatHelp("/ticket", "ban [playername]", "Ban a player from opening new tickets"));
+        if (sender.hasPermission(Permissions.COMMAND_TICKET_BAN)) contents.add(formatHelp("/ticket", "unban [playername]", "Unban a player from opening new tickets"));
+        if (sender.hasPermission(Permissions.COMMAND_RELOAD)) contents.add(formatHelp("/ticket", "reload", "Reload ticket and player data."));
 
 
         if (!contents.isEmpty()) {

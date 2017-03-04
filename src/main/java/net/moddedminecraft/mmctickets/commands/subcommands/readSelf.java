@@ -32,7 +32,7 @@ public class readSelf implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
 
-        if (!src.hasPermission(Permissions.COMMAND_TICKET_READ_ALL) || !src.hasPermission(Permissions.COMMAND_TICKET_READ_SELF)) {
+        if (!src.hasPermission(Permissions.COMMAND_TICKET_READ_SELF)) {
             throw new CommandException(Messages.parse(Messages.errorPermission, Permissions.COMMAND_TICKET_READ_SELF));
         }
         if (!(src instanceof Player)) {

@@ -83,7 +83,7 @@ public class read implements CommandExecutor {
                     for (TicketData ticket : tickets) {
                         if (ticket.getTicketID() == ticketID) {
                             if (!ticket.getName().equals(src.getName()) && !src.hasPermission(Permissions.COMMAND_TICKET_READ_ALL)) {
-                                throw new CommandException(Messages.parse(Messages.errorTicketPermission, Permissions.COMMAND_TICKET_READ_ALL, ticket.getTicketID()));
+                                throw new CommandException(Messages.parse(Messages.errorTicketOwner));
                             }
                             ticketStatus = CommonUtil.getTicketStatusColour(ticket.getStatus());
                             String online = CommonUtil.isUserOnline(ticket.getName());

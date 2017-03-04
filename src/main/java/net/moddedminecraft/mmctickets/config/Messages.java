@@ -32,20 +32,22 @@ public class Messages {
     public static String chatprefix = "&f[&6MMCTickets&f] ";
 
     //errors
-    public static String errorGeneral = "&4An error occurred. {0}";
+    public static String errorGeneral = "&cAn error occurred. {0}";
     public static String errorIncorrectUsage = "&cIncorrect Usage: {0}";
-    public static String errorBanned = "&4You are not allowed to open new ticket.";
-    public static String errorBanUser = "&4Cannot ban {0} from opening new ticket.";
-    public static String errorUnbanUser = "&4Cannot unban {0} from opening new ticket.";
+    public static String errorBanned = "&cYou are not allowed to open new ticket.";
+    public static String errorBannedAlready = "&c{0} is already banned from opening tickets.";
+    public static String errorBanUser = "&cCannot ban {0} from opening new ticket.";
+    public static String errorUnbanUser = "&cCannot unban {0} from opening new ticket.";
+    public static String errorNotBanned = "&c{0} is not banned from opening tickets.";
     public static String errorPermission = "&eYou need permission \"{0}\" to do that.";
-    public static String errorTicketPermission = "&eYou need permission\"{0}\" to view ticket #{1}.";
-    public static String errorTicketStatus = "&4Unable to set ticket status. Check that the status of the ticket does not collide.";
-    public static String errorTicketNotClosed = "&4Ticket #{0} is not closed or on hold.";
-    public static String errorTicketNan = "&4Ticket ID must be a number, provided: &e{0}";
-    public static String errorTicketOwner = "&4You are not the owner of that ticket.";
-    public static String errorTicketClaim = "&4Ticket #{0} is already claimed by {1}.";
-    public static String errorUserNotExist = "&4The specified user {0} does not exist or contains invalid characters.";
-    public static String errorUserNotSpecified = "&4Please specify a player.";
+    public static String errorTicketStatus = "&cUnable to set ticket status. Check that the status of the ticket does not collide.";
+    public static String errorTicketAlreadyClosed = "&cTicket is already closed.";
+    public static String errorTicketNotClosed = "&cTicket #{0} is not closed or on hold.";
+    public static String errorTicketNan = "&cTicket ID must be a number, provided: &e{0}";
+    public static String errorTicketOwner = "&cYou are not the owner of that ticket.";
+    public static String errorTicketClaim = "&cTicket #{0} is already claimed by {1}.";
+    public static String errorUserNotExist = "&cThe specified user {0} does not exist or contains invalid characters.";
+    public static String errorUserNotSpecified = "&cPlease specify a player.";
 
     //teleport
     public static String teleportToTicket = "&9Teleported to ticket #{0}.";
@@ -63,7 +65,7 @@ public class Messages {
     public static String ticketCloseOfflineMulti = "&6While you were gone, {0} tickets were closed. Use /{1} to see your currently open tickets.";
     public static String ticketCloseText = "&6Ticket text: &e{0}";
     public static String ticketCloseUser = "&6Ticket #{0} has been closed by {1}.";
-    public static String ticketDuplicate = "&4Your ticket has not been opened because it was detected as a duplicate.";
+    public static String ticketDuplicate = "&cYour ticket has not been opened because it was detected as a duplicate.";
     public static String ticketOpen = "&aA new ticket has been opened by {0}, id assigned #{1}.";
     public static String ticketOpenUser = "&6You opened a ticket, it has been assigned ID #{0}. A staff member should be with you soon.";
     public static String ticketTitleNotification = "A new ticket has been opened by {0}, id assigned #{1}.";
@@ -79,13 +81,13 @@ public class Messages {
     public static String ticketUnresolvedHeld = "&aThere are {0} open tickets and {1} ticket on hold. Type /{2} to see them.";
     public static String ticketUnclaim = "&6{0} is no longer handling ticket #{1}.";
     public static String ticketUnclaimUser = "&6{0} is no longer handling your ticket #{1}.";
-    public static String ticketNotExist = "&4Ticket #{0} does not exist.";
-    public static String ticketNotClaimed = "&4Ticket #{0} is not claimed.";
-    public static String ticketNotOpen = "&4The ticket #{0} is not open.";
+    public static String ticketNotExist = "&cTicket #{0} does not exist.";
+    public static String ticketNotClaimed = "&cTicket #{0} is not claimed.";
+    public static String ticketNotOpen = "&cThe ticket #{0} is not open.";
     public static String ticketReopen = "&6{0} has reopened ticket #{1}";
-    public static String ticketTooShort = "&4Your ticket needs to contain at least {0} words.";
-    public static String ticketTooMany = "&4You have too many open tickets, please wait before opening more.";
-    public static String ticketTooFast = "&4You need to wait {0} seconds before attempting to open another ticket.";
+    public static String ticketTooShort = "&cYour ticket needs to contain at least {0} words.";
+    public static String ticketTooMany = "&cYou have too many open tickets, please wait before opening more.";
+    public static String ticketTooFast = "&cYou need to wait {0} seconds before attempting to open another ticket.";
 
     //staff
     public static String staffListSeperator = "&e, ";
@@ -102,10 +104,13 @@ public class Messages {
         errorGeneral = check(messages.getNode("error", "general"), errorGeneral).getString();
         errorIncorrectUsage = check(messages.getNode("error", "general"), errorIncorrectUsage).getString();
         errorBanned = check(messages.getNode("error", "banned"), errorBanned).getString();
+        errorBannedAlready = check(messages.getNode("error", "banned-already"), errorBannedAlready).getString();
         errorBanUser = check(messages.getNode("error", "ban-user"), errorBanUser).getString();
         errorUnbanUser = check(messages.getNode("error", "unban-user"), errorUnbanUser).getString();
+        errorNotBanned = check(messages.getNode("error", "not-banned"), errorNotBanned).getString();
         errorPermission = check(messages.getNode("error", "permission"), errorPermission).getString();
         errorTicketStatus = check(messages.getNode("error", "ticket-status"), errorTicketStatus).getString();
+        errorTicketAlreadyClosed = check(messages.getNode("error", "ticket-already-closed"), errorTicketAlreadyClosed).getString();
         errorTicketNotClosed = check(messages.getNode("error", "ticket-not-closed"), errorTicketNotClosed).getString();
         errorTicketNan = check(messages.getNode("error", "ticket-nan"), errorTicketNan).getString();
         errorTicketOwner = check(messages.getNode("error", "ticket-owner"), errorTicketOwner).getString();
@@ -160,7 +165,7 @@ public class Messages {
         staffListPadding = check(messages.getNode("staff", "list-padding"), staffListPadding).getString();
 
         //plugin
-        //pluginOutdated = check(messages.getNode("plugin", "outdated"), "&4You are not running the latest recommended build! Recommended build is: &6{0}").getString();
+        //pluginOutdated = check(messages.getNode("plugin", "outdated"), "&cYou are not running the latest recommended build! Recommended build is: &6{0}").getString();
 
         messageLoader.save(messages);
 
