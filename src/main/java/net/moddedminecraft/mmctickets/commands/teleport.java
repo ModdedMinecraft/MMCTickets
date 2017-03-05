@@ -32,12 +32,12 @@ public class teleport implements CommandExecutor {
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
 
         if (!(src instanceof Player)) {
-            throw new CommandException(Messages.parse(Messages.errorGeneral, "Only players can use this command"));
+            throw new CommandException(Messages.getErrorGen("Only players can use this command"));
         }
         Player player = (Player) src;
 
         if (tickets.isEmpty()) {
-            throw new CommandException(Messages.parse(Messages.errorGeneral, "Tickets list is empty."));
+            throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
         } else {
             boolean ticketExist = false;
             for (TicketData ticket : tickets) {
@@ -47,11 +47,11 @@ public class teleport implements CommandExecutor {
                     Location loc = new Location(world, ticket.getX(), ticket.getY(), ticket.getZ());
                     Vector3d vect = new Vector3d(ticket.getPitch(), ticket.getYaw(), 0);
                     player.setLocationAndRotation(loc, vect);
-                    player.sendMessage(Messages.parse(Messages.teleportToTicket, ticketID));
+                    player.sendMessage(Messages.getTeleportToTicket(ticketID));
                 }
             }
             if (!ticketExist) {
-                throw new CommandException(Messages.parse(Messages.ticketNotExist, ticketID));
+                throw new CommandException(Messages.getTicketNotExist(ticketID));
             }
             return CommandResult.success();
         }

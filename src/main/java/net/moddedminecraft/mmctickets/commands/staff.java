@@ -2,6 +2,7 @@ package net.moddedminecraft.mmctickets.commands;
 
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Messages;
+import net.moddedminecraft.mmctickets.config.Permissions;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -26,10 +27,10 @@ public class staff implements CommandExecutor {
         PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
         List<Text> staffList = new ArrayList<>();
         StringBuilder staff = new StringBuilder();
-        String separator = Messages.staffListSeperator;
+        String separator = Messages.getStaffListSeperator();
 
         for(Player player : Sponge.getServer().getOnlinePlayers()) {
-            if(player.hasPermission("mmctickets.staff")) {
+            if(player.hasPermission(Permissions.STAFF)) {
                 staff.append("&e" +player.getName());
                 staff.append(separator);
             }
@@ -39,13 +40,13 @@ public class staff implements CommandExecutor {
         staffList.add(plugin.fromLegacy(staffString));
 
         if(staffList.isEmpty()) {
-            staffList.add(Messages.parse(Messages.staffListEmpty));
+            staffList.add(Messages.getStaffListEmpty());
         }
 
         paginationService.builder()
-                .title(Messages.parse(Messages.staffListTitle))
+                .title(Messages.getStaffListTitle())
                 .contents(staffList)
-                .padding(Text.of(Messages.staffListPadding))
+                .padding(Messages.getStaffListPadding())
                 .sendTo(src);
         return CommandResult.success();
     }

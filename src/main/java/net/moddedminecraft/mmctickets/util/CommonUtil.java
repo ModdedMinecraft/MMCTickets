@@ -1,6 +1,7 @@
 package net.moddedminecraft.mmctickets.util;
 
 
+import net.moddedminecraft.mmctickets.config.Permissions;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -68,7 +69,7 @@ public class CommonUtil {
 
     public static void notifyOnlineStaff(Text message) {
         for(Player player : Sponge.getServer().getOnlinePlayers()){
-            if(player.hasPermission("mmctickets.staff")) {
+            if(player.hasPermission(Permissions.STAFF)) {
                 player.sendMessage(message);
             }
         }
@@ -76,7 +77,7 @@ public class CommonUtil {
 
     public static void notifyOnlineStaffTitle(Text message) {
         for(Player player : Sponge.getServer().getOnlinePlayers()){
-            if(player.hasPermission("mmctickets.staff")) {
+            if(player.hasPermission(Permissions.STAFF)) {
                 player.sendTitle(Title.builder().subtitle(message).fadeIn(20).fadeOut(20).stay(40).build());
             }
         }
@@ -84,7 +85,7 @@ public class CommonUtil {
 
     public static void notifyOnlineStaffSound() {
         for (Player player : Sponge.getServer().getOnlinePlayers()) {
-            if (player.hasPermission("mmctickets.staff")) {
+            if (player.hasPermission(Permissions.STAFF)) {
                 player.playSound(SoundTypes.BLOCK_NOTE_PLING, player.getLocation().getPosition(), 2);
             }
         }

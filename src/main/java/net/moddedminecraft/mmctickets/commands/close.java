@@ -27,11 +27,6 @@ public class close implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        //TODO
-        // - check for self closing tickets
-        // - check for assigned staff members
-        // -
-        //
 
         final int ticketID = args.<Integer>getOne("ticketID").get();
         final Optional<String> commentOP = args.<String>getOne("comment");
@@ -39,22 +34,21 @@ public class close implements CommandExecutor {
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
 
         if (tickets.isEmpty()) {
-            throw new CommandException(Messages.parse(Messages.errorGeneral, "Tickets list is empty."));
+            throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
         } else {
-            boolean ticketExist = false;
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
                     if (ticket.getName().equals(src.getName()) && !src.hasPermission(Permissions.COMMAND_TICKET_CLOSE_SELF)) {
-                        throw new CommandException(Messages.parse(Messages.errorPermission, Permissions.COMMAND_TICKET_CLOSE_SELF));
+                        throw new CommandException(Messages.getErrorPermission(Permissions.COMMAND_TICKET_CLOSE_SELF));
                     }
                     if (!ticket.getName().equals(src.getName()) && !src.hasPermission(Permissions.COMMAND_TICKET_CLOSE_ALL)) {
-                        throw new CommandException(Messages.parse(Messages.errorTicketOwner));
+                        throw new CommandException(Messages.getErrorTicketOwner());
                     }
                     if (ticket.getStatus() == 3) {
-                        throw new CommandException(Messages.parse(Messages.errorTicketAlreadyClosed));
+                        throw new CommandException(Messages.getErrorTicketAlreadyClosed());
                     }
-                    if (ticket.getStatus() == 1 && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
-                        throw new CommandException(Messages.parse(Messages.errorTicketClaim, ticket.getTicketID(), ticket.getStaffName()));
+                    if (ticket.getStatus() == 1 && !ticket.getStaffName().equals(src.getName()) && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
+                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), ticket.getStaffName()));
                     }
                     if (commentOP.isPresent()) {
                         String comment = commentOP.get();
@@ -63,30 +57,27 @@ public class close implements CommandExecutor {
                     plugin.getTicket(ticketID).setStatus(3);
                     ticket.setStaffName(src.getName());
 
-                    CommonUtil.notifyOnlineStaff(Messages.parse(Messages.ticketClose, ticketID, src.getName()));
+                    CommonUtil.notifyOnlineStaff(Messages.getTicketClose(ticketID, src.getName()));
                     Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getName());
                     if (ticketPlayerOP.isPresent()) {
                         Player ticketPlayer = ticketPlayerOP.get();
-                        ticketPlayer.sendMessage(Messages.parse(Messages.ticketCloseUser, ticket.getTicketID(), src.getName()));
+                        ticketPlayer.sendMessage(Messages.getTicketCloseUser(ticket.getTicketID(), src.getName()));
                         ticket.setNotified(1);
                     } else {
                         plugin.getNotifications().add(ticketPlayerOP.get().getName());
                     }
-                    ticketExist = true;
 
                     try {
                         plugin.saveData();
                     } catch (Exception e) {
-                        src.sendMessage(Messages.parse(Messages.errorGeneral, "Unable to close ticket"));
+                        src.sendMessage(Messages.getErrorGen("Unable to close ticket"));
                         e.printStackTrace();
                     }
+                    return CommandResult.success();
 
                 }
             }
-            if (!ticketExist) {
-                throw new CommandException(Messages.parse(Messages.ticketNotExist));
-            }
-            return CommandResult.success();
+            throw new CommandException(Messages.getTicketNotExist(ticketID));
         }
     }
 }

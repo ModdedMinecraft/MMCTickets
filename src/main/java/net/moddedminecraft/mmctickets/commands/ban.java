@@ -26,25 +26,21 @@ public class ban implements CommandExecutor {
         final Player player = args.<Player>getOne("playername").get();
         final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
 
-        boolean playerExists = false;
         for (PlayerData pData : playerData) {
             if (pData.getPlayerUUID().equals(player.getUniqueId())) {
                 if (pData.getBannedStatus() == 1) {
-                    throw new CommandException(Messages.parse(Messages.errorBannedAlready));
+                    throw new CommandException(Messages.getErrorBannedAlready(player.getName()));
                 }
                 pData.setBannedStatus(1);
-                playerExists = true;
                 try {
                     plugin.saveData();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new CommandException(Messages.parse(Messages.errorBanUser, player.getName()));
+                    throw new CommandException(Messages.getErrorBanUser(player.getName()));
                 }
+                return CommandResult.success();
             }
         }
-        if (!playerExists) {
-            throw new CommandException(Messages.parse(Messages.errorUserNotExist));
-        }
-        return CommandResult.success();
+        throw new CommandException(Messages.getErrorUserNotExist(player.getName()));
     }
 }

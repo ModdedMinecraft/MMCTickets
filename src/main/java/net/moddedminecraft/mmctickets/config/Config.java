@@ -22,8 +22,6 @@ public class Config {
         configCheck();
     }
 
-    public static String chatPrefix = "&f[&6MMCTickets&f] ";
-
     public static Boolean soundNotification;
     public static Boolean staffNotification;
     public static Boolean titleNotification;
@@ -37,6 +35,8 @@ public class Config {
     public static int ticketsPerPage;
     public static int nagTimer;
     public static Boolean nagHeld;
+
+    public static Boolean checkForUpdate;
 
 
 
@@ -60,6 +60,8 @@ public class Config {
         ticketsPerPage = check(config.getNode("ticket", "user", "tickets-per-page"), 5, "This sets the total amount of TicketData that should be shown on each page.").getInt();
         nagTimer = check(config.getNode("ticket", "user", "nag"), 5, "If above 0 (minutes), nag the online staff members about open TicketData.").getInt();
         nagHeld = check(config.getNode("ticket", "user", "nag-held"), true, "If true, the nag feature will mention TicketData on hold. ").getBoolean();
+
+        checkForUpdate = check(config.getNode("update", "check"), true, "If true, will notify at startup and if a player with "+Permissions.STAFF+" logs in, if there is an update available.").getBoolean();
 
         loader.save(config);
 

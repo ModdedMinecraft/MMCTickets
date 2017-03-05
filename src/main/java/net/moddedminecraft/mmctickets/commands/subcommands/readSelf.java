@@ -33,15 +33,15 @@ public class readSelf implements CommandExecutor {
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
 
         if (!src.hasPermission(Permissions.COMMAND_TICKET_READ_SELF)) {
-            throw new CommandException(Messages.parse(Messages.errorPermission, Permissions.COMMAND_TICKET_READ_SELF));
+            throw new CommandException(Messages.getErrorPermission(Permissions.COMMAND_TICKET_READ_SELF));
         }
         if (!(src instanceof Player)) {
-            throw new CommandException(Messages.parse(Messages.errorGeneral, "Console users cannot use this command."));
+            throw new CommandException(Messages.getErrorGen("Console users cannot use this command."));
         }
         Player player = (Player) src;
 
         if (tickets.isEmpty()) {
-            throw new CommandException(Messages.parse(Messages.errorGeneral, "Tickets list is empty."));
+            throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
         } else {
             PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
             List<Text> contents = new ArrayList<>();
@@ -62,7 +62,7 @@ public class readSelf implements CommandExecutor {
             }
 
             if (contents.isEmpty()) {
-                contents.add(Messages.parse(Messages.ticketReadNoneHeld));
+                contents.add(Messages.getTicketReadNoneSelf());
             }
             paginationService.builder()
                     .title(plugin.fromLegacy("&6Your Tickets"))

@@ -36,7 +36,7 @@ public class readClosed implements CommandExecutor {
         }
 
         if (tickets.isEmpty()) {
-            throw new CommandException(Messages.parse(Messages.errorGeneral, "Tickets list is empty."));
+            throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
         } else {
             PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
             List<Text> contents = new ArrayList<>();
@@ -52,7 +52,7 @@ public class readClosed implements CommandExecutor {
             }
 
             if (contents.isEmpty()) {
-                contents.add(Messages.parse(Messages.ticketReadNoneClosed));
+                contents.add(Messages.getTicketReadNoneClosed());
             }
             paginationService.builder()
                     .title(plugin.fromLegacy("&6Closed Tickets"))

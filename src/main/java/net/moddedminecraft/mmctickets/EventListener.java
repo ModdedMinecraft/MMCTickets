@@ -24,8 +24,6 @@ public class EventListener {
 
     @Listener
     public void onPlayerLogin(ClientConnectionEvent.Join event, @Root Player player) {
-        //TODO Add check for plugin version on login
-
         //Save the players data as they login for the first time, If the player already exists, Check if they have changed their name.
         if (!plugin.playersData.containsKey(player.getUniqueId())) {
             plugin.addPlayerData(new PlayerData(player.getUniqueId(), player.getName(), 0));
@@ -68,9 +66,9 @@ public class EventListener {
             Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
                 public void run() {
                     if (finalTotalTickets < 2) {
-                        player.sendMessage(Messages.parse(Messages.ticketCloseOffline));
+                        player.sendMessage(Messages.getTicketCloseOffline());
                     } else {
-                        player.sendMessage(Messages.parse(Messages.ticketCloseOfflineMulti, finalTotalTickets, "check self"));
+                        player.sendMessage(Messages.getTicketCloseOfflineMulti(finalTotalTickets, "check self"));
                     }
                 }
             }).delay(5, TimeUnit.SECONDS).name("mmctickets-s-sendUserNotifications").submit(this.plugin);
@@ -89,17 +87,23 @@ public class EventListener {
             final int finalHeld = heldTickets;
             Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
                 public void run() {
+
                     if (finalOpen == 0) {
-                        player.sendMessage(Messages.parse(Messages.ticketReadNone));
+                        player.sendMessage(Messages.getTicketReadNone());
                     }
                     if (finalOpen > 0 && finalHeld == 0) {
-                        player.sendMessage(Messages.parse(Messages.ticketUnresolved, finalOpen, "check"));
+                        player.sendMessage(Messages.getTicketUnresolved(finalOpen, "check"));
                     }
                     if (finalOpen > 0 && finalHeld > 0) {
-                        player.sendMessage(Messages.parse(Messages.ticketUnresolvedHeld, finalOpen, finalHeld, "check"));
+                        player.sendMessage(Messages.getTicketUnresolvedHeld(finalOpen, finalHeld, "check"));
                     }
                 }
             }).delay(3, TimeUnit.SECONDS).name("mmctickets-s-sendStaffNotifications").submit(this.plugin);
+        }
+
+        //Send update notification to players with permission
+        if (player.hasPermission(Permissions.NOTIFY)) {
+            plugin.updatechecker.startUpdateCheckPlayer(player);
         }
     }
 }

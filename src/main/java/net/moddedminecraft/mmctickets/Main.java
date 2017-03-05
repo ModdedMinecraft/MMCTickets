@@ -13,6 +13,7 @@ import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.PlayerData.PlayerDataSerializer;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.data.TicketData.TicketSerializer;
+import net.moddedminecraft.mmctickets.util.UpdateChecker;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -65,6 +66,9 @@ public class Main {
     private Map<Integer, TicketData> tickets;
     public Map<UUID, PlayerData> playersData;
 
+    public UpdateChecker updatechecker;
+    public String version = "0.1";
+
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
         Sponge.getEventManager().registerListeners(this, new EventListener(this));
@@ -84,6 +88,9 @@ public class Main {
         logger.info("Tickets loaded: " + tickets.size());
         logger.info("Notifications loaded: " + notifications.size());
         logger.info("PlayerData loaded: " + playersData.size());
+
+        updatechecker = new UpdateChecker(this, version);
+        updatechecker.startUpdateCheck();
     }
 
     @Listener
@@ -93,8 +100,6 @@ public class Main {
     }
 
     private void loadCommands() {
-        //TODO Add commands
-
         // /stafflist
         CommandSpec staffList = CommandSpec.builder()
                 .description(Text.of("List online staff members"))
@@ -170,6 +175,47 @@ public class Main {
                 .permission(Permissions.COMMAND_RELOAD)
                 .build();
 
+        // /ticket claim (ticketID)
+        CommandSpec ticketClaim = CommandSpec.builder()
+                .description(Text.of("Claim a ticket"))
+                .executor(new claim(this))
+                .arguments(GenericArguments.integer(Text.of("ticketID")))
+                .permission(Permissions.COMMAND_TICKET_CLAIM)
+                .build();
+
+        // /ticket unclaim (ticketID)
+        CommandSpec ticketUnclaim = CommandSpec.builder()
+                .description(Text.of("Unclaim a ticket"))
+                .executor(new unclaim(this))
+                .arguments(GenericArguments.integer(Text.of("ticketID")))
+                .permission(Permissions.COMMAND_TICKET_UNCLAIM)
+                .build();
+
+        // /ticket reopen (ticketID)
+        CommandSpec ticketReopen = CommandSpec.builder()
+                .description(Text.of("Reopen a ticket"))
+                .executor(new reopen(this))
+                .arguments(GenericArguments.integer(Text.of("ticketID")))
+                .permission(Permissions.COMMAND_TICKET_REOPEN)
+                .build();
+
+        // /ticket assign (ticketID) (player)
+        CommandSpec ticketAssign = CommandSpec.builder()
+                .description(Text.of("Unclaim a ticket"))
+                .executor(new assign(this))
+                .arguments(GenericArguments.integer(Text.of("ticketID")),
+                        GenericArguments.player(Text.of("player")))
+                .permission(Permissions.COMMAND_TICKET_ASSIGN)
+                .build();
+
+        // /ticket hold (ticketID)
+        CommandSpec ticketHold = CommandSpec.builder()
+                .description(Text.of("Put a ticket on hold"))
+                .executor(new hold(this))
+                .arguments(GenericArguments.integer(Text.of("ticketID")))
+                .permission(Permissions.COMMAND_TICKET_HOLD)
+                .build();
+
         // /ticket
         CommandSpec ticketBase = CommandSpec.builder()
                 .description(Text.of("Ticket base command, Displays help"))
@@ -179,7 +225,9 @@ public class Main {
                 .child(ticketClose, "close", "complete")
                 .child(ticketBan, "ban")
                 .child(ticketUnban, "unban")
-                .child(ticketReload, "reloaddata", "reload")
+                .child(ticketReload, "reload")
+                .child(ticketClaim, "claim")
+                .child(ticketUnclaim, "unclaim")
                 .build();
 
         cmdManager.register(this, ticketOpen, "modreq");
@@ -265,4 +313,9 @@ public class Main {
     public Text fromLegacy(String legacy) {
         return TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy);
     }
+
+    public String fromLegacyS(String legacy) {
+        return String.valueOf(TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy));
+    }
+
 }

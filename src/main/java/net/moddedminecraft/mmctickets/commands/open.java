@@ -28,18 +28,39 @@ public class open implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final String message = args.<String>getAll("message").toString();
 
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        int totalTickets = 0;
+        boolean duplicate = false;
+
+        if (!tickets.isEmpty()) {
+            for (TicketData ticket : tickets) {
+                if (ticket.getName().equals(src.getName())) {
+                    totalTickets++;
+                }
+                if (ticket.getMessage().equals(message)) {
+                    duplicate = true;
+                }
+            }
+        }
+
+        if (duplicate) {
+            throw new CommandException(Messages.getTicketDuplicate());
+        }
+        if (totalTickets > Config.maxTickets) {
+            throw new CommandException(Messages.getTicketTooMany());
+        }
         if (message.split("\\s+").length < Config.minWords) {
-            throw new CommandException(Messages.parse(Messages.ticketTooShort, Config.minWords));
+            throw new CommandException(Messages.getTicketTooShort(Config.minWords));
         }
 
         if (!(src instanceof Player)) {
-            throw new CommandException(Messages.parse(Messages.errorGeneral, "Only players can run this command"));
+            throw new CommandException(Messages.getErrorGen("Only players can run this command"));
         }
 
         final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
         for (PlayerData pData : playerData) {
             if (pData.getPlayerName().equals(src.getName()) && pData.getBannedStatus() == 1) {
-                throw new CommandException(Messages.parse(Messages.errorBanned));
+                throw new CommandException(Messages.getErrorBanned());
             }
         }
         Player player = (Player) src;
@@ -62,18 +83,18 @@ public class open implements CommandExecutor {
 
         try {
             plugin.saveData();
-            player.sendMessage(Messages.parse(Messages.ticketOpenUser, ticketID));
+            player.sendMessage(Messages.getTicketOpenUser(ticketID));
             if (Config.staffNotification) {
-                CommonUtil.notifyOnlineStaff(Messages.parse(Messages.ticketOpen, player.getName() , ticketID));
+                CommonUtil.notifyOnlineStaff(Messages.getTicketOpen(player.getName() , ticketID));
             }
             if (Config.titleNotification) {
-                CommonUtil.notifyOnlineStaffTitle(Messages.parse(Messages.ticketTitleNotification, player.getName() , ticketID));
+                CommonUtil.notifyOnlineStaffTitle(Messages.getTicketTitleNotification(player.getName() , ticketID));
             }
             if (Config.soundNotification) {
                 CommonUtil.notifyOnlineStaffSound();
             }
         } catch (Exception e) {
-            player.sendMessage(Messages.parse(Messages.errorGeneral, "Data was not saved correctly."));
+            player.sendMessage(Messages.getErrorGen("Data was not saved correctly."));
             e.printStackTrace();
         }
         return CommandResult.success();

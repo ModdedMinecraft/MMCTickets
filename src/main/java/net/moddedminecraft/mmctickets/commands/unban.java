@@ -26,25 +26,21 @@ public class unban implements CommandExecutor {
         final Player player = args.<Player>getOne("playername").get();
         final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
 
-        boolean playerExists = false;
         for (PlayerData pData : playerData) {
             if (pData.getPlayerUUID().equals(player.getUniqueId())) {
                 if (pData.getBannedStatus() == 0) {
-                    throw new CommandException(Messages.parse(Messages.errorNotBanned));
+                    throw new CommandException(Messages.getErrorNotBanned(player.getName()));
                 }
                 pData.setBannedStatus(0);
-                playerExists = true;
                 try {
                     plugin.saveData();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    throw new CommandException(Messages.parse(Messages.errorGeneral, ""));
+                    throw new CommandException(Messages.getErrorUnbanUser(player.getName()));
                 }
+                return CommandResult.success();
             }
         }
-        if (!playerExists) {
-            throw new CommandException(Messages.parse(Messages.errorUserNotExist));
-        }
-        return CommandResult.success();
+        throw new CommandException(Messages.getErrorUserNotExist(player.getName()));
     }
 }

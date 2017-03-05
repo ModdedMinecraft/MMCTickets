@@ -39,7 +39,7 @@ public class read implements CommandExecutor {
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
 
         if (tickets.isEmpty()) {
-            throw new CommandException(Messages.parse(Messages.errorGeneral, "Tickets list is empty."));
+            throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
         } else {
             if (!ticketIDOp.isPresent()) {
                 if (src.hasPermission(Permissions.COMMAND_TICKET_READ_ALL)) {
@@ -47,11 +47,13 @@ public class read implements CommandExecutor {
                     List<Text> contents = new ArrayList<>();
                     int totalTickets = 0;
                     for (TicketData ticket : tickets) {
-                        if (ticket.getStatus() == 0) {
+                        if (ticket.getStatus() < 2) {
                             String online = CommonUtil.isUserOnline(ticket.getName());
                             totalTickets++;
                             Text.Builder send = Text.builder();
-                            send.append(plugin.fromLegacy("&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
+                            String status = "";
+                            if (ticket.getStatus() == 1) status = "&eClaimed - ";
+                            send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                             send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                             send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
                             contents.add(send.build());
@@ -59,7 +61,7 @@ public class read implements CommandExecutor {
                     }
 
                     if (contents.isEmpty()) {
-                        contents.add(Messages.parse(Messages.ticketReadNone));
+                        contents.add(Messages.getTicketReadNone());
                     }
                     paginationService.builder()
                             .title(plugin.fromLegacy("&6" + totalTickets + " Open Tickets"))
@@ -69,9 +71,9 @@ public class read implements CommandExecutor {
                     return CommandResult.success();
                 } else {
                     if (src.hasPermission(Permissions.COMMAND_TICKET_READ_SELF)) {
-                        throw new CommandException(Messages.parse(Messages.errorIncorrectUsage, "/check self or /check #"));
+                        throw new CommandException(Messages.getErrorIncorrectUsage("/check self or /check #"));
                     } else {
-                        throw new CommandException(Messages.parse(Messages.errorPermission, Permissions.COMMAND_TICKET_READ_ALL));
+                        throw new CommandException(Messages.getErrorPermission(Permissions.COMMAND_TICKET_READ_ALL));
                     }
                 }
             } else {
@@ -83,7 +85,7 @@ public class read implements CommandExecutor {
                     for (TicketData ticket : tickets) {
                         if (ticket.getTicketID() == ticketID) {
                             if (!ticket.getName().equals(src.getName()) && !src.hasPermission(Permissions.COMMAND_TICKET_READ_ALL)) {
-                                throw new CommandException(Messages.parse(Messages.errorTicketOwner));
+                                throw new CommandException(Messages.getErrorTicketOwner());
                             }
                             ticketStatus = CommonUtil.getTicketStatusColour(ticket.getStatus());
                             String online = CommonUtil.isUserOnline(ticket.getName());
@@ -91,7 +93,7 @@ public class read implements CommandExecutor {
                             Text.Builder send = Text.builder();
                             send.append(plugin.fromLegacy("&a" + ticket.getWorld() + "&e x:&a" + ticket.getX() + "&e y:&a" + ticket.getY() + "&e z:&a" + ticket.getZ()));
                             if (src.hasPermission(Permissions.COMMAND_TICKET_TELEPORT)) {
-                                send.onHover(TextActions.showText(Messages.parse(Messages.ticketOnHoverTeleportTo)));
+                                send.onHover(TextActions.showText(Messages.getTicketOnHoverTeleportTo()));
                                 send.onClick(TextActions.executeCallback(teleportTo(world, ticket.getX(), ticket.getY(), ticket.getZ(), ticket.getPitch(), ticket.getYaw(), ticketID)));
                             }
                             if (!ticket.getStaffName().isEmpty()) {
@@ -112,7 +114,7 @@ public class read implements CommandExecutor {
                     }
 
                     if (contents.isEmpty()) {
-                        throw new CommandException(Messages.parse(Messages.ticketNotExist, ticketID));
+                        throw new CommandException(Messages.getTicketNotExist(ticketID));
                     }
 
                     paginationService.builder()
@@ -122,7 +124,7 @@ public class read implements CommandExecutor {
                             .sendTo(src);
                     return CommandResult.success();
                 } else {
-                    throw new CommandException(Messages.parse(Messages.errorPermission, Permissions.COMMAND_TICKET_READ_SELF));
+                    throw new CommandException(Messages.getErrorPermission(Permissions.COMMAND_TICKET_READ_SELF));
                 }
             }
         }
@@ -133,7 +135,7 @@ public class read implements CommandExecutor {
             Location loc = new Location(world, x, y, z);
             Vector3d vect = new Vector3d(pitch, yaw, 0);
             player.setLocationAndRotation(loc, vect);
-            player.sendMessage(Messages.parse(Messages.teleportToTicket, ticketID));
+            player.sendMessage(Messages.getTeleportToTicket(ticketID));
         };
     }
 }

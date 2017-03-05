@@ -29,8 +29,9 @@ public class reload implements CommandExecutor {
             plugin.loadData();
         } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
-            throw new CommandException(Messages.parse(Messages.errorGeneral, "Unable to load data."));
+            throw new CommandException(Messages.getErrorGen("Unable to load data."));
         }
+        src.sendMessage(plugin.fromLegacy("&eTicket and Player data reloaded."));
         return CommandResult.success();
     }
 }
