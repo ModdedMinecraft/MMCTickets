@@ -6,7 +6,7 @@ public class Permissions {
     public static final String COMMAND_TICKET_OPEN = "mmctickets.commands.open";
     public static final String COMMAND_TICKET_CLOSE_SELF = "mmctickets.commands.close.self";
     public static final String COMMAND_TICKET_READ_SELF = "mmctickets.commands.read.self";
-    public static final String COMMAND_STAFFLIST = "mmcticket.commands.stafflist";
+    public static final String COMMAND_STAFFLIST = "mmctickets.commands.stafflist";
 
     //Staff Permissions
     public static final String NOTIFY = "mmctickets.notify";

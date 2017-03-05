@@ -27,11 +27,11 @@ public class Config {
     public static Boolean titleNotification;
 
     public static int minWords;
-    public static int delayTimer;
+    //public static int delayTimer; //TODO
     public static int maxTickets;
     public static Boolean preventDuplicates;
 
-    public static Boolean hideOffline;
+    //public static Boolean hideOffline; //TODO
     public static int ticketsPerPage;
     public static int nagTimer;
     public static Boolean nagHeld;
@@ -52,16 +52,16 @@ public class Config {
 
         // ticket
         minWords = check(config.getNode("ticket", "user", "minimum-words"), 3).getInt();
-        delayTimer = check(config.getNode("ticket", "user", "delay"), 60, "User has to wait this amount of seconds before opening another ticket.").getInt();
-        maxTickets = check(config.getNode("ticket", "user", "max-tickets"), 5, "Maximum number of TicketData a user may have open at the same time.").getInt();
-        preventDuplicates = check(config.getNode("ticket", "user", "prevent-duplicates"), true, "Prevent duplicate TicketData by the same user.").getBoolean();
+        //delayTimer = check(config.getNode("ticket", "user", "delay"), 60, "User has to wait this amount of seconds before opening another ticket.").getInt();
+        maxTickets = check(config.getNode("ticket", "user", "max-tickets"), 5, "Maximum number of tickets a user may have open at the same time.").getInt();
+        preventDuplicates = check(config.getNode("ticket", "user", "prevent-duplicates"), true, "Prevent duplicate tickets by the same user.").getBoolean();
 
-        hideOffline = check(config.getNode("ticket", "user", "hide-offline"), false, "If set to true, hides all TicketData in /ticket read from offline users.").getBoolean();
-        ticketsPerPage = check(config.getNode("ticket", "user", "tickets-per-page"), 5, "This sets the total amount of TicketData that should be shown on each page.").getInt();
-        nagTimer = check(config.getNode("ticket", "user", "nag"), 5, "If above 0 (minutes), nag the online staff members about open TicketData.").getInt();
-        nagHeld = check(config.getNode("ticket", "user", "nag-held"), true, "If true, the nag feature will mention TicketData on hold. ").getBoolean();
+        //hideOffline = check(config.getNode("ticket", "user", "hide-offline"), false, "If set to true, hides all TicketData in /ticket read from offline users.").getBoolean();
+        ticketsPerPage = check(config.getNode("ticket", "user", "tickets-per-page"), 5, "This sets the total amount of tickets that should be shown on each page.").getInt();
+        nagTimer = check(config.getNode("ticket", "user", "nag"), 5, "If above 0 (minutes), nag the online staff members about open tickets.").getInt();
+        nagHeld = check(config.getNode("ticket", "user", "nag-held"), true, "If true, the nag feature will mention tickets on hold. ").getBoolean();
 
-        checkForUpdate = check(config.getNode("update", "check"), true, "If true, will notify at startup and if a player with "+Permissions.STAFF+" logs in, if there is an update available.").getBoolean();
+        checkForUpdate = check(config.getNode("update", "check"), true, "If true, will notify at startup and if a player with \""+Permissions.STAFF+"\" logs in, if there is an update available.").getBoolean();
 
         loader.save(config);
 

@@ -2,6 +2,7 @@ package net.moddedminecraft.mmctickets.commands;
 
 import com.flowpowered.math.vector.Vector3d;
 import net.moddedminecraft.mmctickets.Main;
+import net.moddedminecraft.mmctickets.config.Config;
 import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.config.Permissions;
 import net.moddedminecraft.mmctickets.data.TicketData;
@@ -63,10 +64,15 @@ public class read implements CommandExecutor {
                     if (contents.isEmpty()) {
                         contents.add(Messages.getTicketReadNone());
                     }
+                    int ticketsPer = 5;
+                    if (Config.ticketsPerPage > 0) {
+                        ticketsPer = Config.ticketsPerPage;
+                    }
                     paginationService.builder()
                             .title(plugin.fromLegacy("&6" + totalTickets + " Open Tickets"))
                             .contents(contents)
                             .padding(Text.of("-"))
+                            .linesPerPage(ticketsPer + 2)
                             .sendTo(src);
                     return CommandResult.success();
                 } else {

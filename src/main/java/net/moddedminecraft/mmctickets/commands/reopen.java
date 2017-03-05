@@ -53,12 +53,12 @@ public class reopen implements CommandExecutor {
                         e.printStackTrace();
                     }
 
-                    CommonUtil.notifyOnlineStaff(Messages.getTicketReopen(ticket.getStaffName(), ticket.getTicketID()));
+                    CommonUtil.notifyOnlineStaff(Messages.getTicketReopen(src.getName(), ticket.getTicketID()));
 
                     Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getName());
                     if (ticketPlayerOP.isPresent()) {
                         Player ticketPlayer = ticketPlayerOP.get();
-                        ticketPlayer.sendMessage(Messages.getTicketReopenUser(ticket.getStaffName(), ticket.getTicketID()));
+                        ticketPlayer.sendMessage(Messages.getTicketReopenUser(src.getName(), ticket.getTicketID()));
                     }
                     return CommandResult.success();
                 }

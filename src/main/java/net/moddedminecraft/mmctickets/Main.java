@@ -13,6 +13,7 @@ import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.PlayerData.PlayerDataSerializer;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.data.TicketData.TicketSerializer;
+import net.moddedminecraft.mmctickets.util.CommonUtil;
 import net.moddedminecraft.mmctickets.util.UpdateChecker;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Plugin(id = "mmctickets", name = "MMCTickets", version = "0.1", description = "A real time ticket system")
 public class Main {
@@ -91,6 +93,9 @@ public class Main {
 
         updatechecker = new UpdateChecker(this, version);
         updatechecker.startUpdateCheck();
+
+        //start ticket nag timer
+        nagTimer();
     }
 
     @Listener
@@ -228,6 +233,9 @@ public class Main {
                 .child(ticketReload, "reload")
                 .child(ticketClaim, "claim")
                 .child(ticketUnclaim, "unclaim")
+                .child(ticketReopen, "reopen")
+                .child(ticketAssign, "assign")
+                .child(ticketHold, "hold")
                 .build();
 
         cmdManager.register(this, ticketOpen, "modreq");
@@ -277,6 +285,41 @@ public class Main {
 
     }
 
+    public void nagTimer() {
+        if(Config.nagTimer > 0){
+            Sponge.getScheduler().createSyncExecutor(this).scheduleWithFixedDelay(new Runnable() {
+                @Override
+                public void run() {
+                    final List<TicketData> tickets = new ArrayList<TicketData>(getTickets());
+                    int openTickets = 0;
+                    int heldTickets = 0;
+                    for (TicketData ticket : tickets) {
+                        if (ticket.getStatus() < 2) {
+                            openTickets++;
+                        }
+                        if (ticket.getStatus() == 2) {
+                            heldTickets++;
+                        }
+                    }
+                    if(Config.nagHeld) {
+                        if(heldTickets > 0) {
+                            if(openTickets > 0) {
+                                CommonUtil.notifyOnlineStaff(Messages.getTicketUnresolvedHeld(openTickets, heldTickets, "check"));
+                            }
+                        } else {
+                            if(openTickets > 0) {
+                                CommonUtil.notifyOnlineStaff(Messages.getTicketUnresolved(openTickets, "check"));
+                            }
+                        }
+                    } else {
+                        if(openTickets > 0) {
+                            CommonUtil.notifyOnlineStaff(Messages.getTicketUnresolved(openTickets, "check"));
+                        }
+                    }
+                }
+            }, Config.nagTimer, Config.nagTimer, TimeUnit.MINUTES);
+        }
+    }
     public HoconConfigurationLoader getTicketDataLoader() {
         return HoconConfigurationLoader.builder().setPath(this.ConfigDir.resolve("TicketData.conf")).build();
     }

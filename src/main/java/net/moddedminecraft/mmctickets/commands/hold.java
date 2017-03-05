@@ -53,12 +53,12 @@ public class hold implements CommandExecutor {
                         e.printStackTrace();
                     }
 
-                    CommonUtil.notifyOnlineStaff(Messages.getTicketHold(ticket.getTicketID(), ticket.getStaffName()));
+                    CommonUtil.notifyOnlineStaff(Messages.getTicketHold(ticket.getTicketID(), src.getName()));
 
                     Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getName());
                     if (ticketPlayerOP.isPresent()) {
                         Player ticketPlayer = ticketPlayerOP.get();
-                        ticketPlayer.sendMessage(Messages.getTicketHoldUser(ticket.getTicketID(), ticket.getStaffName()));
+                        ticketPlayer.sendMessage(Messages.getTicketHoldUser(ticket.getTicketID(), src.getName()));
                     }
                     return CommandResult.success();
                 }

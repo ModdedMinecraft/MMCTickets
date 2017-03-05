@@ -26,19 +26,25 @@ public class open implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final String message = args.<String>getAll("message").toString();
+        final String message = args.<String>getOne("message").get();
 
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
         int totalTickets = 0;
         boolean duplicate = false;
+        int ticketID = plugin.getTickets().size() + 1;
 
         if (!tickets.isEmpty()) {
             for (TicketData ticket : tickets) {
-                if (ticket.getName().equals(src.getName())) {
+                if (ticket.getTicketID() == ticketID) {
+                    ticketID++;
+                }
+                if (ticket.getName().equals(src.getName()) && ticket.getStatus() != 3) {
                     totalTickets++;
                 }
-                if (ticket.getMessage().equals(message)) {
-                    duplicate = true;
+                if (Config.preventDuplicates) {
+                    if (ticket.getMessage().equals(message) && ticket.getStatus() != 3 && ticket.getName().equals(src.getName())) {
+                        duplicate = true;
+                    }
                 }
             }
         }
@@ -46,7 +52,7 @@ public class open implements CommandExecutor {
         if (duplicate) {
             throw new CommandException(Messages.getTicketDuplicate());
         }
-        if (totalTickets > Config.maxTickets) {
+        if (totalTickets >= Config.maxTickets) {
             throw new CommandException(Messages.getTicketTooMany());
         }
         if (message.split("\\s+").length < Config.minWords) {
@@ -64,7 +70,6 @@ public class open implements CommandExecutor {
             }
         }
         Player player = (Player) src;
-        int ticketID = plugin.getTickets().size() + 1;
 
         plugin.addTicket(new TicketData(ticketID,
                 src.getName(),
