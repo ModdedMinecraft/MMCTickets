@@ -6,6 +6,7 @@ import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -14,7 +15,9 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class open implements CommandExecutor {
 
@@ -28,10 +31,14 @@ public class open implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final String message = args.<String>getOne("message").get();
 
+        if (plugin.getNotifications().contains(src.getName())) {
+            throw new CommandException(Messages.getTicketTooFast(Config.delayTimer));
+        }
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
         int totalTickets = 0;
         boolean duplicate = false;
         int ticketID = plugin.getTickets().size() + 1;
+
 
         if (!tickets.isEmpty()) {
             for (TicketData ticket : tickets) {
@@ -102,6 +109,15 @@ public class open implements CommandExecutor {
             player.sendMessage(Messages.getErrorGen("Data was not saved correctly."));
             e.printStackTrace();
         }
+        plugin.getWaitTimer().add(src.getName());
+
+        Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
+            @Override
+            public void run() {
+                plugin.getWaitTimer().removeAll(Collections.singleton(src.getName()));
+            }
+        }).delay(Config.delayTimer, TimeUnit.SECONDS).name("mmctickets-s-openTicketWaitTimer").submit(this.plugin);
+
         return CommandResult.success();
     }
 }

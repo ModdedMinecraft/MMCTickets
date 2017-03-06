@@ -27,7 +27,7 @@ public class Config {
     public static Boolean titleNotification;
 
     public static int minWords;
-    //public static int delayTimer; //TODO
+    public static int delayTimer; //TODO
     public static int maxTickets;
     public static Boolean preventDuplicates;
 
@@ -52,7 +52,7 @@ public class Config {
 
         // ticket
         minWords = check(config.getNode("ticket", "user", "minimum-words"), 3).getInt();
-        //delayTimer = check(config.getNode("ticket", "user", "delay"), 60, "User has to wait this amount of seconds before opening another ticket.").getInt();
+        delayTimer = check(config.getNode("ticket", "user", "delay"), 60, "User has to wait this amount of seconds before opening another ticket.").getInt();
         maxTickets = check(config.getNode("ticket", "user", "max-tickets"), 5, "Maximum number of tickets a user may have open at the same time.").getInt();
         preventDuplicates = check(config.getNode("ticket", "user", "prevent-duplicates"), true, "Prevent duplicate tickets by the same user.").getBoolean();
 

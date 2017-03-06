@@ -64,6 +64,7 @@ public class Main {
 
     private CommandManager cmdManager = Sponge.getCommandManager();
 
+    private ArrayList<String> waitTimer;
     private ArrayList<String> notifications;
     private Map<Integer, TicketData> tickets;
     public Map<UUID, PlayerData> playersData;
@@ -342,6 +343,10 @@ public class Main {
 
     public ArrayList<String> getNotifications() {
         return this.notifications;
+    }
+
+    public ArrayList<String> getWaitTimer() {
+        return this.waitTimer;
     }
 
 
