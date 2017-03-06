@@ -51,11 +51,11 @@ public class Messages {
     //teleport
     private static String teleportToTicket = "&9Teleported to ticket #{0}.";
 
-    //TicketData
+    //ticket
     private static String ticketAssign = "&6{0} has been assigned to ticket #{1}.";
     private static String ticketAssignUser = "&6Your ticket #{0} has been assigned to {0}.";
-    //private static String ticketComment = "&6A comment was added to ticket #{0} by {1}.";
-    //private static String ticketCommentUser = "&6Your comment was added to ticket #{0}.";
+    private static String ticketComment = "&6A comment was added to ticket #{0} by {1}.";
+    private static String ticketCommentUser = "&6Your comment was added to ticket #{0}.";
     private static String ticketClaim = "&6{0} is now handling ticket #{1}.";
     private static String ticketClaimUser = "&6{0} is now handling your ticket #{1}.";
     private static String ticketClose = "&6Ticket #{0} was closed by {1}.";
@@ -120,11 +120,11 @@ public class Messages {
         //teleport
         teleportToTicket = check(messages.getNode("teleport", "to-ticket"), teleportToTicket).getString();
 
-        //TicketData
+        //tickets
         ticketAssign = check(messages.getNode("ticket", "assign"), ticketAssign).getString();
         ticketAssignUser = check(messages.getNode("ticket", "assign-user"), ticketAssignUser).getString();
-        //ticketComment = check(messages.getNode("ticket", "comment"), ticketComment).getString();
-        //ticketCommentUser = check(messages.getNode("ticket", "comment-user"), ticketCommentUser).getString();
+        ticketComment = check(messages.getNode("ticket", "comment"), ticketComment).getString();
+        ticketCommentUser = check(messages.getNode("ticket", "comment-user"), ticketCommentUser).getString();
         ticketClaim = check(messages.getNode("ticket", "claim"), ticketClaim).getString();
         ticketClaimUser = check(messages.getNode("ticket", "claim-user"), ticketClaimUser).getString();
         ticketClose = check(messages.getNode("ticket", "close"), ticketClose).getString();
@@ -393,5 +393,13 @@ public class Messages {
 
     public static Text getTicketUnresolvedHeld(int totalOpenTickets, int totalHeldTickets, String command) {
         return parse(ticketUnresolvedHeld, totalOpenTickets, totalHeldTickets, command);
+    }
+
+    public static Text getTicketComment(int ticketID, String staffName) {
+        return parse(ticketComment, ticketID, staffName);
+    }
+
+    public static Text getTicketCommentUser(int ticketID) {
+        return parse(ticketCommentUser, ticketID);
     }
 }

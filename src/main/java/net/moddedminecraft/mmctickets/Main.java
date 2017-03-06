@@ -222,6 +222,15 @@ public class Main {
                 .permission(Permissions.COMMAND_TICKET_HOLD)
                 .build();
 
+        // /ticket comment (ticketID) (comment)
+        CommandSpec ticketComment = CommandSpec.builder()
+                .description(Text.of("Open a ticket"))
+                .executor(new open(this))
+                .arguments(GenericArguments.integer(Text.of("ticketID")),
+                        GenericArguments.remainingJoinedStrings(Text.of("comment")))
+                .permission(Permissions.COMMAND_TICKET_COMMENT)
+                .build();
+
         // /ticket
         CommandSpec ticketBase = CommandSpec.builder()
                 .description(Text.of("Ticket base command, Displays help"))
@@ -237,6 +246,7 @@ public class Main {
                 .child(ticketReopen, "reopen")
                 .child(ticketAssign, "assign")
                 .child(ticketHold, "hold")
+                .child(ticketComment, "comment")
                 .build();
 
         cmdManager.register(this, ticketOpen, "modreq");

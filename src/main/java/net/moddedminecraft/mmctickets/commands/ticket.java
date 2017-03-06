@@ -44,6 +44,7 @@ public class ticket implements CommandExecutor {
         if (sender.hasPermission(Permissions.COMMAND_TICKET_UNCLAIM)) contents.add(formatHelp("/ticket", "unclaim [ticketID]", "Unclaim a claimed ticket"));
         if (sender.hasPermission(Permissions.COMMAND_TICKET_BAN)) contents.add(formatHelp("/ticket", "ban [playername]", "Ban a player from opening new tickets"));
         if (sender.hasPermission(Permissions.COMMAND_TICKET_BAN)) contents.add(formatHelp("/ticket", "unban [playername]", "Unban a player from opening new tickets"));
+        if (sender.hasPermission(Permissions.COMMAND_TICKET_COMMENT)) contents.add(formatHelp("/ticket", "comment [ticketID] [comment]", "put a comment on a ticket"));
         if (sender.hasPermission(Permissions.COMMAND_RELOAD)) contents.add(formatHelp("/ticket", "reload", "Reload ticket and player data."));
 
 
