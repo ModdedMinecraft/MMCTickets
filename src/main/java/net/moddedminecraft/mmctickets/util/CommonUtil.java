@@ -57,6 +57,15 @@ public class CommonUtil {
         return "&c";
     }
 
+    public static boolean checkUserOnline(String name){
+        for(Player player : Sponge.getServer().getOnlinePlayers()){
+            if(name.equals(player.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String getTicketStatusColour(int ticketIDStatus){
         String ticketStatus = "";
         if (ticketIDStatus == 0) ticketStatus = "&eOpen";

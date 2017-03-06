@@ -48,16 +48,32 @@ public class read implements CommandExecutor {
                     List<Text> contents = new ArrayList<>();
                     int totalTickets = 0;
                     for (TicketData ticket : tickets) {
-                        if (ticket.getStatus() < 2) {
-                            String online = CommonUtil.isUserOnline(ticket.getName());
-                            totalTickets++;
-                            Text.Builder send = Text.builder();
-                            String status = "";
-                            if (ticket.getStatus() == 1) status = "&eClaimed - ";
-                            send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
-                            send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
-                            send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
-                            contents.add(send.build());
+                        if (Config.hideOffline) {
+                            if (CommonUtil.checkUserOnline(ticket.getName())) {
+                                if (ticket.getStatus() < 2) {
+                                    String online = CommonUtil.isUserOnline(ticket.getName());
+                                    totalTickets++;
+                                    Text.Builder send = Text.builder();
+                                    String status = "";
+                                    if (ticket.getStatus() == 1) status = "&eClaimed - ";
+                                    send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
+                                    send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
+                                    send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
+                                    contents.add(send.build());
+                                }
+                            }
+                        } else {
+                            if (ticket.getStatus() < 2) {
+                                String online = CommonUtil.isUserOnline(ticket.getName());
+                                totalTickets++;
+                                Text.Builder send = Text.builder();
+                                String status = "";
+                                if (ticket.getStatus() == 1) status = "&eClaimed - ";
+                                send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
+                                send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
+                                send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
+                                contents.add(send.build());
+                            }
                         }
                     }
 

@@ -299,10 +299,6 @@ public class Messages {
         return parse(ticketCloseOfflineMulti, ticketsNum, command);
     }
 
-    //public static Text getTicketCommentUser(int ticketID) {
-    //    return parse(ticketCommentUser, ticketID);
-    //}
-
     public static Text getTicketCloseUser(int ticketID, String staffName) {
         return parse(ticketCloseUser, ticketID, staffName);
     }

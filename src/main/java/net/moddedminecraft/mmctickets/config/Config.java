@@ -31,7 +31,7 @@ public class Config {
     public static int maxTickets;
     public static Boolean preventDuplicates;
 
-    //public static Boolean hideOffline; //TODO
+    public static Boolean hideOffline;
     public static int ticketsPerPage;
     public static int nagTimer;
     public static Boolean nagHeld;
@@ -56,7 +56,7 @@ public class Config {
         maxTickets = check(config.getNode("ticket", "user", "max-tickets"), 5, "Maximum number of tickets a user may have open at the same time.").getInt();
         preventDuplicates = check(config.getNode("ticket", "user", "prevent-duplicates"), true, "Prevent duplicate tickets by the same user.").getBoolean();
 
-        //hideOffline = check(config.getNode("ticket", "user", "hide-offline"), false, "If set to true, hides all TicketData in /ticket read from offline users.").getBoolean();
+        hideOffline = check(config.getNode("ticket", "user", "hide-offline"), false, "If set to true, hides all tickets in /ticket read from offline users.").getBoolean();
         ticketsPerPage = check(config.getNode("ticket", "user", "tickets-per-page"), 5, "This sets the total amount of tickets that should be shown on each page.").getInt();
         nagTimer = check(config.getNode("ticket", "user", "nag"), 5, "If above 0 (minutes), nag the online staff members about open tickets.").getInt();
         nagHeld = check(config.getNode("ticket", "user", "nag-held"), true, "If true, the nag feature will mention tickets on hold. ").getBoolean();
