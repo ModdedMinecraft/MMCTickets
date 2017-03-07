@@ -31,7 +31,12 @@ public class open implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final String message = args.<String>getOne("message").get();
 
-        if (plugin.getNotifications().contains(src.getName())) {
+        if (!(src instanceof Player)) {
+            throw new CommandException(Messages.getErrorGen("Only players can run this command"));
+        }
+        Player player = (Player) src;
+
+        if (plugin.getWaitTimer().contains(src.getName())) {
             throw new CommandException(Messages.getTicketTooFast(Config.delayTimer));
         }
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
@@ -66,17 +71,12 @@ public class open implements CommandExecutor {
             throw new CommandException(Messages.getTicketTooShort(Config.minWords));
         }
 
-        if (!(src instanceof Player)) {
-            throw new CommandException(Messages.getErrorGen("Only players can run this command"));
-        }
-
         final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
         for (PlayerData pData : playerData) {
             if (pData.getPlayerName().equals(src.getName()) && pData.getBannedStatus() == 1) {
                 throw new CommandException(Messages.getErrorBanned());
             }
         }
-        Player player = (Player) src;
 
         plugin.addTicket(new TicketData(ticketID,
                 src.getName(),
