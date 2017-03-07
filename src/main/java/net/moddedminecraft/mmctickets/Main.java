@@ -92,6 +92,8 @@ public class Main {
         logger.info("Notifications loaded: " + notifications.size());
         logger.info("PlayerData loaded: " + playersData.size());
 
+        this.waitTimer = new ArrayList<String>();
+
         updatechecker = new UpdateChecker(this, version);
         updatechecker.startUpdateCheck();
 
@@ -358,7 +360,6 @@ public class Main {
     public ArrayList<String> getWaitTimer() {
         return this.waitTimer;
     }
-
 
     public TicketData addTicket(TicketData ticket) {
         return this.tickets.put(ticket.getTicketID(), ticket);
