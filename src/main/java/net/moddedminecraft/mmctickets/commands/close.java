@@ -64,7 +64,7 @@ public class close implements CommandExecutor {
                         ticketPlayer.sendMessage(Messages.getTicketCloseUser(ticket.getTicketID(), src.getName()));
                         ticket.setNotified(1);
                     } else {
-                        plugin.getNotifications().add(ticketPlayerOP.get().getName());
+                        plugin.getNotifications().add(ticket.getName());
                     }
 
                     try {
