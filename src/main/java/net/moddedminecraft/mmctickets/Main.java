@@ -40,7 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@Plugin(id = "mmctickets", name = "MMCTickets", version = "0.3", description = "A real time ticket system")
+@Plugin(id = "mmctickets", name = "MMCTickets", version = "0.4", description = "A real time ticket system")
 public class Main {
 
     @Inject
@@ -70,7 +70,7 @@ public class Main {
     public Map<UUID, PlayerData> playersData;
 
     public UpdateChecker updatechecker;
-    public String version = "0.3";
+    public String version = "0.4";
 
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
