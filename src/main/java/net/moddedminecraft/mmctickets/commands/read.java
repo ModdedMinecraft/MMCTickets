@@ -125,7 +125,6 @@ public class read implements CommandExecutor {
                                     contents.add(plugin.fromLegacy("&eHandled by: &7" + ticket.getStaffName()));
                             }
                             if (!ticket.getComment().isEmpty()) {
-                                if (ticket.getStatus() == 3)
                                     contents.add(plugin.fromLegacy("&eComment: &7" + ticket.getComment()));
                             }
                             contents.add(plugin.fromLegacy("&eOpened by: " + online + ticket.getName()));

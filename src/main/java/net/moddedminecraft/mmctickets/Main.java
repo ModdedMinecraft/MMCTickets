@@ -227,7 +227,7 @@ public class Main {
         // /ticket comment (ticketID) (comment)
         CommandSpec ticketComment = CommandSpec.builder()
                 .description(Text.of("Open a ticket"))
-                .executor(new open(this))
+                .executor(new comment(this))
                 .arguments(GenericArguments.integer(Text.of("ticketID")),
                         GenericArguments.remainingJoinedStrings(Text.of("comment")))
                 .permission(Permissions.COMMAND_TICKET_COMMENT)
