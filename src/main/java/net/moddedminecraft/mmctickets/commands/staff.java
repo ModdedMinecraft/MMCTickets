@@ -36,8 +36,10 @@ public class staff implements CommandExecutor {
             }
         }
 
-        String staffString = staff.substring(0, staff.length() - separator.length());
-        staffList.add(plugin.fromLegacy(staffString));
+        if (staff.length() > 0) {
+            String staffString = staff.substring(0, staff.length() - separator.length());
+            staffList.add(plugin.fromLegacy(staffString));
+        }
 
         if(staffList.isEmpty()) {
             staffList.add(Messages.getStaffListEmpty());
