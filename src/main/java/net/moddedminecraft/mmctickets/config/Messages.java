@@ -244,7 +244,7 @@ public class Messages {
     }
 
     public static String getStaffListSeperator() {
-        return plugin.fromLegacyS(staffListSeperator);
+        return staffListSeperator;
     }
 
     public static Text getStaffListTitle() {
