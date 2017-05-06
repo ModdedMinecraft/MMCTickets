@@ -6,6 +6,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.title.Title;
 
 public class CommonUtil {
@@ -79,6 +80,17 @@ public class CommonUtil {
     public static void notifyOnlineStaff(Text message) {
         for(Player player : Sponge.getServer().getOnlinePlayers()){
             if(player.hasPermission(Permissions.STAFF)) {
+                player.sendMessage(message);
+            }
+        }
+    }
+
+    public static void notifyOnlineStaffOpen(Text message, int ticketID) {
+        for(Player player : Sponge.getServer().getOnlinePlayers()){
+            if(player.hasPermission(Permissions.STAFF)) {
+                Text.Builder send = Text.builder();
+                send.append(message);
+                send.onClick(TextActions.runCommand("/ticket check " + ticketID));
                 player.sendMessage(message);
             }
         }

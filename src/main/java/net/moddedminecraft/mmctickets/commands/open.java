@@ -97,7 +97,7 @@ public class open implements CommandExecutor {
             plugin.saveData();
             player.sendMessage(Messages.getTicketOpenUser(ticketID));
             if (Config.staffNotification) {
-                CommonUtil.notifyOnlineStaff(Messages.getTicketOpen(player.getName() , ticketID));
+                CommonUtil.notifyOnlineStaffOpen(Messages.getTicketOpen(player.getName() , ticketID), ticketID);
             }
             if (Config.titleNotification) {
                 CommonUtil.notifyOnlineStaffTitle(Messages.getTicketTitleNotification(player.getName() , ticketID));
