@@ -31,6 +31,20 @@ public class Messages {
 
     private static String chatprefix = "&f[&6MMCTickets&f] ";
 
+    //actions
+    private static String claimButton = "&f[&6Claim&f]";
+    private static String claimButtonHover = "&eClick here to claim this ticket.";
+    private static String unclaimButton = "&f[&6Unclaim&f]";
+    private static String unclaimButtonHover = "&eClick here to unclaim this ticket.";
+    private static String closeButton = "&f[&6Close&f]";
+    private static String closeButtonHover = "&eClick here to close this ticket.";
+    private static String reopenButton = "&f[&6Reopen&f]";
+    private static String reopenButtonHover = "&eClick here to reopen this ticket.";
+    private static String commentButton = "&f[&6Comment&f]";
+    private static String commentButtonHover = "&eClick here to put a comment on this ticket.";
+    private static String holdButton = "&f[&6Hold&f]";
+    private static String holdButtonHover = "&eClick here to put this ticket on hold.";
+
     //errors
     private static String errorGeneral = "&cAn error occurred. {0}";
     private static String errorIncorrectUsage = "&cIncorrect Usage: {0}";
@@ -99,6 +113,20 @@ public class Messages {
         if (!Files.exists(defaultMessage)) {
             Files.createFile(defaultMessage);
         }
+
+        //actions
+        claimButton = check(messages.getNode("action", "claim-button"), claimButton).getString();
+        claimButtonHover = check(messages.getNode("action", "claim-button-hover"), claimButtonHover).getString();
+        unclaimButton = check(messages.getNode("action", "unclaim-button"), unclaimButton).getString();
+        unclaimButtonHover = check(messages.getNode("action", "unclaim-button-hover"), unclaimButtonHover).getString();
+        closeButton = check(messages.getNode("action", "close-button"), closeButton).getString();
+        closeButtonHover = check(messages.getNode("action", "close-button-hover"), closeButtonHover).getString();
+        reopenButton = check(messages.getNode("action", "reopen-button"), reopenButton).getString();
+        reopenButtonHover = check(messages.getNode("action", "reopen-button-hover"), reopenButtonHover).getString();
+        commentButton = check(messages.getNode("action", "comment-button"), commentButton).getString();
+        commentButtonHover = check(messages.getNode("action", "comment-button-hover"), commentButtonHover).getString();
+        holdButton = check(messages.getNode("action", "hold-button"), holdButton).getString();
+        holdButtonHover = check(messages.getNode("action", "hold-button-hover"), holdButtonHover).getString();
 
         //errors
         errorGeneral = check(messages.getNode("error", "general"), errorGeneral).getString();
@@ -401,5 +429,53 @@ public class Messages {
 
     public static Text getTicketCommentUser(int ticketID) {
         return parse(ticketCommentUser, ticketID);
+    }
+
+    public static String getClaimButton() {
+        return claimButton;
+    }
+
+    public static String getClaimButtonHover() {
+        return claimButtonHover;
+    }
+
+    public static String getCloseButton() {
+        return closeButton;
+    }
+
+    public static String getCloseButtonHover() {
+        return closeButtonHover;
+    }
+
+    public static String getCommentButton() {
+        return commentButton;
+    }
+
+    public static String getCommentButtonHover() {
+        return commentButtonHover;
+    }
+
+    public static String getReopenButton() {
+        return reopenButton;
+    }
+
+    public static String getReopenButtonHover() {
+        return reopenButtonHover;
+    }
+
+    public static String getUnclaimButton() {
+        return unclaimButton;
+    }
+
+    public static String getUnclaimButtonHover() {
+        return unclaimButtonHover;
+    }
+
+    public static String getHoldButton() {
+        return holdButton;
+    }
+
+    public static String getHoldButtonHover() {
+        return holdButtonHover;
     }
 }

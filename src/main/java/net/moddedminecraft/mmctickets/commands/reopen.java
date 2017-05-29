@@ -35,8 +35,8 @@ public class reopen implements CommandExecutor {
         } else {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
-                    if (ticket.getStatus() > 1) {
-                        src.sendMessage(Messages.getErrorTicketNotClosed(ticketID));
+                    if (ticket.getStatus() <= 1) {
+                        throw new CommandException(Messages.getErrorTicketNotClosed(ticketID));
                     }
                     if (ticket.getStatus() == 1) {
                         throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), ticket.getStaffName()));

@@ -112,11 +112,80 @@ public class read implements CommandExecutor {
                             ticketStatus = CommonUtil.getTicketStatusColour(ticket.getStatus());
                             String online = CommonUtil.isUserOnline(ticket.getName());
                             World world = Sponge.getServer().getWorld(ticket.getWorld()).get();
+
+                            Text.Builder action = Text.builder();
+
+                            if (ticket.getStatus() <= 1) {
+                                if (ticket.getStatus() == 0 && src.hasPermission(Permissions.COMMAND_TICKET_CLAIM)) {
+                                    action.append(Text.builder()
+                                            .append(plugin.fromLegacy(Messages.getClaimButton()))
+                                            .onHover(TextActions.showText(plugin.fromLegacy(Messages.getClaimButtonHover())))
+                                            .onClick(TextActions.runCommand("/ticket claim " + ticket.getTicketID()))
+                                            .build());
+                                    action.append(plugin.fromLegacy(" "));
+                                }
+                                if (ticket.getStatus() == 1) {
+                                    if (ticket.getStaffName().equalsIgnoreCase(src.getName()) && src.hasPermission(Permissions.COMMAND_TICKET_UNCLAIM)) {
+                                        action.append(Text.builder()
+                                                .append(plugin.fromLegacy(Messages.getUnclaimButton()))
+                                                .onHover(TextActions.showText(plugin.fromLegacy(Messages.getUnclaimButtonHover())))
+                                                .onClick(TextActions.runCommand("/ticket unclaim " + ticket.getTicketID()))
+                                                .build());
+                                        action.append(plugin.fromLegacy(" "));
+                                    }
+                                }
+                                if ((ticket.getStatus() == 0 || ticket.getStatus() == 1 && ticket.getStaffName().equalsIgnoreCase(src.getName())) && src.hasPermission(Permissions.COMMAND_TICKET_HOLD)) {
+                                    action.append(Text.builder()
+                                            .append(plugin.fromLegacy(Messages.getHoldButton()))
+                                            .onHover(TextActions.showText(plugin.fromLegacy(Messages.getHoldButtonHover())))
+                                            .onClick(TextActions.runCommand("/ticket hold " + ticket.getTicketID()))
+                                            .build());
+                                    action.append(plugin.fromLegacy(" "));
+                                }
+                            }
+                            if (ticket.getStatus() >= 2) {
+                                if (src.hasPermission(Permissions.COMMAND_TICKET_REOPEN)) {
+                                    action.append(Text.builder()
+                                            .append(plugin.fromLegacy(Messages.getReopenButton()))
+                                            .onHover(TextActions.showText(plugin.fromLegacy(Messages.getReopenButtonHover())))
+                                            .onClick(TextActions.runCommand("/ticket reopen " + ticket.getTicketID()))
+                                            .build());
+                                    action.append(plugin.fromLegacy(" "));
+                                }
+                            }
+                            if (ticket.getStatus() <= 2) {
+                                if ((ticket.getStatus() == 1 && ticket.getStaffName().equalsIgnoreCase(src.getName())) || ticket.getStatus() == 0 || ticket.getStatus() == 2) {
+                                    if (src.hasPermission(Permissions.COMMAND_TICKET_CLOSE_ALL) || src.hasPermission(Permissions.COMMAND_TICKET_CLOSE_SELF)) {
+                                        action.append(Text.builder()
+                                                .append(plugin.fromLegacy(Messages.getCloseButton()))
+                                                .onHover(TextActions.showText(plugin.fromLegacy(Messages.getCloseButtonHover())))
+                                                .onClick(TextActions.runCommand("/ticket complete " + ticket.getTicketID()))
+                                                .build());
+                                        action.append(plugin.fromLegacy(" "));
+                                    }
+                                }
+                            }
+                            if (ticket.getComment().isEmpty() && src.hasPermission(Permissions.COMMAND_TICKET_COMMENT)) {
+                                if (ticket.getStatus() != 1 || ticket.getStatus() == 1 && ticket.getStaffName().equalsIgnoreCase(src.getName())) {
+                                    action.append(Text.builder()
+                                            .append(plugin.fromLegacy(Messages.getCommentButton()))
+                                            .onHover(TextActions.showText(plugin.fromLegacy(Messages.getCommentButtonHover())))
+                                            .onClick(TextActions.suggestCommand("/ticket comment " + ticket.getTicketID() + " "))
+                                            .build());
+                                }
+                            }
+
+
+
                             Text.Builder send = Text.builder();
                             send.append(plugin.fromLegacy("&a" + ticket.getWorld() + "&e x:&a" + ticket.getX() + "&e y:&a" + ticket.getY() + "&e z:&a" + ticket.getZ()));
                             if (src.hasPermission(Permissions.COMMAND_TICKET_TELEPORT)) {
                                 send.onHover(TextActions.showText(Messages.getTicketOnHoverTeleportTo()));
                                 send.onClick(TextActions.executeCallback(teleportTo(world, ticket.getX(), ticket.getY(), ticket.getZ(), ticket.getPitch(), ticket.getYaw(), ticketID)));
+                            }
+
+                            if (!action.build().isEmpty()) {
+                                contents.add(action.build());
                             }
                             if (!ticket.getStaffName().isEmpty()) {
                                 if (ticket.getStatus() == 1)
