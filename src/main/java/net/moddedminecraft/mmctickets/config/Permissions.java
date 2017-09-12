@@ -21,6 +21,7 @@ public class Permissions {
     public static final String COMMAND_TICKET_HOLD = "mmctickets.commands.hold";
     public static final String COMMAND_TICKET_BAN = "mmctickets.commands.ban";
     public static final String COMMAND_TICKET_COMMENT = "mmctickets.commands.comment";
+    public static final String COMMAND_TICKET_EDIT_COMMENT = "mmctickets.commands.edit.comment";
     public static final String COMMAND_RELOAD = "mmctickets.commands.reload";
     public static final String CLAIMED_TICKET_BYPASS = "mmctickets.bypass.claimed";
 }

@@ -33,17 +33,22 @@ public class EventListener {
                 e.printStackTrace();
             }
         } else {
-            final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
-            for (PlayerData pData : playerData) {
-                if (pData.getPlayerUUID().equals(player.getUniqueId()) && !pData.getPlayerName().equals(player.getName())) {
-                    pData.setPlayerName(player.getName());
-                    try {
-                        plugin.saveData();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
+                public void run() {
+                    final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
+                    for (PlayerData pData : playerData) {
+                        if (pData.getPlayerUUID().equals(player.getUniqueId()) && !pData.getPlayerName().equals(player.getName())) {
+                            pData.setPlayerName(player.getName());
+                            try {
+                                plugin.saveData();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
-            }
+            }).delay(15, TimeUnit.SECONDS).name("mmctickets-s-checkUserNameOnLogin").submit(this.plugin);
+
         }
 
         //Notify a player if a ticket they created was closed while they were offline

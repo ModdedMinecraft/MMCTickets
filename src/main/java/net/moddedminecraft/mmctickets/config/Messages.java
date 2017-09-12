@@ -44,6 +44,8 @@ public class Messages {
     private static String commentButtonHover = "&eClick here to put a comment on this ticket.";
     private static String holdButton = "&f[&6Hold&f]";
     private static String holdButtonHover = "&eClick here to put this ticket on hold.";
+    private static String yesButton = "&f[&6Yes&f]";
+    private static String yesButtonHover = "&eClick here to confirm the overwrite.";
 
     //errors
     private static String errorGeneral = "&cAn error occurred. {0}";
@@ -68,6 +70,7 @@ public class Messages {
     //ticket
     private static String ticketAssign = "&6{0} has been assigned to ticket #{1}.";
     private static String ticketAssignUser = "&6Your ticket #{0} has been assigned to {0}.";
+    private static String ticketCommentedit = "&6Ticket #{0} already has a comment attached. Do you wish to overwrite this?";
     private static String ticketComment = "&6A comment was added to ticket #{0} by {1}.";
     private static String ticketCommentUser = "&6Your comment was added to ticket #{0}.";
     private static String ticketClaim = "&6{0} is now handling ticket #{1}.";
@@ -127,6 +130,7 @@ public class Messages {
         commentButtonHover = check(messages.getNode("action", "comment-button-hover"), commentButtonHover).getString();
         holdButton = check(messages.getNode("action", "hold-button"), holdButton).getString();
         holdButtonHover = check(messages.getNode("action", "hold-button-hover"), holdButtonHover).getString();
+        yesButton = check(messages.getNode("action", "yes-button"), yesButton).getString();
 
         //errors
         errorGeneral = check(messages.getNode("error", "general"), errorGeneral).getString();
@@ -151,6 +155,7 @@ public class Messages {
         //tickets
         ticketAssign = check(messages.getNode("ticket", "assign"), ticketAssign).getString();
         ticketAssignUser = check(messages.getNode("ticket", "assign-user"), ticketAssignUser).getString();
+        ticketCommentedit = check(messages.getNode("ticket", "comment-edit"), ticketCommentedit).getString();
         ticketComment = check(messages.getNode("ticket", "comment"), ticketComment).getString();
         ticketCommentUser = check(messages.getNode("ticket", "comment-user"), ticketCommentUser).getString();
         ticketClaim = check(messages.getNode("ticket", "claim"), ticketClaim).getString();
@@ -477,5 +482,17 @@ public class Messages {
 
     public static String getHoldButtonHover() {
         return holdButtonHover;
+    }
+
+    public static String getYesButton() {
+        return yesButton;
+    }
+
+    public static Text getTicketCommentedit(int ticketID) {
+        return parse(ticketCommentedit, ticketID);
+    }
+
+    public static String getYesButtonHover() {
+        return yesButtonHover;
     }
 }
