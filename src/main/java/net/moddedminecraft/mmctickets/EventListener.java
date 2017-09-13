@@ -4,6 +4,7 @@ import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.config.Permissions;
 import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.TicketData;
+import net.moddedminecraft.mmctickets.data.ticketStatus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -85,8 +86,8 @@ public class EventListener {
             int openTickets = 0;
             int heldTickets = 0;
             for (TicketData ticket : tickets) {
-                if (ticket.getStatus() == 0) openTickets++;
-                if (ticket.getStatus() == 2) heldTickets++;
+                if (ticket.getStatus() == ticketStatus.Open) openTickets++;
+                if (ticket.getStatus() == ticketStatus.Held) heldTickets++;
             }
             final int finalOpen = openTickets;
             final int finalHeld = heldTickets;

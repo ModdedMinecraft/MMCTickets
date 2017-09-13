@@ -11,7 +11,7 @@ import java.util.List;
 
 public class TicketData extends TicketDataUtil{
 
-    public TicketData(int ticketID, String name, String staffname, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, int status, int notified) {
+    public TicketData(int ticketID, String name, String staffname, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified) {
         super(ticketID, name, staffname, comment, timestamp, world, x, y, z, yaw, pitch, message, status, notified);
     }
 
@@ -34,7 +34,7 @@ public class TicketData extends TicketDataUtil{
                     node.getNode("yaw").getDouble(),
                     node.getNode("pitch").getDouble(),
                     node.getNode("message").getString(),
-                    node.getNode("status").getInt(),
+                    ticketStatus.valueOf(node.getNode("status").getString()),
                     node.getNode("notified").getInt());
         }
 
@@ -52,7 +52,7 @@ public class TicketData extends TicketDataUtil{
             node.getNode("yaw").setValue(ticket.yaw);
             node.getNode("pitch").setValue(ticket.pitch);
             node.getNode("message").setValue(ticket.message);
-            node.getNode("status").setValue(ticket.status);
+            node.getNode("status").setValue(ticket.status.toString());
             node.getNode("notified").setValue(ticket.notified);
         }
 

@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
+
 public class read implements CommandExecutor {
 
     private final Main plugin;
@@ -50,12 +52,12 @@ public class read implements CommandExecutor {
                     for (TicketData ticket : tickets) {
                         if (Config.hideOffline) {
                             if (CommonUtil.checkUserOnline(ticket.getName())) {
-                                if (ticket.getStatus() < 2) {
+                                if (ticket.getStatus() == Claimed || ticket.getStatus() == Open) {
                                     String online = CommonUtil.isUserOnline(ticket.getName());
                                     totalTickets++;
                                     Text.Builder send = Text.builder();
                                     String status = "";
-                                    if (ticket.getStatus() == 1) status = "&eClaimed - ";
+                                    if (ticket.getStatus() == Claimed) status = "&eClaimed - ";
                                     send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                                     send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                                     send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
@@ -63,12 +65,12 @@ public class read implements CommandExecutor {
                                 }
                             }
                         } else {
-                            if (ticket.getStatus() < 2) {
+                            if (ticket.getStatus() == Claimed || ticket.getStatus() == Open) {
                                 String online = CommonUtil.isUserOnline(ticket.getName());
                                 totalTickets++;
                                 Text.Builder send = Text.builder();
                                 String status = "";
-                                if (ticket.getStatus() == 1) status = "&eClaimed - ";
+                                if (ticket.getStatus() == Claimed) status = "&eClaimed - ";
                                 send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                                 send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                                 send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
@@ -115,8 +117,8 @@ public class read implements CommandExecutor {
 
                             Text.Builder action = Text.builder();
 
-                            if (ticket.getStatus() <= 1) {
-                                if (ticket.getStatus() == 0 && src.hasPermission(Permissions.COMMAND_TICKET_CLAIM)) {
+                            if (ticket.getStatus() == Open || ticket.getStatus() == Claimed) {
+                                if (ticket.getStatus() == Open && src.hasPermission(Permissions.COMMAND_TICKET_CLAIM)) {
                                     action.append(Text.builder()
                                             .append(plugin.fromLegacy(Messages.getClaimButton()))
                                             .onHover(TextActions.showText(plugin.fromLegacy(Messages.getClaimButtonHover())))
@@ -124,7 +126,7 @@ public class read implements CommandExecutor {
                                             .build());
                                     action.append(plugin.fromLegacy(" "));
                                 }
-                                if (ticket.getStatus() == 1) {
+                                if (ticket.getStatus() == Claimed) {
                                     if (ticket.getStaffName().equalsIgnoreCase(src.getName()) && src.hasPermission(Permissions.COMMAND_TICKET_UNCLAIM)) {
                                         action.append(Text.builder()
                                                 .append(plugin.fromLegacy(Messages.getUnclaimButton()))
@@ -134,7 +136,7 @@ public class read implements CommandExecutor {
                                         action.append(plugin.fromLegacy(" "));
                                     }
                                 }
-                                if ((ticket.getStatus() == 0 || ticket.getStatus() == 1 && ticket.getStaffName().equalsIgnoreCase(src.getName())) && src.hasPermission(Permissions.COMMAND_TICKET_HOLD)) {
+                                if ((ticket.getStatus() == Open || ticket.getStatus() == Claimed && ticket.getStaffName().equalsIgnoreCase(src.getName())) && src.hasPermission(Permissions.COMMAND_TICKET_HOLD)) {
                                     action.append(Text.builder()
                                             .append(plugin.fromLegacy(Messages.getHoldButton()))
                                             .onHover(TextActions.showText(plugin.fromLegacy(Messages.getHoldButtonHover())))
@@ -143,7 +145,7 @@ public class read implements CommandExecutor {
                                     action.append(plugin.fromLegacy(" "));
                                 }
                             }
-                            if (ticket.getStatus() >= 2) {
+                            if (ticket.getStatus() == Held || ticket.getStatus() == Closed) {
                                 if (src.hasPermission(Permissions.COMMAND_TICKET_REOPEN)) {
                                     action.append(Text.builder()
                                             .append(plugin.fromLegacy(Messages.getReopenButton()))
@@ -153,8 +155,8 @@ public class read implements CommandExecutor {
                                     action.append(plugin.fromLegacy(" "));
                                 }
                             }
-                            if (ticket.getStatus() <= 2) {
-                                if ((ticket.getStatus() == 1 && ticket.getStaffName().equalsIgnoreCase(src.getName())) || ticket.getStatus() == 0 || ticket.getStatus() == 2) {
+                            if (ticket.getStatus() == Held || ticket.getStatus() == Claimed || ticket.getStatus() == Open) {
+                                if ((ticket.getStatus() == Claimed && ticket.getStaffName().equalsIgnoreCase(src.getName())) || ticket.getStatus() == Open || ticket.getStatus() == Held) {
                                     if (src.hasPermission(Permissions.COMMAND_TICKET_CLOSE_ALL) || src.hasPermission(Permissions.COMMAND_TICKET_CLOSE_SELF)) {
                                         action.append(Text.builder()
                                                 .append(plugin.fromLegacy(Messages.getCloseButton()))
@@ -166,7 +168,7 @@ public class read implements CommandExecutor {
                                 }
                             }
                             if (ticket.getComment().isEmpty() && src.hasPermission(Permissions.COMMAND_TICKET_COMMENT)) {
-                                if (ticket.getStatus() != 1 || ticket.getStatus() == 1 && ticket.getStaffName().equalsIgnoreCase(src.getName())) {
+                                if (ticket.getStatus() != Claimed || ticket.getStatus() == Claimed && ticket.getStaffName().equalsIgnoreCase(src.getName())) {
                                     action.append(Text.builder()
                                             .append(plugin.fromLegacy(Messages.getCommentButton()))
                                             .onHover(TextActions.showText(plugin.fromLegacy(Messages.getCommentButtonHover())))
@@ -188,9 +190,9 @@ public class read implements CommandExecutor {
                                 contents.add(action.build());
                             }
                             if (!ticket.getStaffName().isEmpty()) {
-                                if (ticket.getStatus() == 1)
+                                if (ticket.getStatus() == Claimed)
                                     contents.add(plugin.fromLegacy("&eClaimed by: &7" + ticket.getStaffName()));
-                                else if (ticket.getStatus() == 3)
+                                else if (ticket.getStatus() == Closed)
                                     contents.add(plugin.fromLegacy("&eHandled by: &7" + ticket.getStaffName()));
                             }
                             if (!ticket.getComment().isEmpty()) {

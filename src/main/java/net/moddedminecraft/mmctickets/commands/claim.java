@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
+
 public class claim implements CommandExecutor {
 
     private final Main plugin;
@@ -35,18 +37,18 @@ public class claim implements CommandExecutor {
         } else {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
-                    if (!ticket.getStaffName().equals(src.getName()) && ticket.getStatus() == 1 && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
+                    if (!ticket.getStaffName().equals(src.getName()) && ticket.getStatus() == Claimed && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
                         throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), ticket.getStaffName()));
                     }
-                    if (ticket.getStaffName().equals(src.getName()) && ticket.getStatus() == 1) {
+                    if (ticket.getStaffName().equals(src.getName()) && ticket.getStatus() == Claimed) {
                         throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), "you"));
                     }
-                    if (ticket.getStatus() == 3 || ticket.getStatus() == 2) {
+                    if (ticket.getStatus() == Closed || ticket.getStatus() == Held) {
                         throw new CommandException(Messages.getTicketNotOpen(ticketID));
                     }
 
                     ticket.setStaffName(src.getName());
-                    ticket.setStatus(1);
+                    ticket.setStatus(Claimed);
 
                     try {
                         plugin.saveData();

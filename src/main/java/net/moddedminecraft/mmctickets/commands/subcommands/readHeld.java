@@ -18,6 +18,8 @@ import org.spongepowered.api.text.action.TextActions;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.Held;
+
 public class readHeld implements CommandExecutor {
 
     private final Main plugin;
@@ -40,7 +42,7 @@ public class readHeld implements CommandExecutor {
             PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
             List<Text> contents = new ArrayList<>();
             for (TicketData ticket : tickets) {
-                if (ticket.getStatus() == 2) {
+                if (ticket.getStatus() == Held) {
                     String online = CommonUtil.isUserOnline(ticket.getName());
                     Text.Builder send = Text.builder();
                     send.append(plugin.fromLegacy("&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));

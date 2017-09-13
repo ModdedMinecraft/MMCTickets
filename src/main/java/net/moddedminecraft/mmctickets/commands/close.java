@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.Claimed;
+import static net.moddedminecraft.mmctickets.data.ticketStatus.Closed;
+
+
 public class close implements CommandExecutor {
 
     private final Main plugin;
@@ -44,17 +48,17 @@ public class close implements CommandExecutor {
                     if (!ticket.getName().equals(src.getName()) && !src.hasPermission(Permissions.COMMAND_TICKET_CLOSE_ALL)) {
                         throw new CommandException(Messages.getErrorTicketOwner());
                     }
-                    if (ticket.getStatus() == 3) {
+                    if (ticket.getStatus() == Closed) {
                         throw new CommandException(Messages.getErrorTicketAlreadyClosed());
                     }
-                    if (ticket.getStatus() == 1 && !ticket.getStaffName().equals(src.getName()) && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
+                    if (ticket.getStatus() == Claimed && !ticket.getStaffName().equals(src.getName()) && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
                         throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), ticket.getStaffName()));
                     }
                     if (commentOP.isPresent()) {
                         String comment = commentOP.get();
                         plugin.getTicket(ticketID).setComment(comment);
                     }
-                    plugin.getTicket(ticketID).setStatus(3);
+                    plugin.getTicket(ticketID).setStatus(Closed);
                     ticket.setStaffName(src.getName());
 
                     CommonUtil.notifyOnlineStaff(Messages.getTicketClose(ticketID, src.getName()));

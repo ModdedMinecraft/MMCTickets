@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
+
 public class unclaim implements CommandExecutor {
 
     private final Main plugin;
@@ -35,18 +37,18 @@ public class unclaim implements CommandExecutor {
         } else {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
-                    if (!ticket.getStaffName().equals(src.getName()) && ticket.getStatus() == 1 && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
+                    if (!ticket.getStaffName().equals(src.getName()) && ticket.getStatus() == Claimed && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
                         throw new CommandException(Messages.getErrorTicketUnclaim(ticket.getTicketID(), ticket.getStaffName()));
                     }
-                    if (ticket.getStatus() == 0) {
+                    if (ticket.getStatus() == Open) {
                         throw new CommandException(Messages.getTicketNotClaimed(ticket.getTicketID()));
                     }
-                    if (ticket.getStatus() == 3 || ticket.getStatus() == 2) {
+                    if (ticket.getStatus() == Closed || ticket.getStatus() == Held) {
                         throw new CommandException(Messages.getTicketNotOpen(ticketID));
                     }
 
                     ticket.setStaffName("");
-                    ticket.setStatus(0);
+                    ticket.setStatus(Open);
 
                     try {
                         plugin.saveData();

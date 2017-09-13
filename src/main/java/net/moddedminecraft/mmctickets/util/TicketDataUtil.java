@@ -1,13 +1,17 @@
 package net.moddedminecraft.mmctickets.util;
 
+import net.moddedminecraft.mmctickets.data.ticketStatus;
+
 public class TicketDataUtil {
 
     protected String name, world, staffname, comment, message;
-    protected int ticketID, x, y, z, status, notified;
+    protected int ticketID, x, y, z, notified;
     protected Double yaw, pitch;
     protected long timestamp;
+    protected ticketStatus status;
 
-    public TicketDataUtil(int ticketID, String name, String staffname, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, int status, int notified) {
+
+    public TicketDataUtil(int ticketID, String name, String staffname, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified) {
         this.ticketID = ticketID;
         this.name = name;
         this.staffname = staffname;
@@ -72,7 +76,7 @@ public class TicketDataUtil {
         return message.replaceAll("(\\[)(.*)(\\])", "$2");
     }
 
-    public int getStatus() {
+    public ticketStatus getStatus() {
         return status;
     }
 
@@ -80,7 +84,7 @@ public class TicketDataUtil {
         return notified;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(ticketStatus status) {
         this.status = status;
     }
 

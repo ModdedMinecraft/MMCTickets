@@ -35,10 +35,15 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 
 @Plugin(id = "mmctickets", name = "MMCTickets", version = "1.3.0", description = "A real time ticket system")
 public class Main {
@@ -75,6 +80,7 @@ public class Main {
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
         Sponge.getEventManager().registerListeners(this, new EventListener(this));
+        convertOldData();
 
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(TicketData.class), new TicketSerializer());
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(PlayerData.class), new PlayerDataSerializer());
@@ -270,7 +276,7 @@ public class Main {
         this.notifications = new ArrayList<String>();
         for (TicketData ticket : ticketList) {
             this.tickets.put(ticket.getTicketID(), ticket);
-            if (ticket.getNotified() == 0 && ticket.getStatus() == 3) this.notifications.add(ticket.getName());
+            if (ticket.getNotified() == 0 && ticket.getStatus() == Closed) this.notifications.add(ticket.getName());
         }
 
         HoconConfigurationLoader playerloader = getPlayerDataLoader();
@@ -307,10 +313,10 @@ public class Main {
                     int openTickets = 0;
                     int heldTickets = 0;
                     for (TicketData ticket : tickets) {
-                        if (ticket.getStatus() < 2) {
+                        if (ticket.getStatus() == Open || ticket.getStatus() == Claimed) {
                             openTickets++;
                         }
-                        if (ticket.getStatus() == 2) {
+                        if (ticket.getStatus() == Held) {
                             heldTickets++;
                         }
                     }
@@ -375,6 +381,21 @@ public class Main {
 
     public String fromLegacyS(String legacy) {
         return String.valueOf(TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy));
+    }
+
+    private void convertOldData() throws IOException {
+        Path path = this.ConfigDir.resolve("TicketData.conf");
+        if (path.toFile().exists()) {
+            Charset charset = StandardCharsets.UTF_8;
+            String content = new String(Files.readAllBytes(path), charset);
+            if (content.contains("status=0") || content.contains("status=1") || content.contains("status=2") || content.contains("status=3")) {
+                content = content.replaceAll("status=0", "status=Open");
+                content = content.replaceAll("status=1", "status=Claimed");
+                content = content.replaceAll("status=2", "status=Held");
+                content = content.replaceAll("status=3", "status=Closed");
+                Files.write(path, content.getBytes(charset));
+            }
+        }
     }
 
 }

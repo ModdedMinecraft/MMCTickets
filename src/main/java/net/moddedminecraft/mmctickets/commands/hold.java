@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
+
 public class hold implements CommandExecutor {
     private final Main plugin;
 
@@ -34,16 +36,16 @@ public class hold implements CommandExecutor {
         } else {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
-                    if (ticket.getStatus() == 3) {
+                    if (ticket.getStatus() == Closed) {
                         src.sendMessage(Messages.getErrorTicketAlreadyClosed());
                     }
-                    if (ticket.getStatus() == 2) {
+                    if (ticket.getStatus() == Held) {
                         src.sendMessage(Messages.getErrorTicketlreadyHold());
                     }
-                    if (ticket.getStatus() == 1 && !ticket.getStaffName().equals(src.getName())) {
+                    if (ticket.getStatus() == Claimed && !ticket.getStaffName().equals(src.getName())) {
                         src.sendMessage(Messages.getErrorTicketClaim(ticket.getTicketID(), ticket.getStaffName()));
                     }
-                    ticket.setStatus(2);
+                    ticket.setStatus(Held);
                     ticket.setStaffName("");
 
                     try {

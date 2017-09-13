@@ -20,6 +20,8 @@ import org.spongepowered.api.text.action.TextActions;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
+
 public class readSelf implements CommandExecutor {
 
     private final Main plugin;
@@ -50,9 +52,9 @@ public class readSelf implements CommandExecutor {
                     String online = CommonUtil.isUserOnline(ticket.getName());
                     Text.Builder send = Text.builder();
                     String status = "";
-                    if (ticket.getStatus() == 0) status = "&aOpen &e- ";
-                    if (ticket.getStatus() == 2) status = "&6Held &e- ";
-                    if (ticket.getStatus() == 3) status = "&cClosed &e- ";
+                    if (ticket.getStatus() == Open) status = "&aOpen &e- ";
+                    if (ticket.getStatus() == Held) status = "&6Held &e- ";
+                    if (ticket.getStatus() == Closed) status = "&cClosed &e- ";
                     send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                     send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                     send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));

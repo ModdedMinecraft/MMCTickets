@@ -2,12 +2,15 @@ package net.moddedminecraft.mmctickets.util;
 
 
 import net.moddedminecraft.mmctickets.config.Permissions;
+import net.moddedminecraft.mmctickets.data.ticketStatus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.title.Title;
+
+import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 
 public class CommonUtil {
     private static final int SECOND_MILLIS = 1000;
@@ -67,12 +70,12 @@ public class CommonUtil {
         return false;
     }
 
-    public static String getTicketStatusColour(int ticketIDStatus){
+    public static String getTicketStatusColour(ticketStatus ticketIDStatus){
         String ticketStatus = "";
-        if (ticketIDStatus == 0) ticketStatus = "&eOpen";
-        if (ticketIDStatus == 1) ticketStatus = "&eClaimed";
-        if (ticketIDStatus == 2) ticketStatus = "&eHeld";
-        if (ticketIDStatus == 3) ticketStatus = "&cClosed";
+        if (ticketIDStatus == Open) ticketStatus = "&eOpen";
+        if (ticketIDStatus == Claimed) ticketStatus = "&eClaimed";
+        if (ticketIDStatus == Held) ticketStatus = "&eHeld";
+        if (ticketIDStatus == Closed) ticketStatus = "&cClosed";
 
         return ticketStatus;
     }

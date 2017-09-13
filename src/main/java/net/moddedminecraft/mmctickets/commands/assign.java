@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.Claimed;
+import static net.moddedminecraft.mmctickets.data.ticketStatus.Closed;
+
 public class assign implements CommandExecutor {
     private final Main plugin;
 
@@ -36,13 +39,13 @@ public class assign implements CommandExecutor {
         } else {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
-                    if (ticket.getStatus() < 2) {
-                        src.sendMessage(Messages.getErrorTicketNotClosed(ticketID));
+                    if (ticket.getStatus() == Closed) {
+                        src.sendMessage(Messages.getErrorTicketAlreadyClosed());
                     }
-                    if (ticket.getStatus() == 1 && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
+                    if (ticket.getStatus() == Claimed && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
                         throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), ticket.getStaffName()));
                     }
-                    ticket.setStatus(1);
+                    ticket.setStatus(Claimed);
                     ticket.setStaffName(player.getName());
 
                     try {

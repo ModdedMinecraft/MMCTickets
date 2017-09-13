@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.Claimed;
+import static net.moddedminecraft.mmctickets.data.ticketStatus.Open;
+
 
 public class reopen implements CommandExecutor {
     private final Main plugin;
@@ -35,13 +38,13 @@ public class reopen implements CommandExecutor {
         } else {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
-                    if (ticket.getStatus() <= 1) {
+                    if (ticket.getStatus() == Claimed || ticket.getStatus() == Open) {
                         throw new CommandException(Messages.getErrorTicketNotClosed(ticketID));
                     }
-                    if (ticket.getStatus() == 1) {
+                    if (ticket.getStatus() == Claimed) {
                         throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), ticket.getStaffName()));
                     }
-                    ticket.setStatus(0);
+                    ticket.setStatus(Open);
                     ticket.setStaffName("");
                     ticket.setComment("");
                     ticket.setNotified(0);

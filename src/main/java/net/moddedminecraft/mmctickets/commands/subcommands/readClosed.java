@@ -19,6 +19,8 @@ import org.spongepowered.api.text.action.TextActions;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.Closed;
+
 public class readClosed implements CommandExecutor {
 
     private final Main plugin;
@@ -41,7 +43,7 @@ public class readClosed implements CommandExecutor {
             PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
             List<Text> contents = new ArrayList<>();
             for (TicketData ticket : tickets) {
-                if (ticket.getStatus() == 3) {
+                if (ticket.getStatus() == Closed) {
                     String online = CommonUtil.isUserOnline(ticket.getName());
                     Text.Builder send = Text.builder();
                     send.append(plugin.fromLegacy("&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));

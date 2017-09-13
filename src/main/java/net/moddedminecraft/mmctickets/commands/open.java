@@ -19,6 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static net.moddedminecraft.mmctickets.data.ticketStatus.Closed;
+import static net.moddedminecraft.mmctickets.data.ticketStatus.Open;
+
 public class open implements CommandExecutor {
 
     private final Main plugin;
@@ -50,11 +53,11 @@ public class open implements CommandExecutor {
                 if (ticket.getTicketID() == ticketID) {
                     ticketID++;
                 }
-                if (ticket.getName().equals(src.getName()) && ticket.getStatus() != 3) {
+                if (ticket.getName().equals(src.getName()) && ticket.getStatus() != Closed) {
                     totalTickets++;
                 }
                 if (Config.preventDuplicates) {
-                    if (ticket.getMessage().equals(message) && ticket.getStatus() != 3 && ticket.getName().equals(src.getName())) {
+                    if (ticket.getMessage().equals(message) && ticket.getStatus() != Closed && ticket.getName().equals(src.getName())) {
                         duplicate = true;
                     }
                 }
@@ -77,7 +80,7 @@ public class open implements CommandExecutor {
                 throw new CommandException(Messages.getErrorBanned());
             }
         }
-
+        UUID uuidP = player.getUniqueId().;
         plugin.addTicket(new TicketData(ticketID,
                 src.getName(),
                 "",
@@ -90,7 +93,7 @@ public class open implements CommandExecutor {
                 player.getHeadRotation().getX(),
                 player.getHeadRotation().getY(),
                 message,
-                0,
+                Open,
                 0));
 
         try {
