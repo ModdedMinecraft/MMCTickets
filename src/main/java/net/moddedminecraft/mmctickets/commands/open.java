@@ -80,7 +80,6 @@ public class open implements CommandExecutor {
                 throw new CommandException(Messages.getErrorBanned());
             }
         }
-        UUID uuidP = player.getUniqueId().;
         plugin.addTicket(new TicketData(ticketID,
                 src.getName(),
                 "",
