@@ -4,6 +4,7 @@ import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.config.Permissions;
 import net.moddedminecraft.mmctickets.data.TicketData;
+import net.moddedminecraft.mmctickets.util.CommonUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -17,6 +18,7 @@ import org.spongepowered.api.text.action.TextActions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.Claimed;
@@ -35,14 +37,19 @@ public class comment implements CommandExecutor {
         final String comment = args.<String>getOne("comment").get();
 
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        if (src instanceof Player) {
+            Player player = (Player) src;
+            uuid = player.getUniqueId();
+        }
 
         if (tickets.isEmpty()) {
             throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
         } else {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
-                    if (!ticket.getStaffName().equals(src.getName()) && ticket.getStatus() == Claimed && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
-                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), ticket.getStaffName()));
+                    if (!ticket.getStaffUUID().equals(uuid) && ticket.getStatus() == Claimed && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
+                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
                     }
                     if (!ticket.getComment().isEmpty()) {
                         if (src.hasPermission(Permissions.COMMAND_TICKET_EDIT_COMMENT)) {
@@ -68,7 +75,7 @@ public class comment implements CommandExecutor {
                         e.printStackTrace();
                     }
 
-                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getName());
+                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getPlayerUUID());
                     if (ticketPlayerOP.isPresent()) {
                         Player ticketPlayer = ticketPlayerOP.get();
                         ticketPlayer.sendMessage(Messages.getTicketComment(ticket.getTicketID(), src.getName()));
@@ -97,7 +104,7 @@ public class comment implements CommandExecutor {
                         e.printStackTrace();
                     }
 
-                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getName());
+                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getPlayerUUID());
                     if (ticketPlayerOP.isPresent()) {
                         Player ticketPlayer = ticketPlayerOP.get();
                         ticketPlayer.sendMessage(Messages.getTicketComment(ticket.getTicketID(), name));

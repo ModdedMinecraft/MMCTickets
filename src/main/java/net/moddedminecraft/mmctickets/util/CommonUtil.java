@@ -6,9 +6,13 @@ import net.moddedminecraft.mmctickets.data.ticketStatus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.title.Title;
+
+import java.util.Optional;
+import java.util.UUID;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 
@@ -52,9 +56,9 @@ public class CommonUtil {
         return message;
     }
 
-    public static String isUserOnline(String name){
+    public static String isUserOnline(UUID uuid){
         for(Player player : Sponge.getServer().getOnlinePlayers()){
-            if(name.equals(player.getName())) {
+            if(uuid.equals(player.getUniqueId())) {
                 return "&a";
             }
         }
@@ -113,5 +117,23 @@ public class CommonUtil {
                 player.playSound(SoundTypes.BLOCK_NOTE_PLING, player.getLocation().getPosition(), 2);
             }
         }
+    }
+
+    public static String getNameFromUUID(UUID uuid) {
+        Optional<Player> onlinePlayer = Sponge.getServer().getPlayer(uuid);
+        if (onlinePlayer.isPresent()) {
+            return Sponge.getServer().getPlayer(uuid).get().getName();
+        }
+        Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
+        return userStorage.get().get(uuid).get().getName();
+    }
+
+    public static UUID getUUIDFromName(String name) {
+        Optional<Player> onlinePlayer = Sponge.getServer().getPlayer(name);
+        if (onlinePlayer.isPresent()) {
+            return Sponge.getServer().getPlayer(name).get().getUniqueId();
+        }
+        Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
+        return userStorage.get().get(name).get().getUniqueId();
     }
 }

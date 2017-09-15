@@ -11,8 +11,8 @@ import java.util.List;
 
 public class TicketData extends TicketDataUtil{
 
-    public TicketData(int ticketID, String name, String staffname, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified) {
-        super(ticketID, name, staffname, comment, timestamp, world, x, y, z, yaw, pitch, message, status, notified);
+    public TicketData(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified) {
+        super(ticketID, playerUUID, staffUUID, comment, timestamp, world, x, y, z, yaw, pitch, message, status, notified);
     }
 
     public static class TicketSerializer implements TypeSerializer<TicketData> {
@@ -23,8 +23,8 @@ public class TicketData extends TicketDataUtil{
         public TicketData deserialize(TypeToken<?> token, ConfigurationNode node) throws ObjectMappingException {
             return new TicketData(
                     node.getNode("ticketID").getInt(),
-                    node.getNode("name").getString(),
-                    node.getNode("staffname").getString(),
+                    node.getNode("playerUUID").getString(),
+                    node.getNode("staffUUID").getString(),
                     node.getNode("comment").getString(),
                     node.getNode("timestamp").getInt(),
                     node.getNode("world").getString(),
@@ -41,8 +41,8 @@ public class TicketData extends TicketDataUtil{
         @Override
         public void serialize(TypeToken<?> token, TicketData ticket, ConfigurationNode node) throws ObjectMappingException {
             node.getNode("ticketID").setValue(ticket.ticketID);
-            node.getNode("name").setValue(ticket.name);
-            node.getNode("staffname").setValue(ticket.staffname);
+            node.getNode("playerUUID").setValue(ticket.playerUUID);
+            node.getNode("staffUUID").setValue(ticket.staffUUID);
             node.getNode("comment").setValue(ticket.comment);
             node.getNode("timestamp").setValue(ticket.timestamp);
             node.getNode("world").setValue(ticket.world);

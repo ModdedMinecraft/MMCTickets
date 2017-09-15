@@ -15,6 +15,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 
@@ -31,6 +32,12 @@ public class hold implements CommandExecutor {
 
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
 
+        UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        if (src instanceof Player) {
+            Player player = (Player) src;
+            uuid = player.getUniqueId();
+        }
+
         if (tickets.isEmpty()) {
             throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
         } else {
@@ -42,11 +49,11 @@ public class hold implements CommandExecutor {
                     if (ticket.getStatus() == Held) {
                         src.sendMessage(Messages.getErrorTicketlreadyHold());
                     }
-                    if (ticket.getStatus() == Claimed && !ticket.getStaffName().equals(src.getName())) {
-                        src.sendMessage(Messages.getErrorTicketClaim(ticket.getTicketID(), ticket.getStaffName()));
+                    if (ticket.getStatus() == Claimed && !ticket.getStaffUUID().equals(uuid)) {
+                        src.sendMessage(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
                     }
                     ticket.setStatus(Held);
-                    ticket.setStaffName("");
+                    ticket.setStaffUUID(UUID.fromString("00000000-0000-0000-0000-000000000000").toString());
 
                     try {
                         plugin.saveData();
@@ -57,7 +64,7 @@ public class hold implements CommandExecutor {
 
                     CommonUtil.notifyOnlineStaff(Messages.getTicketHold(ticket.getTicketID(), src.getName()));
 
-                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getName());
+                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getPlayerUUID());
                     if (ticketPlayerOP.isPresent()) {
                         Player ticketPlayer = ticketPlayerOP.get();
                         ticketPlayer.sendMessage(Messages.getTicketHoldUser(ticket.getTicketID(), src.getName()));

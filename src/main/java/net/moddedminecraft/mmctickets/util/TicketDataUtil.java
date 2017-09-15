@@ -2,19 +2,21 @@ package net.moddedminecraft.mmctickets.util;
 
 import net.moddedminecraft.mmctickets.data.ticketStatus;
 
+import java.util.UUID;
+
 public class TicketDataUtil {
 
-    protected String name, world, staffname, comment, message;
+    protected String playerUUID, world, staffUUID, comment, message;
     protected int ticketID, x, y, z, notified;
     protected Double yaw, pitch;
     protected long timestamp;
     protected ticketStatus status;
 
 
-    public TicketDataUtil(int ticketID, String name, String staffname, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified) {
+    public TicketDataUtil(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified) {
         this.ticketID = ticketID;
-        this.name = name;
-        this.staffname = staffname;
+        this.playerUUID = playerUUID;
+        this.staffUUID = staffUUID;
         this.comment = comment;
         this.timestamp = timestamp;
         this.world = world;
@@ -32,12 +34,20 @@ public class TicketDataUtil {
         return ticketID;
     }
 
-    public String getName() {
-        return name;
+    public UUID getPlayerUUID() {
+        return UUID.fromString(playerUUID);
     }
 
-    public String getStaffName() {
-        return staffname;
+    public UUID getStaffUUID() {
+        return UUID.fromString(staffUUID);
+    }
+
+    public String getOldPlayer() {
+        return playerUUID;
+    }
+
+    public String getOldStaffname() {
+        return staffUUID;
     }
 
     public String getComment() {
@@ -96,8 +106,12 @@ public class TicketDataUtil {
         this.comment = comment;
     }
 
-    public void setStaffName(String staffname) {
-        this.staffname = staffname;
+    public void setStaffUUID(String uuid) {
+        this.staffUUID = uuid;
+    }
+
+    public void setPlayerUUID(UUID uuid) {
+        this.playerUUID = String.valueOf(uuid);
     }
 
 }

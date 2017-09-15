@@ -53,11 +53,11 @@ public class EventListener {
         }
 
         //Notify a player if a ticket they created was closed while they were offline
-        if (plugin.getNotifications().contains(player.getName())) {
+        if (plugin.getNotifications().contains(player.getUniqueId())) {
             final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
             int totalTickets = 0;
             for (TicketData ticket : tickets) {
-                if (ticket.getName().equals(player.getName()) && ticket.getNotified() == 0) {
+                if (ticket.getPlayerUUID().equals(player.getUniqueId()) && ticket.getNotified() == 0) {
                     totalTickets++;
                     ticket.setNotified(1);
                 }
@@ -67,7 +67,7 @@ public class EventListener {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            plugin.getNotifications().removeAll(Collections.singleton(player.getName()));
+            plugin.getNotifications().removeAll(Collections.singleton(player.getUniqueId()));
             final int finalTotalTickets = totalTickets;
             Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
                 public void run() {

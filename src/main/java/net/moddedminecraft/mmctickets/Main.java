@@ -31,6 +31,7 @@ import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
@@ -70,7 +71,7 @@ public class Main {
     private CommandManager cmdManager = Sponge.getCommandManager();
 
     private ArrayList<String> waitTimer;
-    private ArrayList<String> notifications;
+    private ArrayList<UUID> notifications;
     private Map<Integer, TicketData> tickets;
     public Map<UUID, PlayerData> playersData;
 
@@ -93,6 +94,7 @@ public class Main {
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) throws IOException {
+        checkOldNames();
         logger.info("MMCTickets Loaded");
         logger.info("Tickets loaded: " + tickets.size());
         logger.info("Notifications loaded: " + notifications.size());
@@ -273,10 +275,10 @@ public class Main {
 
         List<TicketData> ticketList = rootNode.getNode("Tickets").getList(TypeToken.of(TicketData.class));
         this.tickets = new HashMap<Integer, TicketData>();
-        this.notifications = new ArrayList<String>();
+        this.notifications = new ArrayList<UUID>();
         for (TicketData ticket : ticketList) {
             this.tickets.put(ticket.getTicketID(), ticket);
-            if (ticket.getNotified() == 0 && ticket.getStatus() == Closed) this.notifications.add(ticket.getName());
+            if (ticket.getNotified() == 0 && ticket.getStatus() == Closed) this.notifications.add(ticket.getPlayerUUID());
         }
 
         HoconConfigurationLoader playerloader = getPlayerDataLoader();
@@ -359,7 +361,7 @@ public class Main {
         return Collections.unmodifiableCollection(this.playersData.values());
     }
 
-    public ArrayList<String> getNotifications() {
+    public ArrayList<UUID> getNotifications() {
         return this.notifications;
     }
 
@@ -395,7 +397,35 @@ public class Main {
                 content = content.replaceAll("status=3", "status=Closed");
                 Files.write(path, content.getBytes(charset));
             }
+            if (content.contains("name") || content.contains("staffname")) {
+                content = content.replaceAll("staffname", "staffUUID");
+                content = content.replaceAll("staffUUID=\"\"", "staffUUID=\"00000000-0000-0000-0000-000000000000\"");
+                content = content.replaceAll("name", "playerUUID");
+                Files.write(path, content.getBytes(charset));
+            }
         }
     }
 
+    private void checkOldNames() {
+        final List<TicketData> tickets = new ArrayList<TicketData>(getTickets());
+        Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
+        Boolean save = false;
+        for (TicketData ticket : tickets) {
+            if (!ticket.getOldPlayer().matches("[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}")) {
+                ticket.setPlayerUUID(userStorage.get().get(ticket.getOldPlayer()).get().getUniqueId());
+                save = true;
+            }
+            if (!ticket.getOldStaffname().matches("[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}")) {
+                ticket.setStaffUUID(userStorage.get().get(ticket.getOldStaffname()).get().getUniqueId().toString());
+                save = true;
+            }
+        }
+        if (save) {
+            try {
+                saveData();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

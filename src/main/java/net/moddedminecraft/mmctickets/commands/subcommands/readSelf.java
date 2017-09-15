@@ -48,14 +48,14 @@ public class readSelf implements CommandExecutor {
             PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
             List<Text> contents = new ArrayList<>();
             for (TicketData ticket : tickets) {
-                if (ticket.getName().equals(player.getName())) {
-                    String online = CommonUtil.isUserOnline(ticket.getName());
+                if (ticket.getPlayerUUID().equals(player.getUniqueId())) {
+                    String online = CommonUtil.isUserOnline(ticket.getPlayerUUID());
                     Text.Builder send = Text.builder();
                     String status = "";
                     if (ticket.getStatus() == Open) status = "&aOpen &e- ";
                     if (ticket.getStatus() == Held) status = "&6Held &e- ";
                     if (ticket.getStatus() == Closed) status = "&cClosed &e- ";
-                    send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + ticket.getName() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
+                    send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID()) + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                     send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                     send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
                     contents.add(send.build());

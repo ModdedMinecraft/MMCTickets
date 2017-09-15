@@ -17,6 +17,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.Closed;
@@ -38,6 +39,7 @@ public class open implements CommandExecutor {
             throw new CommandException(Messages.getErrorGen("Only players can run this command"));
         }
         Player player = (Player) src;
+        UUID uuid = player.getUniqueId();
 
         if (plugin.getWaitTimer().contains(src.getName())) {
             throw new CommandException(Messages.getTicketTooFast(Config.delayTimer));
@@ -53,11 +55,11 @@ public class open implements CommandExecutor {
                 if (ticket.getTicketID() == ticketID) {
                     ticketID++;
                 }
-                if (ticket.getName().equals(src.getName()) && ticket.getStatus() != Closed) {
+                if (ticket.getPlayerUUID().equals(uuid) && ticket.getStatus() != Closed) {
                     totalTickets++;
                 }
                 if (Config.preventDuplicates) {
-                    if (ticket.getMessage().equals(message) && ticket.getStatus() != Closed && ticket.getName().equals(src.getName())) {
+                    if (ticket.getMessage().equals(message) && ticket.getStatus() != Closed && ticket.getPlayerUUID().equals(uuid)) {
                         duplicate = true;
                     }
                 }
@@ -81,8 +83,8 @@ public class open implements CommandExecutor {
             }
         }
         plugin.addTicket(new TicketData(ticketID,
-                src.getName(),
-                "",
+                String.valueOf(uuid),
+                UUID.fromString("00000000-0000-0000-0000-000000000000").toString(),
                 "",
                 System.currentTimeMillis()/1000,
                 player.getWorld().getName(),

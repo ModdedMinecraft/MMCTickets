@@ -15,6 +15,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.Claimed;
 import static net.moddedminecraft.mmctickets.data.ticketStatus.Open;
@@ -42,10 +43,10 @@ public class reopen implements CommandExecutor {
                         throw new CommandException(Messages.getErrorTicketNotClosed(ticketID));
                     }
                     if (ticket.getStatus() == Claimed) {
-                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), ticket.getStaffName()));
+                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
                     }
                     ticket.setStatus(Open);
-                    ticket.setStaffName("");
+                    ticket.setStaffUUID(UUID.fromString("00000000-0000-0000-0000-000000000000").toString());
                     ticket.setComment("");
                     ticket.setNotified(0);
 
@@ -58,7 +59,7 @@ public class reopen implements CommandExecutor {
 
                     CommonUtil.notifyOnlineStaff(Messages.getTicketReopen(src.getName(), ticket.getTicketID()));
 
-                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getName());
+                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getPlayerUUID());
                     if (ticketPlayerOP.isPresent()) {
                         Player ticketPlayer = ticketPlayerOP.get();
                         ticketPlayer.sendMessage(Messages.getTicketReopenUser(src.getName(), ticket.getTicketID()));
