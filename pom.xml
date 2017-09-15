@@ -6,7 +6,7 @@
 
     <groupId>net.moddedminecraft</groupId>
     <artifactId>MMCTickets</artifactId>
-    <version>1.3.0-API-5.2-6.X</version>
+    <version>1.3.0-API-5.2-7.X</version>
     <name>MMCTickets</name>
     <description>
         A real time ticket system
