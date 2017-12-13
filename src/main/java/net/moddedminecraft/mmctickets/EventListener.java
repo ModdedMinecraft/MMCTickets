@@ -25,32 +25,22 @@ public class EventListener {
 
     @Listener
     public void onPlayerLogin(ClientConnectionEvent.Join event, @Root Player player) {
-        //Save the players data as they login for the first time, If the player already exists, Check if they have changed their name.
-        if (!plugin.playersData.containsKey(player.getUniqueId())) {
-            plugin.addPlayerData(new PlayerData(player.getUniqueId(), player.getName(), 0));
-            try {
-                plugin.saveData();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
-                public void run() {
-                    final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
-                    for (PlayerData pData : playerData) {
-                        if (pData.getPlayerUUID().equals(player.getUniqueId()) && !pData.getPlayerName().equals(player.getName())) {
-                            pData.setPlayerName(player.getName());
-                            try {
-                                plugin.saveData();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+        //If the playerdata for the player exists, Check if they have changed their name.
+        Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
+            public void run() {
+                final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
+                for (PlayerData pData : playerData) {
+                    if (pData.getPlayerUUID().equals(player.getUniqueId()) && !pData.getPlayerName().equals(player.getName())) {
+                        pData.setPlayerName(player.getName());
+                        try {
+                            plugin.saveData();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
                 }
-            }).delay(15, TimeUnit.SECONDS).name("mmctickets-s-checkUserNameOnLogin").submit(this.plugin);
-
-        }
+            }
+        }).delay(15, TimeUnit.SECONDS).name("mmctickets-s-checkUserNameOnLogin").submit(this.plugin);
 
         //Notify a player if a ticket they created was closed while they were offline
         if (plugin.getNotifications().contains(player.getUniqueId())) {

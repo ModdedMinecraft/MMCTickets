@@ -3,6 +3,7 @@ package net.moddedminecraft.mmctickets.commands;
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.data.PlayerData;
+import net.moddedminecraft.mmctickets.util.CommonUtil;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -27,6 +28,7 @@ public class ban implements CommandExecutor {
         final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
 
         for (PlayerData pData : playerData) {
+            CommonUtil.checkPlayerData(plugin, player);
             if (pData.getPlayerUUID().equals(player.getUniqueId())) {
                 if (pData.getBannedStatus() == 1) {
                     throw new CommandException(Messages.getErrorBannedAlready(player.getName()));
