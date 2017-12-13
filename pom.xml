@@ -6,7 +6,7 @@
 
     <groupId>net.moddedminecraft</groupId>
     <artifactId>MMCTickets</artifactId>
-    <version>1.4.0-API-5.2-7.X</version>
+    <version>1.4.0-API-7</version>
     <name>MMCTickets</name>
     <description>
         A real time ticket system
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
-            <version>5.2.0-SNAPSHOT</version>
+            <version>7.0.0-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
