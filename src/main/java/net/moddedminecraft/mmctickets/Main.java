@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 
-@Plugin(id = "mmctickets", name = "MMCTickets", version = "1.4.0", description = "A real time ticket system")
+@Plugin(id = "mmctickets", name = "MMCTickets", version = "1.4.1", description = "A real time ticket system")
 public class Main {
 
     @Inject
@@ -76,7 +76,7 @@ public class Main {
     public Map<UUID, PlayerData> playersData;
 
     public UpdateChecker updatechecker;
-    public String version = "1.4.0";
+    public String version = "1.4.1";
 
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
