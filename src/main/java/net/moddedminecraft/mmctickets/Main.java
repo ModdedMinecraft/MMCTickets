@@ -241,6 +241,14 @@ public class Main {
                 .permission(Permissions.COMMAND_TICKET_COMMENT)
                 .build();
 
+        // /ticket teleport (ticketID)
+        CommandSpec ticketTeleport = CommandSpec.builder()
+                .description(Text.of("Teleport to a ticket"))
+                .executor(new teleport(this))
+                .arguments(GenericArguments.integer(Text.of("ticketID")))
+                .permission(Permissions.COMMAND_TICKET_TELEPORT)
+                .build();
+
         // /ticket
         CommandSpec ticketBase = CommandSpec.builder()
                 .description(Text.of("Ticket base command, Displays help"))
@@ -257,6 +265,7 @@ public class Main {
                 .child(ticketAssign, "assign")
                 .child(ticketHold, "hold")
                 .child(ticketComment, "comment")
+                .child(ticketTeleport, "teleport", "tp")
                 .build();
 
         cmdManager.register(this, ticketOpen, "modreq");
