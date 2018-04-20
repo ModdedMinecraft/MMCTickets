@@ -76,7 +76,7 @@ public class Main {
     public Map<UUID, PlayerData> playersData;
 
     public UpdateChecker updatechecker;
-    public String version = "1.4.1";
+    public String version = "1.4.2";
 
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
