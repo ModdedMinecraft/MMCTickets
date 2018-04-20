@@ -172,7 +172,7 @@ public class Main {
         CommandSpec ticketBan = CommandSpec.builder()
                 .description(Text.of("Ban a player from being able to create new tickets"))
                 .executor(new ban(this))
-                .arguments(GenericArguments.player(Text.of("playername")))
+                .arguments(GenericArguments.user(Text.of("playername")))
                 .permission(Permissions.COMMAND_TICKET_BAN)
                 .build();
 
@@ -180,7 +180,7 @@ public class Main {
         CommandSpec ticketUnban = CommandSpec.builder()
                 .description(Text.of("Unban a player from being able to create new tickets"))
                 .executor(new unban(this))
-                .arguments(GenericArguments.player(Text.of("playername")))
+                .arguments(GenericArguments.user(Text.of("playername")))
                 .permission(Permissions.COMMAND_TICKET_BAN)
                 .build();
 
@@ -220,7 +220,7 @@ public class Main {
                 .description(Text.of("Unclaim a ticket"))
                 .executor(new assign(this))
                 .arguments(GenericArguments.integer(Text.of("ticketID")),
-                        GenericArguments.player(Text.of("player")))
+                        GenericArguments.user(Text.of("player")))
                 .permission(Permissions.COMMAND_TICKET_ASSIGN)
                 .build();
 

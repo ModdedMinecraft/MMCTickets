@@ -120,7 +120,7 @@ public class read implements CommandExecutor {
                             }
                             ticketStatus = CommonUtil.getTicketStatusColour(ticket.getStatus());
                             String online = CommonUtil.isUserOnline(ticket.getPlayerUUID());
-                            World world = Sponge.getServer().getWorld(ticket.getWorld()).get();
+                            Optional<World> worldOptional = Sponge.getServer().getWorld(ticket.getWorld());
 
                             Text.Builder action = Text.builder();
 
@@ -190,7 +190,7 @@ public class read implements CommandExecutor {
                             send.append(plugin.fromLegacy("&a" + ticket.getWorld() + "&e x:&a" + ticket.getX() + "&e y:&a" + ticket.getY() + "&e z:&a" + ticket.getZ()));
                             if (src.hasPermission(Permissions.COMMAND_TICKET_TELEPORT)) {
                                 send.onHover(TextActions.showText(Messages.getTicketOnHoverTeleportTo()));
-                                send.onClick(TextActions.executeCallback(teleportTo(world, ticket.getX(), ticket.getY(), ticket.getZ(), ticket.getPitch(), ticket.getYaw(), ticketID)));
+                                worldOptional.ifPresent(world -> send.onClick(TextActions.executeCallback(teleportTo(world, ticket.getX(), ticket.getY(), ticket.getZ(), ticket.getPitch(), ticket.getYaw(), ticketID))));
                             }
 
                             if (!action.build().isEmpty()) {

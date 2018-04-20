@@ -12,6 +12,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class assign implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final int ticketID = args.<Integer>getOne("ticketID").get();
-        final Player player = args.<Player>getOne("player").get();
+        final User user = args.<Player>getOne("player").get();
 
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
 
@@ -46,12 +47,12 @@ public class assign implements CommandExecutor {
                         throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
                     }
                     ticket.setStatus(Claimed);
-                    ticket.setStaffUUID(player.getUniqueId().toString());
+                    ticket.setStaffUUID(user.getUniqueId().toString());
 
                     try {
                         plugin.saveData();
                     } catch (Exception e) {
-                        src.sendMessage(Messages.getErrorGen("Unable to assign " + player.getName() + " to ticket"));
+                        src.sendMessage(Messages.getErrorGen("Unable to assign " + user.getName() + " to ticket"));
                         e.printStackTrace();
                     }
 
