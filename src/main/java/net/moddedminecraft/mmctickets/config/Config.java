@@ -38,12 +38,17 @@ public class Config {
 
     public static Boolean checkForUpdate;
 
+    public static String language;
+
 
 
     private void configCheck() throws IOException, ObjectMappingException {
         if (!plugin.defaultConf.toFile().exists()) {
             plugin.defaultConf.toFile().createNewFile();
         }
+
+        //locale
+        language = check(config.getNode("language"), "EN", "Localization to be used, All available translations are in the 'localization' folder").getString();
 
         // notifications
         soundNotification = check(config.getNode("notifications", "sound"), true, "If true, a notification sound will be played when requests are created.").getBoolean();

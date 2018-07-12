@@ -5,6 +5,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 
 import java.io.IOException;
@@ -23,7 +24,13 @@ public class Messages {
 
     public Messages(Main main) throws IOException, ObjectMappingException {
         plugin = main;
-        defaultMessage = plugin.ConfigDir.resolve("messages.conf");
+        String language = Config.language;
+        checkLangAssetFiles();
+        defaultMessage = plugin.ConfigDir.resolve("localization/messages_" + language + ".conf");
+        if (Files.notExists(defaultMessage)) {
+            plugin.logger.warn("Localization was not found");
+        }
+
         messageLoader = HoconConfigurationLoader.builder().setPath(defaultMessage).build();
         messages = messageLoader.load();
         messageCheck();
@@ -206,6 +213,24 @@ public class Messages {
             node.setValue(defaultValue);
         }
         return node;
+    }
+
+    private void checkLangAssetFiles() throws IOException {
+        if (!Files.isDirectory(plugin.ConfigDir.resolve("localization"))) {
+            Files.createDirectory(plugin.ConfigDir.resolve("localization"));
+        }
+        String[] assets = {
+                "messages_EN.conf",
+                "messages_DE.conf"
+        };
+
+        for (String asset : assets) {
+            if (!Files.exists(plugin.ConfigDir.resolve("localization/" +asset))) {
+                if (Sponge.getAssetManager().getAsset(plugin, asset).isPresent()) {
+                    Sponge.getAssetManager().getAsset(plugin, asset).get().copyToFile(plugin.ConfigDir.resolve("localization/" +asset));
+                }
+            }
+        }
     }
 
     private static Text parse(String key, Object ... params){
