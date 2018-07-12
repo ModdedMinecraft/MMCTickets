@@ -304,10 +304,6 @@ public class Messages {
         return parse(pluginOutdated, version);
     }
 
-    //public static Text getTicketComment(int ticketID, String staffName) {
-    //    return parse(ticketComment, ticketID, staffName);
-    //}
-
     public static Text getStaffListPadding() {
         return parse(staffListPadding);
     }
