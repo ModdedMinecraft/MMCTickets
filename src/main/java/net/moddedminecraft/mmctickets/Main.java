@@ -76,7 +76,6 @@ public class Main {
     public Map<UUID, PlayerData> playersData;
 
     public UpdateChecker updatechecker;
-    public String version = "1.4.2";
 
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
@@ -102,7 +101,7 @@ public class Main {
 
         this.waitTimer = new ArrayList<String>();
 
-        updatechecker = new UpdateChecker(this, version);
+        updatechecker = new UpdateChecker(this, Sponge.getPluginManager().getPlugin("mmctickets").get().getVersion().get());
         updatechecker.startUpdateCheck();
 
         //start ticket nag timer

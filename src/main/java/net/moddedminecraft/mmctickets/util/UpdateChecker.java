@@ -52,7 +52,7 @@ public class UpdateChecker {
 
     public void main() throws Exception {
         Gson gson = new Gson();
-        String json = readUrl("https://ore.spongepowered.org/api/projects/MMCTickets");
+        String json = readUrl("https://ore.spongepowered.org/api/v1/projects/mmctickets");
 
         Answer answer = gson.fromJson(json, Answer.class);
 
@@ -66,9 +66,22 @@ public class UpdateChecker {
             } catch (Exception e) {
                 plugin.getLogger().info("Update check failed. URL Invalid.");
             }
-            int rec = Integer.parseInt(recommendedVersion.replace(".", ""));
-            int cur = Integer.parseInt(currentVersion.replace(".", ""));
-            if (rec > cur) {
+
+            String[] recSplit = recommendedVersion.split("[.]", 3);
+            int recMajor = Integer.parseInt(recSplit[0]);
+            int recMinor = Integer.parseInt(recSplit[1]);
+            int recPatch = Integer.parseInt(recSplit[2]);
+
+            String[] curSplit = currentVersion.split("[.]", 3);
+            int curMajor = Integer.parseInt(curSplit[0]);
+            int curMinor = Integer.parseInt(curSplit[1]);
+            int curPatch = Integer.parseInt(curSplit[2]);
+
+            if (recMajor > curMajor) {
+                plugin.getLogger().info(Messages.getPluginOutdated(recommendedVersion).toPlain());
+            } else if (recMinor > curMinor) {
+                plugin.getLogger().info(Messages.getPluginOutdated(recommendedVersion).toPlain());
+            } else if (recPatch > curPatch) {
                 plugin.getLogger().info(Messages.getPluginOutdated(recommendedVersion).toPlain());
             }
         }
@@ -81,9 +94,26 @@ public class UpdateChecker {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            int rec = Integer.parseInt(recommendedVersion.replace(".", ""));
-            int cur = Integer.parseInt(currentVersion.replace(".", ""));
-            if (rec > cur) {
+
+            String[] recSplit = recommendedVersion.split("[.]", 3);
+            int recMajor = Integer.parseInt(recSplit[0]);
+            int recMinor = Integer.parseInt(recSplit[1]);
+            int recPatch = Integer.parseInt(recSplit[2]);
+
+            String[] curSplit = currentVersion.split("[.]", 3);
+            int curMajor = Integer.parseInt(curSplit[0]);
+            int curMinor = Integer.parseInt(curSplit[1]);
+            int curPatch = Integer.parseInt(curSplit[2]);
+
+            if (recMajor > curMajor) {
+                String text1 = Messages.getChatprefix().toPlain();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
+                player.sendMessage(Text.of(text1 + text2));
+            } else if (recMinor > curMinor) {
+                String text1 = Messages.getChatprefix().toPlain();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
+                player.sendMessage(Text.of(text1 + text2));
+            } else if (recPatch > curPatch) {
                 String text1 = Messages.getChatprefix().toPlain();
                 String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
                 player.sendMessage(Text.of(text1 + text2));
