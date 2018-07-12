@@ -79,6 +79,10 @@ public class UpdateChecker {
 
             if (recPatch > curPatch && recMinor >= curMinor && recMajor >= curMajor) {
                 plugin.getLogger().info(Messages.getPluginOutdated(recommendedVersion).toPlain());
+            } else if (recPatch <= curPatch && recMinor > curMinor && recMajor >= curMajor) {
+                plugin.getLogger().info(Messages.getPluginOutdated(recommendedVersion).toPlain());
+            } else if (recPatch <= curPatch && recMinor <= curMinor && recMajor > curMajor) {
+                plugin.getLogger().info(Messages.getPluginOutdated(recommendedVersion).toPlain());
             }
         }
     }
@@ -102,6 +106,14 @@ public class UpdateChecker {
             int curPatch = Integer.parseInt(curSplit[2]);
 
             if (recPatch > curPatch && recMinor >= curMinor && recMajor >= curMajor) {
+                String text1 = Messages.getChatprefix().toPlain();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
+                player.sendMessage(Text.of(text1 + text2));
+            } else if (recPatch <= curPatch && recMinor > curMinor && recMajor >= curMajor) {
+                String text1 = Messages.getChatprefix().toPlain();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
+                player.sendMessage(Text.of(text1 + text2));
+            } else if (recPatch <= curPatch && recMinor <= curMinor && recMajor > curMajor) {
                 String text1 = Messages.getChatprefix().toPlain();
                 String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
                 player.sendMessage(Text.of(text1 + text2));
