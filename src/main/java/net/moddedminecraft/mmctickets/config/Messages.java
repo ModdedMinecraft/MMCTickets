@@ -69,7 +69,7 @@ public class Messages {
 
     //ticket
     private static String ticketAssign = "&6{0} has been assigned to ticket #{1}.";
-    private static String ticketAssignUser = "&6Your ticket #{0} has been assigned to {0}.";
+    private static String ticketAssignUser = "&6Your ticket #{0} has been assigned to {1}.";
     private static String ticketCommentedit = "&6Ticket #{0} already has a comment attached. Do you wish to overwrite this?";
     private static String ticketComment = "&6A comment was added to ticket #{0} by {1}.";
     private static String ticketCommentUser = "&6Your comment was added to ticket #{0}.";
