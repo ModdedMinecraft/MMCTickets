@@ -40,6 +40,17 @@ public class Config {
 
     public static String language;
 
+    //Database
+    public static String storageEngine;
+    public static String databaseFile;
+    public static String h2Prefix;
+    public static String mysqlHost;
+    public static int mysqlPort;
+    public static String mysqlDatabase;
+    public static String mysqlUser;
+    public static String mysqlPass;
+    public static String mysqlPrefix;
+
 
 
     private void configCheck() throws IOException, ObjectMappingException {
@@ -67,6 +78,17 @@ public class Config {
         nagHeld = check(config.getNode("ticket", "user", "nag-held"), true, "If true, the nag feature will mention tickets on hold. ").getBoolean();
 
         checkForUpdate = check(config.getNode("update", "check"), true, "If true, will notify at startup and if a player with \""+Permissions.STAFF+"\" logs in, if there is an update available.").getBoolean();
+
+        //Database
+        storageEngine = check(config.getNode("storage", "storage-engine"), "h2", "The stoage engine that should be used, Allowed values: h2 or mysql").getString();
+        databaseFile = check(config.getNode("storage", "h2", "database-file"), "mmctickets-Database.db", "Where the databaseFile will be stored. Can be a relative or absolute path. An absolute path is recommended when using this to synchronize over several servers").getString();
+        h2Prefix = check(config.getNode("storage", "h2", "prefix"), "mmctickets_", "Prefix for the plugin tables").getString();
+        mysqlHost = check(config.getNode("storage", "mysql", "host"), "localhost", "Host of the MySQL Server").getString();
+        mysqlPort = check(config.getNode("storage", "mysql", "port"), "3306", "Port of the MySQL server. Default: 3306").getInt();
+        mysqlDatabase = check(config.getNode("storage", "mysql", "database"), "mmctickets", "The database to store in").getString();
+        mysqlUser = check(config.getNode("storage", "mysql", "user"), "root", "The user for the database").getString();
+        mysqlPass = check(config.getNode("storage", "mysql", "password"), "pass", "Password for that user").getString();
+        mysqlPrefix = check(config.getNode("storage", "mysql", "table-prefix"), "mmctickets_", "Prefix for the plugin tables").getString();
 
         loader.save(config);
 

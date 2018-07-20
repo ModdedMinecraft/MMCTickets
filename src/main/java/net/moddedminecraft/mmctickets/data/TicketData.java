@@ -9,7 +9,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import java.util.List;
 
 
-public class TicketData extends TicketDataUtil{
+public class TicketData extends TicketDataUtil {
 
     public TicketData(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified) {
         super(ticketID, playerUUID, staffUUID, comment, timestamp, world, x, y, z, yaw, pitch, message, status, notified);

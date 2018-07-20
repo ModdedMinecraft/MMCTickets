@@ -3,7 +3,6 @@ package net.moddedminecraft.mmctickets.util;
 
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Permissions;
-import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.ticketStatus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -131,14 +130,15 @@ public class CommonUtil {
     }
 
     public static void checkPlayerData(Main plugin, Player player) {
-        if (!plugin.playersData.containsKey(player.getUniqueId())) {
+        //TODO Single player check
+        /*if (!plugin.getDataStore().getPlayerData().containsKey(player.getUniqueId())) {
             plugin.addPlayerData(new PlayerData(player.getUniqueId(), player.getName(), 0));
             try {
                 plugin.saveData();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     public static UUID getUUIDFromName(String name) {

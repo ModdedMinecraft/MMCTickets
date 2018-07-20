@@ -13,10 +13,10 @@ import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.PlayerData.PlayerDataSerializer;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.data.TicketData.TicketSerializer;
+import net.moddedminecraft.mmctickets.database.DataStoreManager;
+import net.moddedminecraft.mmctickets.database.IDataStore;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
 import net.moddedminecraft.mmctickets.util.UpdateChecker;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
@@ -31,17 +31,15 @@ import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
@@ -50,7 +48,7 @@ import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 public class Main {
 
     @Inject
-    public Logger logger;
+    public static Logger logger;
 
     @Inject
     private Metrics metrics;
@@ -61,7 +59,7 @@ public class Main {
 
     @Inject
     @ConfigDir(sharedRoot = false)
-    public Path ConfigDir;
+    public static Path ConfigDir;
 
     private static SimpleDateFormat sdf = new SimpleDateFormat("MMM.dd kk:mm z");
 
@@ -71,16 +69,22 @@ public class Main {
     private CommandManager cmdManager = Sponge.getCommandManager();
 
     private ArrayList<String> waitTimer;
-    private ArrayList<UUID> notifications;
-    private Map<Integer, TicketData> tickets;
-    public Map<UUID, PlayerData> playersData;
+
+    //private ArrayList<UUID> notifications;
+
+
+    private DataStoreManager dataStoreManager;
+
+    //TODO REMOVE
+    //private Map<Integer, TicketData> tickets;
+    //public Map<UUID, PlayerData> playersData;
 
     public UpdateChecker updatechecker;
 
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
         Sponge.getEventManager().registerListeners(this, new EventListener(this));
-        convertOldData();
+        //convertOldData();
 
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(TicketData.class), new TicketSerializer());
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(PlayerData.class), new PlayerDataSerializer());
@@ -88,16 +92,17 @@ public class Main {
         config = new Config(this);
         messages = new Messages(this);
         loadCommands();
-        loadData();
+        //loadData();
     }
 
     @Listener
     public void onServerStart(GameStartedServerEvent event) throws IOException {
-        checkOldNames();
+        //checkOldNames();
+        dataStoreManager = new DataStoreManager(this);
         logger.info("MMCTickets Loaded");
-        logger.info("Tickets loaded: " + tickets.size());
-        logger.info("Notifications loaded: " + notifications.size());
-        logger.info("PlayerData loaded: " + playersData.size());
+        logger.info("Tickets loaded: " + getDataStore().getTicketData().size());
+        logger.info("Notifications loaded: " + getDataStore().getNotifications().size());
+        logger.info("PlayerData loaded: " + getDataStore().getPlayerData().size());
 
         this.waitTimer = new ArrayList<String>();
 
@@ -277,7 +282,11 @@ public class Main {
         return logger;
     }
 
-    synchronized public void loadData() throws IOException, ObjectMappingException {
+    public IDataStore getDataStore() {
+        return dataStoreManager.getDataStore();
+    }
+
+    /*synchronized public void loadData() throws IOException, ObjectMappingException {
         HoconConfigurationLoader loader = getTicketDataLoader();
         ConfigurationNode rootNode = loader.load();
 
@@ -312,7 +321,7 @@ public class Main {
         playerrootNode.getNode("PlayersData").setValue(PlayerDataSerializer.token, new ArrayList<PlayerData>(this.playersData.values()));
         playerloader.save(playerrootNode);
 
-    }
+    }*/
 
     public void nagTimer() {
         if(Config.nagTimer > 0){
@@ -349,7 +358,8 @@ public class Main {
             }, Config.nagTimer, Config.nagTimer, TimeUnit.MINUTES);
         }
     }
-    public HoconConfigurationLoader getTicketDataLoader() {
+
+    /*public HoconConfigurationLoader getTicketDataLoader() {
         return HoconConfigurationLoader.builder().setPath(this.ConfigDir.resolve("TicketData.conf")).build();
     }
 
@@ -371,19 +381,19 @@ public class Main {
 
     public ArrayList<UUID> getNotifications() {
         return this.notifications;
-    }
+    }*/
 
     public ArrayList<String> getWaitTimer() {
         return this.waitTimer;
     }
 
-    public TicketData addTicket(TicketData ticket) {
+    /*public TicketData addTicket(TicketData ticket) {
         return this.tickets.put(ticket.getTicketID(), ticket);
     }
 
     public PlayerData addPlayerData(PlayerData pData) {
         return this.playersData.put(pData.getPlayerUUID(), pData);
-    }
+    }*/
 
     public Text fromLegacy(String legacy) {
         return TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy);
@@ -393,7 +403,7 @@ public class Main {
         return String.valueOf(TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy));
     }
 
-    private void convertOldData() throws IOException {
+    /*private void convertOldData() throws IOException {
         Path path = this.ConfigDir.resolve("TicketData.conf");
         if (path.toFile().exists()) {
             Charset charset = StandardCharsets.UTF_8;
@@ -413,6 +423,7 @@ public class Main {
             }
         }
     }
+
 
     private void checkOldNames() {
         final List<TicketData> tickets = new ArrayList<TicketData>(getTickets());
@@ -435,5 +446,5 @@ public class Main {
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 }

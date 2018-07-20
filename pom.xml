@@ -45,14 +45,29 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>spongeapi</artifactId>
             <version>7.1.0-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.1.0</version>
+        </dependency>
     </dependencies>
     <repositories>
+        <repository>
+            <id>lombok-repo</id>
+            <url>https://mvnrepository.com/artifact/org.projectlombok/lombok</url>
+        </repository>
         <repository>
             <id>sponge-repo</id>
             <url>http://repo.spongepowered.org/maven</url>
