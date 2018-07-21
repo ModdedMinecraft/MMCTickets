@@ -188,7 +188,7 @@ public class read implements CommandExecutor {
 
                             Text.Builder send = Text.builder();
                             send.append(plugin.fromLegacy("&a" + ticket.getWorld() + "&e x:&a" + ticket.getX() + "&e y:&a" + ticket.getY() + "&e z:&a" + ticket.getZ()));
-                            if (src.hasPermission(Permissions.COMMAND_TICKET_TELEPORT)) {
+                            if (src.hasPermission(Permissions.COMMAND_TICKET_TELEPORT) && ticket.getServer().equalsIgnoreCase(Config.server)) {
                                 send.onHover(TextActions.showText(Messages.getTicketOnHoverTeleportTo()));
                                 worldOptional.ifPresent(world -> send.onClick(TextActions.executeCallback(teleportTo(world, ticket.getX(), ticket.getY(), ticket.getZ(), ticket.getPitch(), ticket.getYaw(), ticketID))));
                             }
@@ -203,10 +203,11 @@ public class read implements CommandExecutor {
                                     contents.add(plugin.fromLegacy("&eHandled by: &7" + CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
                             }
                             if (!ticket.getComment().isEmpty()) {
-                                    contents.add(plugin.fromLegacy("&eComment: &7" + ticket.getComment()));
+                                contents.add(plugin.fromLegacy("&eComment: &7" + ticket.getComment()));
                             }
                             contents.add(plugin.fromLegacy("&eOpened by: " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID())));
                             contents.add(plugin.fromLegacy("&eWhen: " + CommonUtil.getTimeAgo(ticket.getTimestamp())));
+                            contents.add(plugin.fromLegacy("&eServer: " + ticket.getServer()));
                             contents.add(send.build());
                             contents.add(plugin.fromLegacy("&7" + ticket.getMessage()));
                         }
