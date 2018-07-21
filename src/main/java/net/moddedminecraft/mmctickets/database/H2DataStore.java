@@ -191,7 +191,7 @@ public final class H2DataStore implements IDataStore {
     @Override
     public boolean updateTicketData(TicketData ticketData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("MERGE INTO " + Config.h2Prefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement statement = connection.prepareStatement("MERGE INTO " + Config.h2Prefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             statement.setInt(1, ticketData.getTicketID());
             statement.setString(2, ticketData.getPlayerUUID().toString());
             statement.setString(3, ticketData.getStaffUUID().toString());
