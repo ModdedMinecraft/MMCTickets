@@ -28,12 +28,12 @@ public class EventListener {
         //If the playerdata for the player exists, Check if they have changed their name.
         Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
             public void run() {
-                final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
+                final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getDataStore().getPlayerData());
                 for (PlayerData pData : playerData) {
                     if (pData.getPlayerUUID().equals(player.getUniqueId()) && !pData.getPlayerName().equals(player.getName())) {
                         pData.setPlayerName(player.getName());
                         try {
-                            plugin.saveData();
+                            plugin.getDataStore().updatePlayerData(pData);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -43,21 +43,21 @@ public class EventListener {
         }).delay(15, TimeUnit.SECONDS).name("mmctickets-s-checkUserNameOnLogin").submit(this.plugin);
 
         //Notify a player if a ticket they created was closed while they were offline
-        if (plugin.getNotifications().contains(player.getUniqueId())) {
-            final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        if (plugin.getDataStore().getNotifications().contains(player.getUniqueId())) {
+            final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
             int totalTickets = 0;
             for (TicketData ticket : tickets) {
                 if (ticket.getPlayerUUID().equals(player.getUniqueId()) && ticket.getNotified() == 0) {
                     totalTickets++;
                     ticket.setNotified(1);
+                    try {
+                        plugin.getDataStore().updateTicketData(ticket);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-            try {
-                plugin.saveData();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            plugin.getNotifications().removeAll(Collections.singleton(player.getUniqueId()));
+            plugin.getDataStore().getNotifications().removeAll(Collections.singleton(player.getUniqueId()));
             final int finalTotalTickets = totalTickets;
             Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
                 public void run() {
@@ -72,7 +72,7 @@ public class EventListener {
 
         //Notify staff of the current open tickets when they login
         if (player.hasPermission(Permissions.STAFF)) {
-            final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+            final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
             int openTickets = 0;
             int heldTickets = 0;
             for (TicketData ticket : tickets) {

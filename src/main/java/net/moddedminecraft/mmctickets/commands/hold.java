@@ -30,7 +30,7 @@ public class hold implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final int ticketID = args.<Integer>getOne("ticketID").get();
 
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
         UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
         if (src instanceof Player) {
@@ -56,7 +56,7 @@ public class hold implements CommandExecutor {
                     ticket.setStaffUUID(UUID.fromString("00000000-0000-0000-0000-000000000000").toString());
 
                     try {
-                        plugin.saveData();
+                        plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
                         src.sendMessage(Messages.getErrorGen("Unable to put ticket on hold"));
                         e.printStackTrace();

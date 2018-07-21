@@ -36,10 +36,8 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
@@ -60,24 +58,14 @@ public class Main {
     @Inject
     @ConfigDir(sharedRoot = false)
     public static Path ConfigDir;
-
-    private static SimpleDateFormat sdf = new SimpleDateFormat("MMM.dd kk:mm z");
-
+    
     public Config config;
     public Messages messages;
 
     private CommandManager cmdManager = Sponge.getCommandManager();
 
     private ArrayList<String> waitTimer;
-
-    //private ArrayList<UUID> notifications;
-
-
     private DataStoreManager dataStoreManager;
-
-    //TODO REMOVE
-    //private Map<Integer, TicketData> tickets;
-    //public Map<UUID, PlayerData> playersData;
 
     public UpdateChecker updatechecker;
 
@@ -117,6 +105,11 @@ public class Main {
     public void onPluginReload(GameReloadEvent event) throws IOException, ObjectMappingException {
         this.config = new Config(this);
         this.messages = new Messages(this);
+        dataStoreManager = new DataStoreManager(this);
+    }
+
+    public void setDataStoreManager(DataStoreManager dataStoreManager) {
+        this.dataStoreManager = dataStoreManager;
     }
 
     private void loadCommands() {
@@ -286,49 +279,12 @@ public class Main {
         return dataStoreManager.getDataStore();
     }
 
-    /*synchronized public void loadData() throws IOException, ObjectMappingException {
-        HoconConfigurationLoader loader = getTicketDataLoader();
-        ConfigurationNode rootNode = loader.load();
-
-        List<TicketData> ticketList = rootNode.getNode("Tickets").getList(TypeToken.of(TicketData.class));
-        this.tickets = new HashMap<Integer, TicketData>();
-        this.notifications = new ArrayList<UUID>();
-        for (TicketData ticket : ticketList) {
-            this.tickets.put(ticket.getTicketID(), ticket);
-            if (ticket.getNotified() == 0 && ticket.getStatus() == Closed) this.notifications.add(ticket.getPlayerUUID());
-        }
-
-        HoconConfigurationLoader playerloader = getPlayerDataLoader();
-        ConfigurationNode playerrootNode = playerloader.load();
-
-        List<PlayerData> playersDataList = playerrootNode.getNode("PlayersData").getList(TypeToken.of(PlayerData.class));
-        this.playersData = new HashMap<UUID, PlayerData>();
-        for (PlayerData pd : playersDataList) {
-            this.playersData.put(pd.getPlayerUUID(), pd);
-        }
-    }
-
-    synchronized public void saveData() throws IOException, ObjectMappingException {
-        HoconConfigurationLoader loader = getTicketDataLoader();
-        ConfigurationNode rootNode = loader.load();
-
-        rootNode.getNode("Tickets").setValue(TicketSerializer.token, new ArrayList<TicketData>(this.tickets.values()));
-        loader.save(rootNode);
-
-        HoconConfigurationLoader playerloader = getPlayerDataLoader();
-        ConfigurationNode playerrootNode = playerloader.load();
-
-        playerrootNode.getNode("PlayersData").setValue(PlayerDataSerializer.token, new ArrayList<PlayerData>(this.playersData.values()));
-        playerloader.save(playerrootNode);
-
-    }*/
-
     public void nagTimer() {
         if(Config.nagTimer > 0){
             Sponge.getScheduler().createSyncExecutor(this).scheduleWithFixedDelay(new Runnable() {
                 @Override
                 public void run() {
-                    final List<TicketData> tickets = new ArrayList<TicketData>(getTickets());
+                    final List<TicketData> tickets = new ArrayList<TicketData>(getDataStore().getTicketData());
                     int openTickets = 0;
                     int heldTickets = 0;
                     for (TicketData ticket : tickets) {
@@ -359,41 +315,9 @@ public class Main {
         }
     }
 
-    /*public HoconConfigurationLoader getTicketDataLoader() {
-        return HoconConfigurationLoader.builder().setPath(this.ConfigDir.resolve("TicketData.conf")).build();
-    }
-
-    public HoconConfigurationLoader getPlayerDataLoader() {
-        return HoconConfigurationLoader.builder().setPath(this.ConfigDir.resolve("PlayerData.conf")).build();
-    }
-
-    public TicketData getTicket(int ticketID) {
-        return this.tickets.get(ticketID);
-    }
-
-    public Collection<TicketData> getTickets() {
-        return Collections.unmodifiableCollection(this.tickets.values());
-    }
-
-    public Collection<PlayerData> getPlayerData() {
-        return Collections.unmodifiableCollection(this.playersData.values());
-    }
-
-    public ArrayList<UUID> getNotifications() {
-        return this.notifications;
-    }*/
-
     public ArrayList<String> getWaitTimer() {
         return this.waitTimer;
     }
-
-    /*public TicketData addTicket(TicketData ticket) {
-        return this.tickets.put(ticket.getTicketID(), ticket);
-    }
-
-    public PlayerData addPlayerData(PlayerData pData) {
-        return this.playersData.put(pData.getPlayerUUID(), pData);
-    }*/
 
     public Text fromLegacy(String legacy) {
         return TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy);
@@ -403,7 +327,8 @@ public class Main {
         return String.valueOf(TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy));
     }
 
-    /*private void convertOldData() throws IOException {
+    /*
+    private void convertOldData() throws IOException {
         Path path = this.ConfigDir.resolve("TicketData.conf");
         if (path.toFile().exists()) {
             Charset charset = StandardCharsets.UTF_8;
@@ -446,5 +371,6 @@ public class Main {
                 e.printStackTrace();
             }
         }
-    }*/
+    }
+    */
 }

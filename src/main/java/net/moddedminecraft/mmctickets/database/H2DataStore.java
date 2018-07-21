@@ -134,6 +134,20 @@ public final class H2DataStore implements IDataStore {
     }
 
     @Override
+    public Optional<TicketData> getTicket(int ticketID) {
+        List<TicketData> ticketList = getTicketData();
+        if (ticketList == null || ticketList.isEmpty()) {
+            return Optional.empty();
+        }
+        for (TicketData ticket : ticketList) {
+            if (ticket.getTicketID() == ticketID) {
+                return Optional.of(ticket);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public boolean addTicketData(TicketData ticketData) {
         try (Connection connection = getConnection()) {
             PreparedStatement statement = connection.prepareStatement("INSERT INTO " +
@@ -172,6 +186,49 @@ public final class H2DataStore implements IDataStore {
             return statement.executeUpdate() > 0;
         } catch (SQLException ex) {
             plugin.getLogger().error("H2: Error adding playerdata", ex);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updateTicketData(TicketData ticketData) {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("MERGE INTO " +
+                    Config.h2Prefix + "tickets VALUES (" +
+                    ticketData.getTicketID() + ", " +
+                    ticketData.getPlayerUUID().toString() + ", " +
+                    ticketData.getStaffUUID().toString() + ", " +
+                    ticketData.getComment() + ", " +
+                    ticketData.getTimestamp() + ", " +
+                    ticketData.getWorld() + ", " +
+                    ticketData.getX() + ", " +
+                    ticketData.getY() + ", " +
+                    ticketData.getZ() + ", " +
+                    ticketData.getYaw() + ", " +
+                    ticketData.getPitch() + ", " +
+                    ticketData.getMessage() + ", " +
+                    ticketData.getStatus().toString() + ", " +
+                    ticketData.getNotified() + "" +
+                    ")");
+            return statement.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            plugin.getLogger().error("H2: Error updating ticketdata", ex);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean updatePlayerData(PlayerData playerData) {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("MERGE INTO " +
+                    Config.h2Prefix + "playerdata VALUES (" +
+                    playerData.getPlayerUUID().toString() + ", " +
+                    playerData.getPlayerName() + ", " +
+                    playerData.getBannedStatus() + "" +
+                    ")");
+            return statement.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            plugin.getLogger().error("H2: Error updating playerdata", ex);
         }
         return false;
     }

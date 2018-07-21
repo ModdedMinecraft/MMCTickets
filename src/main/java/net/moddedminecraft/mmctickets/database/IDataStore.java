@@ -5,6 +5,7 @@ import net.moddedminecraft.mmctickets.data.TicketData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface IDataStore {
@@ -19,8 +20,13 @@ public interface IDataStore {
 
     public abstract ArrayList<UUID> getNotifications();
 
+    public abstract Optional<TicketData> getTicket(int ticketID);
+
     public abstract boolean addTicketData(TicketData ticketData);
 
     public abstract boolean addPlayerData(PlayerData playerData);
 
+    public abstract boolean updateTicketData(TicketData ticketData);
+
+    public abstract boolean updatePlayerData(PlayerData playerData);
 }

@@ -33,7 +33,7 @@ public class assign implements CommandExecutor {
         final int ticketID = args.<Integer>getOne("ticketID").get();
         final User user = args.<Player>getOne("player").get();
 
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
         if (tickets.isEmpty()) {
             throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
@@ -50,7 +50,7 @@ public class assign implements CommandExecutor {
                     ticket.setStaffUUID(user.getUniqueId().toString());
 
                     try {
-                        plugin.saveData();
+                        plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
                         src.sendMessage(Messages.getErrorGen("Unable to assign " + user.getName() + " to ticket"));
                         e.printStackTrace();

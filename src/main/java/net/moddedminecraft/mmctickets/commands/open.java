@@ -44,10 +44,10 @@ public class open implements CommandExecutor {
         if (plugin.getWaitTimer().contains(src.getName())) {
             throw new CommandException(Messages.getTicketTooFast(Config.delayTimer));
         }
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
         int totalTickets = 0;
         boolean duplicate = false;
-        int ticketID = plugin.getTickets().size() + 1;
+        int ticketID = tickets.size() + 1;
 
 
         if (!tickets.isEmpty()) {
@@ -76,29 +76,29 @@ public class open implements CommandExecutor {
             throw new CommandException(Messages.getTicketTooShort(Config.minWords));
         }
 
-        final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
+        final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getDataStore().getPlayerData());
         for (PlayerData pData : playerData) {
             if (pData.getPlayerName().equals(src.getName()) && pData.getBannedStatus() == 1) {
                 throw new CommandException(Messages.getErrorBanned());
             }
         }
-        plugin.addTicket(new TicketData(ticketID,
-                String.valueOf(uuid),
-                UUID.fromString("00000000-0000-0000-0000-000000000000").toString(),
-                "",
-                System.currentTimeMillis()/1000,
-                player.getWorld().getName(),
-                player.getLocation().getBlockX(),
-                player.getLocation().getBlockY(),
-                player.getLocation().getBlockZ(),
-                player.getHeadRotation().getX(),
-                player.getHeadRotation().getY(),
-                message,
-                Open,
-                0));
 
         try {
-            plugin.saveData();
+            plugin.getDataStore().addTicketData(new TicketData(ticketID,
+                    String.valueOf(uuid),
+                    UUID.fromString("00000000-0000-0000-0000-000000000000").toString(),
+                    "",
+                    System.currentTimeMillis()/1000,
+                    player.getWorld().getName(),
+                    player.getLocation().getBlockX(),
+                    player.getLocation().getBlockY(),
+                    player.getLocation().getBlockZ(),
+                    player.getHeadRotation().getX(),
+                    player.getHeadRotation().getY(),
+                    message,
+                    Open,
+                    0));
+
             player.sendMessage(Messages.getTicketOpenUser(ticketID));
             if (Config.staffNotification) {
                 CommonUtil.notifyOnlineStaffOpen(Messages.getTicketOpen(player.getName() , ticketID), ticketID);

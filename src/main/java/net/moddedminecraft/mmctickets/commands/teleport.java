@@ -29,7 +29,7 @@ public class teleport implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final int ticketID = args.<Integer>getOne("ticketID").get();
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
         if (!(src instanceof Player)) {
             throw new CommandException(Messages.getErrorGen("Only players can use this command"));

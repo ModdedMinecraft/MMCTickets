@@ -40,7 +40,7 @@ public class read implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final Optional<Integer> ticketIDOp = args.<Integer>getOne("ticketID");
 
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
         UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
         if (src instanceof Player) {

@@ -31,7 +31,7 @@ public class claim implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final int ticketID = args.<Integer>getOne("ticketID").get();
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
         UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
         if (src instanceof Player) {
@@ -58,7 +58,7 @@ public class claim implements CommandExecutor {
                     ticket.setStatus(Claimed);
 
                     try {
-                        plugin.saveData();
+                        plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
                         src.sendMessage(Messages.getErrorGen("Unable to claim ticket"));
                         e.printStackTrace();

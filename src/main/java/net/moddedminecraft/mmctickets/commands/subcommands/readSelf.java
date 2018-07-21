@@ -32,7 +32,7 @@ public class readSelf implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
         if (!src.hasPermission(Permissions.COMMAND_TICKET_READ_SELF)) {
             throw new CommandException(Messages.getErrorPermission(Permissions.COMMAND_TICKET_READ_SELF));

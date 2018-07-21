@@ -36,7 +36,7 @@ public class comment implements CommandExecutor {
         final int ticketID = args.<Integer>getOne("ticketID").get();
         final String comment = args.<String>getOne("comment").get();
 
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
         UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
         if (src instanceof Player) {
             Player player = (Player) src;
@@ -69,7 +69,7 @@ public class comment implements CommandExecutor {
                     ticket.setComment(comment);
 
                     try {
-                        plugin.saveData();
+                        plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
                         src.sendMessage(Messages.getErrorGen("Unable to comment on ticket"));
                         e.printStackTrace();
@@ -92,13 +92,13 @@ public class comment implements CommandExecutor {
 
     private Consumer<CommandSource> changeTicketComment(int ticketID, String comment, String name) {
         return consumer -> {
-            final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+            final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
                     ticket.setComment(comment);
 
                     try {
-                        plugin.saveData();
+                        plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
                         consumer.sendMessage(Messages.getErrorGen("Unable to comment on ticket"));
                         e.printStackTrace();
