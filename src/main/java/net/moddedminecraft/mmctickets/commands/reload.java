@@ -28,6 +28,7 @@ public class reload implements CommandExecutor {
             plugin.config = new Config(this.plugin);
             plugin.messages = new Messages(this.plugin);
             plugin.setDataStoreManager(new DataStoreManager(this.plugin));
+            plugin.loadDataStore();
         } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
             throw new CommandException(Messages.getErrorGen("Unable to load data."));

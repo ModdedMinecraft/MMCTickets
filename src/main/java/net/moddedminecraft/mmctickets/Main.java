@@ -115,6 +115,10 @@ public class Main {
         this.config = new Config(this);
         this.messages = new Messages(this);
         dataStoreManager = new DataStoreManager(this);
+        loadDataStore();
+    }
+
+    public void loadDataStore() {
         if (dataStoreManager.load()) {
             getLogger().info("MMCTickets datastore Loaded");
         } else {
