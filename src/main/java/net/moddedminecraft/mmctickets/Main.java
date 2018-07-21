@@ -58,7 +58,7 @@ public class Main {
     @Inject
     @ConfigDir(sharedRoot = false)
     public static Path ConfigDir;
-    
+
     public Config config;
     public Messages messages;
 
@@ -87,18 +87,22 @@ public class Main {
     public void onServerStart(GameStartedServerEvent event) throws IOException {
         //checkOldNames();
         dataStoreManager = new DataStoreManager(this);
-        logger.info("MMCTickets Loaded");
-        logger.info("Tickets loaded: " + getDataStore().getTicketData().size());
-        logger.info("Notifications loaded: " + getDataStore().getNotifications().size());
-        logger.info("PlayerData loaded: " + getDataStore().getPlayerData().size());
+        if (dataStoreManager.load()) {
+            logger.info("MMCTickets Loaded");
+            logger.info("Tickets loaded: " + getDataStore().getTicketData().size());
+            logger.info("Notifications loaded: " + getDataStore().getNotifications().size());
+            logger.info("PlayerData loaded: " + getDataStore().getPlayerData().size());
 
-        this.waitTimer = new ArrayList<String>();
+            this.waitTimer = new ArrayList<String>();
 
-        updatechecker = new UpdateChecker(this, Sponge.getPluginManager().getPlugin("mmctickets").get().getVersion().get());
-        updatechecker.startUpdateCheck();
+            updatechecker = new UpdateChecker(this, Sponge.getPluginManager().getPlugin("mmctickets").get().getVersion().get());
+            updatechecker.startUpdateCheck();
 
-        //start ticket nag timer
-        nagTimer();
+            //start ticket nag timer
+            nagTimer();
+        } else {
+            getLogger().error("Unable to load a datastore please check your Console/Config!");
+        }
     }
 
     @Listener

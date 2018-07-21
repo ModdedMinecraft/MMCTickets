@@ -6,7 +6,7 @@ import net.moddedminecraft.mmctickets.config.Config;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-public class DataStoreManager {
+public final class DataStoreManager {
 
     private final Main plugin;
 

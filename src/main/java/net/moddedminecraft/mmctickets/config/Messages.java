@@ -119,7 +119,7 @@ public class Messages {
     //plugin
     private static String pluginOutdated = "&cYou are not running the latest recommended build! Recommended build is: &6{0}";
 
-    private void messageCheck() throws IOException, ObjectMappingException {
+    private void messageCheck() throws IOException {
         if (!Files.exists(defaultMessage)) {
             Files.createFile(defaultMessage);
         }
@@ -138,6 +138,7 @@ public class Messages {
         holdButton = check(messages.getNode("action", "hold-button"), holdButton).getString();
         holdButtonHover = check(messages.getNode("action", "hold-button-hover"), holdButtonHover).getString();
         yesButton = check(messages.getNode("action", "yes-button"), yesButton).getString();
+        yesButtonHover = check(messages.getNode("action", "yes-button-hover"), yesButtonHover).getString();
 
         //errors
         errorGeneral = check(messages.getNode("error", "general"), errorGeneral).getString();
@@ -216,8 +217,8 @@ public class Messages {
     }
 
     private void checkLangAssetFiles() throws IOException {
-        if (!Files.isDirectory(plugin.ConfigDir.resolve("localization"))) {
-            Files.createDirectory(plugin.ConfigDir.resolve("localization"));
+        if (!Files.isDirectory(Main.ConfigDir.resolve("localization"))) {
+            Files.createDirectory(Main.ConfigDir.resolve("localization"));
         }
         String[] assets = {
                 "messages_EN.conf",
@@ -225,9 +226,9 @@ public class Messages {
         };
 
         for (String asset : assets) {
-            if (!Files.exists(plugin.ConfigDir.resolve("localization/" +asset))) {
+            if (!Files.exists(Main.ConfigDir.resolve("localization/" +asset))) {
                 if (Sponge.getAssetManager().getAsset(plugin, asset).isPresent()) {
-                    Sponge.getAssetManager().getAsset(plugin, asset).get().copyToFile(plugin.ConfigDir.resolve("localization/" +asset));
+                    Sponge.getAssetManager().getAsset(plugin, asset).get().copyToFile(Main.ConfigDir.resolve("localization/" +asset));
                 }
             }
         }
