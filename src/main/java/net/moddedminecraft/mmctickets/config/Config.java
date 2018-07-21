@@ -50,6 +50,7 @@ public class Config {
     public static String mysqlUser;
     public static String mysqlPass;
     public static String mysqlPrefix;
+    public static String server;
 
 
 
@@ -57,6 +58,9 @@ public class Config {
         if (!plugin.defaultConf.toFile().exists()) {
             plugin.defaultConf.toFile().createNewFile();
         }
+
+        //server
+        server = check(config.getNode("server"), "", "Required, Name of the server. Used for ticket's originating server identification").getString();
 
         //locale
         language = check(config.getNode("language"), "EN", "Localization to be used, All available translations are in the 'localization' folder").getString();
@@ -81,7 +85,7 @@ public class Config {
 
         //Database
         storageEngine = check(config.getNode("storage", "storage-engine"), "h2", "The stoage engine that should be used, Allowed values: h2 or mysql").getString();
-        databaseFile = check(config.getNode("storage", "h2", "database-file"), "mmctickets/Database.db", "Where the databaseFile will be stored. Can be a relative or absolute path. An absolute path is recommended when using this to synchronize over several servers").getString();
+        databaseFile = check(config.getNode("storage", "h2", "database-file"), "Database.db", "Where the databaseFile will be stored. Can be a relative or absolute path. An absolute path is recommended when using this to synchronize over several servers").getString();
         h2Prefix = check(config.getNode("storage", "h2", "prefix"), "mmctickets_", "Prefix for the plugin tables").getString();
         mysqlHost = check(config.getNode("storage", "mysql", "host"), "localhost", "Host of the MySQL Server").getString();
         mysqlPort = check(config.getNode("storage", "mysql", "port"), "3306", "Port of the MySQL server. Default: 3306").getInt();

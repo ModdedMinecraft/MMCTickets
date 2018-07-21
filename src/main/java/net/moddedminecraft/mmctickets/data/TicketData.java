@@ -11,8 +11,8 @@ import java.util.List;
 
 public class TicketData extends TicketDataUtil {
 
-    public TicketData(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified) {
-        super(ticketID, playerUUID, staffUUID, comment, timestamp, world, x, y, z, yaw, pitch, message, status, notified);
+    public TicketData(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified, String server) {
+        super(ticketID, playerUUID, staffUUID, comment, timestamp, world, x, y, z, yaw, pitch, message, status, notified,server);
     }
 
     public static class TicketSerializer implements TypeSerializer<TicketData> {
@@ -35,7 +35,8 @@ public class TicketData extends TicketDataUtil {
                     node.getNode("pitch").getDouble(),
                     node.getNode("message").getString(),
                     ticketStatus.valueOf(node.getNode("status").getString()),
-                    node.getNode("notified").getInt());
+                    node.getNode("notified").getInt(),
+                    node.getNode("server").getString());
         }
 
         @Override
@@ -54,6 +55,7 @@ public class TicketData extends TicketDataUtil {
             node.getNode("message").setValue(ticket.message);
             node.getNode("status").setValue(ticket.status.toString());
             node.getNode("notified").setValue(ticket.notified);
+            node.getNode("server").setValue(ticket.server);
         }
 
     }

@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static net.moddedminecraft.mmctickets.data.ticketStatus.Closed;
-
 public final class H2DataStore implements IDataStore {
 
     private final Main plugin;
@@ -39,28 +37,30 @@ public final class H2DataStore implements IDataStore {
         }
         try (Connection connection = getConnection()) {
             connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.h2Prefix + "tickets ("
-                    + "  ticketid INTEGER NOT NULL PRIMARY KEY,"
-                    + "  playeruuid VARCHAR(36) NOT NULL,"
-                    + "  staffuuid VARCHAR(36) NOT NULL,"
-                    + "  comment VARCHAR(700) NOT NULL,"
-                    + "  timestamp BIGINT NOT NULL,"
-                    + "  world VARCHAR(100) NOT NULL,"
-                    + "  coordx INTEGER NOT NULL,"
-                    + "  coordy INTEGER NOT NULL,"
-                    + "  coordz INTEGER NOT NULL,"
-                    + "  yaw DOUBLE NOT NULL,"
-                    + "  pitch DOUBLE NOT NULL,"
-                    + "  message VARCHAR(700) NOT NULL,"
-                    + "  status VARCHAR(20) NOT NULL,"
-                    + "  notified INTEGER NOT NULL"
-                    + ")");
-
-            connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.h2Prefix + "playerdata ("
-                    + "uuid VARCHAR(36) NOT NULL PRIMARY KEY,"
-                    + "playername VARCHAR(36) NOT NULL, "
-                    + "banned BOOLEAN NOT NULL, "
+                    + " ticketid INTEGER NOT NULL PRIMARY KEY,"
+                    + " playeruuid VARCHAR(60) NOT NULL,"
+                    + " staffuuid VARCHAR(60) NOT NULL,"
+                    + " comment VARCHAR(700) NOT NULL,"
+                    + " timestamp BIGINT NOT NULL,"
+                    + " world VARCHAR(100) NOT NULL,"
+                    + " coordx INTEGER NOT NULL,"
+                    + " coordy INTEGER NOT NULL,"
+                    + " coordz INTEGER NOT NULL,"
+                    + " yaw DOUBLE NOT NULL,"
+                    + " pitch DOUBLE NOT NULL,"
+                    + " message VARCHAR(700) NOT NULL,"
+                    + " status VARCHAR(20) NOT NULL,"
+                    + " notified INTEGER NOT NULL,"
+                    + " server VARCHAR(100) NOT NULL"
                     + ");");
 
+            connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.h2Prefix + "playerdata ("
+                    + "uuid VARCHAR(36) NOT NULL PRIMARY KEY, "
+                    + "playername VARCHAR(36) NOT NULL, "
+                    + "banned INTEGER NOT NULL"
+                    + ");");
+
+            getConnection().commit();
         } catch (SQLException ex) {
             plugin.getLogger().error("Unable to create tables", ex);
             return false;
@@ -89,7 +89,8 @@ public final class H2DataStore implements IDataStore {
                         rs.getDouble("pitch"),
                         rs.getString("message"),
                         ticketStatus.valueOf(rs.getString("status")),
-                        rs.getInt("notified")
+                        rs.getInt("notified"),
+                        rs.getString("server")
                 );
                 ticketList.add(ticketData);
             }
@@ -126,7 +127,7 @@ public final class H2DataStore implements IDataStore {
         ArrayList<UUID> notifications = new ArrayList<>();
         List<TicketData> ticketData = getTicketData();
         for (TicketData ticket : ticketData) {
-            if (ticket.getNotified() == 0 && ticket.getStatus() == Closed) {
+            if (ticket.getNotified() == 0 && ticket.getStatus() == ticketStatus.Closed) {
                 notifications.add(ticket.getPlayerUUID());
             }
         }
@@ -150,23 +151,22 @@ public final class H2DataStore implements IDataStore {
     @Override
     public boolean addTicketData(TicketData ticketData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO " +
-                    Config.h2Prefix + "tickets VALUES (" +
-                    ticketData.getTicketID() + ", " +
-                    ticketData.getPlayerUUID().toString() + ", " +
-                    ticketData.getStaffUUID().toString() + ", " +
-                    ticketData.getComment() + ", " +
-                    ticketData.getTimestamp() + ", " +
-                    ticketData.getWorld() + ", " +
-                    ticketData.getX() + ", " +
-                    ticketData.getY() + ", " +
-                    ticketData.getZ() + ", " +
-                    ticketData.getYaw() + ", " +
-                    ticketData.getPitch() + ", " +
-                    ticketData.getMessage() + ", " +
-                    ticketData.getStatus().toString() + ", " +
-                    ticketData.getNotified() + "" +
-                    ")");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO " + Config.h2Prefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            statement.setInt(1, ticketData.getTicketID());
+            statement.setString(2, ticketData.getPlayerUUID().toString());
+            statement.setString(3, ticketData.getStaffUUID().toString());
+            statement.setString(4, ticketData.getComment());
+            statement.setLong(5, ticketData.getTimestamp());
+            statement.setString(6, ticketData.getWorld());
+            statement.setInt(7, ticketData.getX());
+            statement.setInt(8, ticketData.getY());
+            statement.setInt(9, ticketData.getZ());
+            statement.setDouble(10, ticketData.getYaw());
+            statement.setDouble(11, ticketData.getPitch());
+            statement.setString(12, ticketData.getMessage());
+            statement.setString(13, ticketData.getStatus().toString());
+            statement.setInt(14, ticketData.getNotified());
+            statement.setString(15, ticketData.getServer());
             return statement.executeUpdate() > 0;
         } catch (SQLException ex) {
             plugin.getLogger().error("H2: Error adding ticketdata", ex);
@@ -177,12 +177,10 @@ public final class H2DataStore implements IDataStore {
     @Override
     public boolean addPlayerData(PlayerData playerData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO " +
-                    Config.h2Prefix + "playerdata VALUES (" +
-                    playerData.getPlayerUUID().toString() + ", " +
-                    playerData.getPlayerName() + ", " +
-                    playerData.getBannedStatus() + "" +
-                    ")");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO " + Config.h2Prefix + "playerdata VALUES (?, ?, ?);");
+            statement.setString(1, playerData.getPlayerUUID().toString());
+            statement.setString(2, playerData.getPlayerName());
+            statement.setInt(3, playerData.getBannedStatus());
             return statement.executeUpdate() > 0;
         } catch (SQLException ex) {
             plugin.getLogger().error("H2: Error adding playerdata", ex);
@@ -193,23 +191,22 @@ public final class H2DataStore implements IDataStore {
     @Override
     public boolean updateTicketData(TicketData ticketData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("MERGE INTO " +
-                    Config.h2Prefix + "tickets VALUES (" +
-                    ticketData.getTicketID() + ", " +
-                    ticketData.getPlayerUUID().toString() + ", " +
-                    ticketData.getStaffUUID().toString() + ", " +
-                    ticketData.getComment() + ", " +
-                    ticketData.getTimestamp() + ", " +
-                    ticketData.getWorld() + ", " +
-                    ticketData.getX() + ", " +
-                    ticketData.getY() + ", " +
-                    ticketData.getZ() + ", " +
-                    ticketData.getYaw() + ", " +
-                    ticketData.getPitch() + ", " +
-                    ticketData.getMessage() + ", " +
-                    ticketData.getStatus().toString() + ", " +
-                    ticketData.getNotified() + "" +
-                    ")");
+            PreparedStatement statement = connection.prepareStatement("MERGE INTO " + Config.h2Prefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            statement.setInt(1, ticketData.getTicketID());
+            statement.setString(2, ticketData.getPlayerUUID().toString());
+            statement.setString(3, ticketData.getStaffUUID().toString());
+            statement.setString(4, ticketData.getComment());
+            statement.setLong(5, ticketData.getTimestamp());
+            statement.setString(6, ticketData.getWorld());
+            statement.setInt(7, ticketData.getX());
+            statement.setInt(8, ticketData.getY());
+            statement.setInt(9, ticketData.getZ());
+            statement.setDouble(10, ticketData.getYaw());
+            statement.setDouble(11, ticketData.getPitch());
+            statement.setString(12, ticketData.getMessage());
+            statement.setString(13, ticketData.getStatus().toString());
+            statement.setInt(14, ticketData.getNotified());
+            statement.setString(15, ticketData.getServer());
             return statement.executeUpdate() > 0;
         } catch (SQLException ex) {
             plugin.getLogger().error("H2: Error updating ticketdata", ex);
@@ -220,12 +217,10 @@ public final class H2DataStore implements IDataStore {
     @Override
     public boolean updatePlayerData(PlayerData playerData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("MERGE INTO " +
-                    Config.h2Prefix + "playerdata VALUES (" +
-                    playerData.getPlayerUUID().toString() + ", " +
-                    playerData.getPlayerName() + ", " +
-                    playerData.getBannedStatus() + "" +
-                    ")");
+            PreparedStatement statement = connection.prepareStatement("MERGE INTO " + Config.h2Prefix + "playerdata VALUES (?, ?, ?);");
+            statement.setString(1, playerData.getPlayerUUID().toString());
+            statement.setString(2, playerData.getPlayerName());
+            statement.setInt(3, playerData.getBannedStatus());
             return statement.executeUpdate() > 0;
         } catch (SQLException ex) {
             plugin.getLogger().error("H2: Error updating playerdata", ex);
@@ -247,8 +242,8 @@ public final class H2DataStore implements IDataStore {
     public Optional<HikariDataSource> getDataSource() {
         try {
             HikariDataSource ds = new HikariDataSource();
-            ds.setDriverClassName("org.h2.Driver");
-            ds.setJdbcUrl("jdbc:h2://" + new File(Config.databaseFile).getAbsolutePath());
+            ds.setDriverClassName("org.h2.jdbcx.JdbcDataSource");
+            ds.setJdbcUrl("jdbc:h2://" + new File(plugin.ConfigDir.toFile(), Config.databaseFile).getAbsolutePath());
             ds.setConnectionTimeout(1000);
             ds.setLoginTimeout(5);
             ds.setAutoCommit(true);

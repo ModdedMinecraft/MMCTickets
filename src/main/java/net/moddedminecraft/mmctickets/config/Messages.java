@@ -28,7 +28,7 @@ public class Messages {
         checkLangAssetFiles();
         defaultMessage = plugin.ConfigDir.resolve("localization/messages_" + language + ".conf");
         if (Files.notExists(defaultMessage)) {
-            plugin.logger.warn("Localization was not found");
+            plugin.getLogger().warn("Localization was not found");
         }
 
         messageLoader = HoconConfigurationLoader.builder().setPath(defaultMessage).build();
@@ -217,8 +217,8 @@ public class Messages {
     }
 
     private void checkLangAssetFiles() throws IOException {
-        if (!Files.isDirectory(Main.ConfigDir.resolve("localization"))) {
-            Files.createDirectory(Main.ConfigDir.resolve("localization"));
+        if (!Files.isDirectory(plugin.ConfigDir.resolve("localization"))) {
+            Files.createDirectory(plugin.ConfigDir.resolve("localization"));
         }
         String[] assets = {
                 "messages_EN.conf",
@@ -226,9 +226,9 @@ public class Messages {
         };
 
         for (String asset : assets) {
-            if (!Files.exists(Main.ConfigDir.resolve("localization/" +asset))) {
+            if (!Files.exists(plugin.ConfigDir.resolve("localization/" +asset))) {
                 if (Sponge.getAssetManager().getAsset(plugin, asset).isPresent()) {
-                    Sponge.getAssetManager().getAsset(plugin, asset).get().copyToFile(Main.ConfigDir.resolve("localization/" +asset));
+                    Sponge.getAssetManager().getAsset(plugin, asset).get().copyToFile(plugin.ConfigDir.resolve("localization/" +asset));
                 }
             }
         }

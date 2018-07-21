@@ -28,6 +28,7 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
+import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
@@ -46,7 +47,7 @@ import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 public class Main {
 
     @Inject
-    public static Logger logger;
+    private Logger logger;
 
     @Inject
     private Metrics metrics;
@@ -57,7 +58,7 @@ public class Main {
 
     @Inject
     @ConfigDir(sharedRoot = false)
-    public static Path ConfigDir;
+    public Path ConfigDir;
 
     public Config config;
     public Messages messages;
@@ -84,14 +85,21 @@ public class Main {
     }
 
     @Listener
-    public void onServerStart(GameStartedServerEvent event) throws IOException {
-        //checkOldNames();
+    public void onServerAboutStart(GameAboutToStartServerEvent event) {
         dataStoreManager = new DataStoreManager(this);
         if (dataStoreManager.load()) {
-            logger.info("MMCTickets Loaded");
-            logger.info("Tickets loaded: " + getDataStore().getTicketData().size());
-            logger.info("Notifications loaded: " + getDataStore().getNotifications().size());
-            logger.info("PlayerData loaded: " + getDataStore().getPlayerData().size());
+            getLogger().info("MMCTickets datastore Loaded");
+        } else {
+            getLogger().error("Unable to load a datastore please check your Console/Config!");
+        }
+    }
+
+        @Listener
+    public void onServerStart(GameStartedServerEvent event) {
+            getLogger().info("MMCTickets Loaded");
+            getLogger().info("Tickets loaded: " + getDataStore().getTicketData().size());
+            getLogger().info("Notifications loaded: " + getDataStore().getNotifications().size());
+            getLogger().info("PlayerData loaded: " + getDataStore().getPlayerData().size());
 
             this.waitTimer = new ArrayList<String>();
 
@@ -100,9 +108,6 @@ public class Main {
 
             //start ticket nag timer
             nagTimer();
-        } else {
-            getLogger().error("Unable to load a datastore please check your Console/Config!");
-        }
     }
 
     @Listener
@@ -110,6 +115,11 @@ public class Main {
         this.config = new Config(this);
         this.messages = new Messages(this);
         dataStoreManager = new DataStoreManager(this);
+        if (dataStoreManager.load()) {
+            getLogger().info("MMCTickets datastore Loaded");
+        } else {
+            getLogger().error("Unable to load a datastore please check your Console/Config!");
+        }
     }
 
     public void setDataStoreManager(DataStoreManager dataStoreManager) {

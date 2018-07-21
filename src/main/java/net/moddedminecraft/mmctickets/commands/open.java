@@ -97,7 +97,8 @@ public class open implements CommandExecutor {
                     player.getHeadRotation().getY(),
                     message,
                     Open,
-                    0));
+                    0,
+                    Config.server));
 
             player.sendMessage(Messages.getTicketOpenUser(ticketID));
             if (Config.staffNotification) {

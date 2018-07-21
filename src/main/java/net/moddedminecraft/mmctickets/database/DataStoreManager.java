@@ -22,15 +22,15 @@ public final class DataStoreManager {
             clearDataStores();
         }
         registerDataStore("H2", H2DataStore.class);
-        //registerDataStore("MYSQL", MYSQLDataStore.class);
+        registerDataStore("MYSQL", MYSQLDataStore.class);
         switch (Config.storageEngine.toUpperCase()) {
             case "MYSQL":
                 setDataStoreInstance("MYSQL");
-                plugin.getLogger().info("Loading datastore: " + getDataStore().getDatabaseName());
+                plugin.getLogger().info("Loading datastore: MySQL");
                 return getDataStore().load();
             case "H2":
                 setDataStoreInstance("H2");
-                plugin.getLogger().info("Loading datastore: " + getDataStore().getDatabaseName());
+                plugin.getLogger().info("Loading datastore: H2 ");
                 return getDataStore().load();
             default:
                 plugin.getLogger().error("Unable to determine selected datastore.");
@@ -81,11 +81,11 @@ public final class DataStoreManager {
      *
      * @param dataStoreId
      */
-    public void setDataStoreInstance(String dataStoreId) {
+    private void setDataStoreInstance(String dataStoreId) {
         try {
-            dataStore = dataStores.get(dataStoreId).getConstructor(Main.class).newInstance(plugin);
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            throw new RuntimeException("Couldn't instantate data store " + dataStoreId);
+            dataStore = dataStores.get(dataStoreId).getConstructor(Main.class).newInstance(this.plugin);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | SecurityException e) {
+            throw new RuntimeException("Couldn't instantiate data store " + dataStoreId + " " + e);
         }
     }
 

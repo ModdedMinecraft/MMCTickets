@@ -65,7 +65,7 @@ public class close implements CommandExecutor {
                         String comment = commentOP.get();
                         plugin.getDataStore().getTicket(ticketID).ifPresent(tData -> tData.setComment(comment));
                     }
-                    plugin.getDataStore().getTicket(ticketID).ifPresent(tData -> tData.setStatus(Closed));
+                    ticket.setStatus(Closed);
                     ticket.setStaffUUID(uuid.toString());
 
                     CommonUtil.notifyOnlineStaff(Messages.getTicketClose(ticketID, src.getName()));
