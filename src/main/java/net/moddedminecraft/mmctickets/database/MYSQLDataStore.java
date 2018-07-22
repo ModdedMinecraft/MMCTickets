@@ -190,7 +190,7 @@ public final class MYSQLDataStore implements IDataStore  {
     @Override
     public boolean updateTicketData(TicketData ticketData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("MERGE INTO " + Config.h2Prefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + Config.h2Prefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             statement.setInt(1, ticketData.getTicketID());
             statement.setString(2, ticketData.getPlayerUUID().toString());
             statement.setString(3, ticketData.getStaffUUID().toString());
@@ -216,7 +216,7 @@ public final class MYSQLDataStore implements IDataStore  {
     @Override
     public boolean updatePlayerData(PlayerData playerData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("MERGE INTO " + Config.h2Prefix + "playerdata VALUES (?, ?, ?);");
+            PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + Config.h2Prefix + "playerdata VALUES (?, ?, ?);");
             statement.setString(1, playerData.getPlayerUUID().toString());
             statement.setString(2, playerData.getPlayerName());
             statement.setInt(3, playerData.getBannedStatus());
