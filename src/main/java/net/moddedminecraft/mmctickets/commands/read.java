@@ -65,7 +65,7 @@ public class read implements CommandExecutor {
                                     Text.Builder send = Text.builder();
                                     String status = "";
                                     if (ticket.getStatus() == Claimed) status = "&eClaimed - ";
-                                    send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID()) + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
+                                    send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID()) + " &6on " + ticket.getServer() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                                     send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                                     send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
                                     contents.add(send.build());
@@ -78,7 +78,7 @@ public class read implements CommandExecutor {
                                 Text.Builder send = Text.builder();
                                 String status = "";
                                 if (ticket.getStatus() == Claimed) status = "&eClaimed - ";
-                                send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID()) + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
+                                send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID()) + " &6on " + ticket.getServer() + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                                 send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                                 send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
                                 contents.add(send.build());
@@ -207,7 +207,7 @@ public class read implements CommandExecutor {
                             }
                             contents.add(plugin.fromLegacy("&eOpened by: " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID())));
                             contents.add(plugin.fromLegacy("&eWhen: " + CommonUtil.getTimeAgo(ticket.getTimestamp())));
-                            contents.add(plugin.fromLegacy("&eServer: " + ticket.getServer()));
+                            contents.add(plugin.fromLegacy("&eServer: &7" + ticket.getServer()));
                             contents.add(send.build());
                             contents.add(plugin.fromLegacy("&7" + ticket.getMessage()));
                         }
