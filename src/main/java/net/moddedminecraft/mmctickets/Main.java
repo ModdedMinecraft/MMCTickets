@@ -345,6 +345,16 @@ public class Main {
         return String.valueOf(TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy));
     }
 
+    @Deprecated
+    public List<TicketData> getTickets() {
+        return getDataStore().getTicketData();
+    }
+
+    @Deprecated
+    public TicketData getTicket(int ticketID) {
+        return getDataStore().getTicket(ticketID).get();
+    }
+
     /*
     private void convertOldData() throws IOException {
         Path path = this.ConfigDir.resolve("TicketData.conf");
