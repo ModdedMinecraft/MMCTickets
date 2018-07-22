@@ -101,7 +101,8 @@ public class CommonUtil {
                 Text.Builder send = Text.builder();
                 send.append(message);
                 send.onClick(TextActions.runCommand("/ticket check " + ticketID));
-                player.sendMessage(message);
+                send.onHover(TextActions.showText(Text.of("Click here to get more details for ticket #" + ticketID)));
+                player.sendMessage(send.build());
             }
         }
     }
