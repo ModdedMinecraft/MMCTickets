@@ -36,7 +36,7 @@ public class close implements CommandExecutor {
         final int ticketID = args.<Integer>getOne("ticketID").get();
         final Optional<String> commentOP = args.<String>getOne("comment");
 
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
         UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
         if (src instanceof Player) {
@@ -63,9 +63,9 @@ public class close implements CommandExecutor {
                     }
                     if (commentOP.isPresent()) {
                         String comment = commentOP.get();
-                        plugin.getTicket(ticketID).setComment(comment);
+                        ticket.setComment(comment);
                     }
-                    plugin.getTicket(ticketID).setStatus(Closed);
+                    ticket.setStatus(Closed);
                     ticket.setStaffUUID(uuid.toString());
 
                     CommonUtil.notifyOnlineStaff(Messages.getTicketClose(ticketID, src.getName()));
@@ -75,11 +75,11 @@ public class close implements CommandExecutor {
                         ticketPlayer.sendMessage(Messages.getTicketCloseUser(ticket.getTicketID(), src.getName()));
                         ticket.setNotified(1);
                     } else {
-                        plugin.getNotifications().add(ticket.getPlayerUUID());
+                        plugin.getDataStore().getNotifications().add(ticket.getPlayerUUID());
                     }
 
                     try {
-                        plugin.saveData();
+                        plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
                         src.sendMessage(Messages.getErrorGen("Unable to close ticket"));
                         e.printStackTrace();

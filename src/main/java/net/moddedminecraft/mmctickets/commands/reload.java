@@ -3,6 +3,7 @@ package net.moddedminecraft.mmctickets.commands;
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Config;
 import net.moddedminecraft.mmctickets.config.Messages;
+import net.moddedminecraft.mmctickets.database.DataStoreManager;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -26,7 +27,8 @@ public class reload implements CommandExecutor {
         try {
             plugin.config = new Config(this.plugin);
             plugin.messages = new Messages(this.plugin);
-            plugin.loadData();
+            plugin.setDataStoreManager(new DataStoreManager(this.plugin));
+            plugin.loadDataStore();
         } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
             throw new CommandException(Messages.getErrorGen("Unable to load data."));

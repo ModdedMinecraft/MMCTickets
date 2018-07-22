@@ -32,7 +32,7 @@ public class reopen implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final int ticketID = args.<Integer>getOne("ticketID").get();
 
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
         if (tickets.isEmpty()) {
             throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
@@ -51,7 +51,7 @@ public class reopen implements CommandExecutor {
                     ticket.setNotified(0);
 
                     try {
-                        plugin.saveData();
+                        plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
                         src.sendMessage(Messages.getErrorGen("Unable to reopen ticket"));
                         e.printStackTrace();

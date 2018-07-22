@@ -30,7 +30,7 @@ public class readHeld implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getTickets());
+        final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
         if (src instanceof Player) {
             Player player = (Player) src;
@@ -45,7 +45,7 @@ public class readHeld implements CommandExecutor {
                 if (ticket.getStatus() == Held) {
                     String online = CommonUtil.isUserOnline(ticket.getPlayerUUID());
                     Text.Builder send = Text.builder();
-                    send.append(plugin.fromLegacy("&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID()) + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
+                    send.append(plugin.fromLegacy("&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID()) + " &6on " + CommonUtil.checkTicketServer(ticket.getServer()) + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                     send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                     send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
                     contents.add(send.build());

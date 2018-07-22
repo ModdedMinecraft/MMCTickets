@@ -26,12 +26,12 @@ public class ban implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final User user = args.<Player>getOne("playername").get();
-        final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
+        final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getDataStore().getPlayerData());
 
-        for (PlayerData pData : playerData) {
-            if (!user.getPlayer().isPresent()) {
-                throw new CommandException(Messages.getErrorGen("Unable to get player"));
-            } else {
+        if (!user.getPlayer().isPresent()) {
+            throw new CommandException(Messages.getErrorGen("Unable to get player"));
+        } else {
+            for (PlayerData pData : playerData) {
                 CommonUtil.checkPlayerData(plugin, user.getPlayer().get());
                 if (pData.getPlayerUUID().equals(user.getUniqueId())) {
                     if (pData.getBannedStatus() == 1) {
@@ -39,7 +39,7 @@ public class ban implements CommandExecutor {
                     }
                     pData.setBannedStatus(1);
                     try {
-                        plugin.saveData();
+                        plugin.getDataStore().updatePlayerData(pData);
                     } catch (Exception e) {
                         e.printStackTrace();
                         throw new CommandException(Messages.getErrorBanUser(user.getName()));

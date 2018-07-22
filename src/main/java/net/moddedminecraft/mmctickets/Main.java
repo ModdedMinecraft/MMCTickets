@@ -13,10 +13,10 @@ import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.PlayerData.PlayerDataSerializer;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.data.TicketData.TicketSerializer;
+import net.moddedminecraft.mmctickets.database.DataStoreManager;
+import net.moddedminecraft.mmctickets.database.IDataStore;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
 import net.moddedminecraft.mmctickets.util.UpdateChecker;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
@@ -28,20 +28,17 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
+import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
@@ -50,7 +47,7 @@ import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 public class Main {
 
     @Inject
-    public Logger logger;
+    private Logger logger;
 
     @Inject
     private Metrics metrics;
@@ -63,24 +60,19 @@ public class Main {
     @ConfigDir(sharedRoot = false)
     public Path ConfigDir;
 
-    private static SimpleDateFormat sdf = new SimpleDateFormat("MMM.dd kk:mm z");
-
     public Config config;
     public Messages messages;
 
     private CommandManager cmdManager = Sponge.getCommandManager();
 
     private ArrayList<String> waitTimer;
-    private ArrayList<UUID> notifications;
-    private Map<Integer, TicketData> tickets;
-    public Map<UUID, PlayerData> playersData;
+    private DataStoreManager dataStoreManager;
 
     public UpdateChecker updatechecker;
 
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
         Sponge.getEventManager().registerListeners(this, new EventListener(this));
-        convertOldData();
 
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(TicketData.class), new TicketSerializer());
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(PlayerData.class), new PlayerDataSerializer());
@@ -88,30 +80,52 @@ public class Main {
         config = new Config(this);
         messages = new Messages(this);
         loadCommands();
-        loadData();
     }
 
     @Listener
-    public void onServerStart(GameStartedServerEvent event) throws IOException {
-        checkOldNames();
-        logger.info("MMCTickets Loaded");
-        logger.info("Tickets loaded: " + tickets.size());
-        logger.info("Notifications loaded: " + notifications.size());
-        logger.info("PlayerData loaded: " + playersData.size());
+    public void onServerAboutStart(GameAboutToStartServerEvent event) {
+        dataStoreManager = new DataStoreManager(this);
+        if (dataStoreManager.load()) {
+            getLogger().info("MMCTickets datastore Loaded");
+        } else {
+            getLogger().error("Unable to load a datastore please check your Console/Config!");
+        }
+    }
 
-        this.waitTimer = new ArrayList<String>();
+        @Listener
+    public void onServerStart(GameStartedServerEvent event) {
+            getLogger().info("MMCTickets Loaded");
+            getLogger().info("Tickets loaded: " + getDataStore().getTicketData().size());
+            getLogger().info("Notifications loaded: " + getDataStore().getNotifications().size());
+            getLogger().info("PlayerData loaded: " + getDataStore().getPlayerData().size());
 
-        updatechecker = new UpdateChecker(this, Sponge.getPluginManager().getPlugin("mmctickets").get().getVersion().get());
-        updatechecker.startUpdateCheck();
+            this.waitTimer = new ArrayList<String>();
 
-        //start ticket nag timer
-        nagTimer();
+            updatechecker = new UpdateChecker(this, Sponge.getPluginManager().getPlugin("mmctickets").get().getVersion().get());
+            updatechecker.startUpdateCheck();
+
+            //start ticket nag timer
+            nagTimer();
     }
 
     @Listener
     public void onPluginReload(GameReloadEvent event) throws IOException, ObjectMappingException {
         this.config = new Config(this);
         this.messages = new Messages(this);
+        dataStoreManager = new DataStoreManager(this);
+        loadDataStore();
+    }
+
+    public void loadDataStore() {
+        if (dataStoreManager.load()) {
+            getLogger().info("MMCTickets datastore Loaded");
+        } else {
+            getLogger().error("Unable to load a datastore please check your Console/Config!");
+        }
+    }
+
+    public void setDataStoreManager(DataStoreManager dataStoreManager) {
+        this.dataStoreManager = dataStoreManager;
     }
 
     private void loadCommands() {
@@ -277,41 +291,8 @@ public class Main {
         return logger;
     }
 
-    synchronized public void loadData() throws IOException, ObjectMappingException {
-        HoconConfigurationLoader loader = getTicketDataLoader();
-        ConfigurationNode rootNode = loader.load();
-
-        List<TicketData> ticketList = rootNode.getNode("Tickets").getList(TypeToken.of(TicketData.class));
-        this.tickets = new HashMap<Integer, TicketData>();
-        this.notifications = new ArrayList<UUID>();
-        for (TicketData ticket : ticketList) {
-            this.tickets.put(ticket.getTicketID(), ticket);
-            if (ticket.getNotified() == 0 && ticket.getStatus() == Closed) this.notifications.add(ticket.getPlayerUUID());
-        }
-
-        HoconConfigurationLoader playerloader = getPlayerDataLoader();
-        ConfigurationNode playerrootNode = playerloader.load();
-
-        List<PlayerData> playersDataList = playerrootNode.getNode("PlayersData").getList(TypeToken.of(PlayerData.class));
-        this.playersData = new HashMap<UUID, PlayerData>();
-        for (PlayerData pd : playersDataList) {
-            this.playersData.put(pd.getPlayerUUID(), pd);
-        }
-    }
-
-    synchronized public void saveData() throws IOException, ObjectMappingException {
-        HoconConfigurationLoader loader = getTicketDataLoader();
-        ConfigurationNode rootNode = loader.load();
-
-        rootNode.getNode("Tickets").setValue(TicketSerializer.token, new ArrayList<TicketData>(this.tickets.values()));
-        loader.save(rootNode);
-
-        HoconConfigurationLoader playerloader = getPlayerDataLoader();
-        ConfigurationNode playerrootNode = playerloader.load();
-
-        playerrootNode.getNode("PlayersData").setValue(PlayerDataSerializer.token, new ArrayList<PlayerData>(this.playersData.values()));
-        playerloader.save(playerrootNode);
-
+    public IDataStore getDataStore() {
+        return dataStoreManager.getDataStore();
     }
 
     public void nagTimer() {
@@ -319,7 +300,7 @@ public class Main {
             Sponge.getScheduler().createSyncExecutor(this).scheduleWithFixedDelay(new Runnable() {
                 @Override
                 public void run() {
-                    final List<TicketData> tickets = new ArrayList<TicketData>(getTickets());
+                    final List<TicketData> tickets = new ArrayList<TicketData>(getDataStore().getTicketData());
                     int openTickets = 0;
                     int heldTickets = 0;
                     for (TicketData ticket : tickets) {
@@ -349,91 +330,26 @@ public class Main {
             }, Config.nagTimer, Config.nagTimer, TimeUnit.MINUTES);
         }
     }
-    public HoconConfigurationLoader getTicketDataLoader() {
-        return HoconConfigurationLoader.builder().setPath(this.ConfigDir.resolve("TicketData.conf")).build();
-    }
-
-    public HoconConfigurationLoader getPlayerDataLoader() {
-        return HoconConfigurationLoader.builder().setPath(this.ConfigDir.resolve("PlayerData.conf")).build();
-    }
-
-    public TicketData getTicket(int ticketID) {
-        return this.tickets.get(ticketID);
-    }
-
-    public Collection<TicketData> getTickets() {
-        return Collections.unmodifiableCollection(this.tickets.values());
-    }
-
-    public Collection<PlayerData> getPlayerData() {
-        return Collections.unmodifiableCollection(this.playersData.values());
-    }
-
-    public ArrayList<UUID> getNotifications() {
-        return this.notifications;
-    }
 
     public ArrayList<String> getWaitTimer() {
         return this.waitTimer;
-    }
-
-    public TicketData addTicket(TicketData ticket) {
-        return this.tickets.put(ticket.getTicketID(), ticket);
-    }
-
-    public PlayerData addPlayerData(PlayerData pData) {
-        return this.playersData.put(pData.getPlayerUUID(), pData);
     }
 
     public Text fromLegacy(String legacy) {
         return TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy);
     }
 
-    public String fromLegacyS(String legacy) {
-        return String.valueOf(TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy));
+    @Deprecated
+    public List<TicketData> getTickets() {
+        return getDataStore().getTicketData();
     }
 
-    private void convertOldData() throws IOException {
-        Path path = this.ConfigDir.resolve("TicketData.conf");
-        if (path.toFile().exists()) {
-            Charset charset = StandardCharsets.UTF_8;
-            String content = new String(Files.readAllBytes(path), charset);
-            if (content.contains("status=0") || content.contains("status=1") || content.contains("status=2") || content.contains("status=3")) {
-                content = content.replaceAll("status=0", "status=Open");
-                content = content.replaceAll("status=1", "status=Claimed");
-                content = content.replaceAll("status=2", "status=Held");
-                content = content.replaceAll("status=3", "status=Closed");
-                Files.write(path, content.getBytes(charset));
-            }
-            if (content.contains("name") || content.contains("staffname")) {
-                content = content.replaceAll("staffname", "staffUUID");
-                content = content.replaceAll("staffUUID=\"\"", "staffUUID=\"00000000-0000-0000-0000-000000000000\"");
-                content = content.replaceAll("name", "playerUUID");
-                Files.write(path, content.getBytes(charset));
-            }
+    @Deprecated
+    public TicketData getTicket(int ticketID) {
+        if (getDataStore().getTicket(ticketID).isPresent()) {
+            return getDataStore().getTicket(ticketID).get();
         }
+        return null;
     }
 
-    private void checkOldNames() {
-        final List<TicketData> tickets = new ArrayList<TicketData>(getTickets());
-        Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
-        Boolean save = false;
-        for (TicketData ticket : tickets) {
-            if (!ticket.getOldPlayer().matches("[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}")) {
-                ticket.setPlayerUUID(userStorage.get().get(ticket.getOldPlayer()).get().getUniqueId());
-                save = true;
-            }
-            if (!ticket.getOldStaffname().matches("[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}")) {
-                ticket.setStaffUUID(userStorage.get().get(ticket.getOldStaffname()).get().getUniqueId().toString());
-                save = true;
-            }
-        }
-        if (save) {
-            try {
-                saveData();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

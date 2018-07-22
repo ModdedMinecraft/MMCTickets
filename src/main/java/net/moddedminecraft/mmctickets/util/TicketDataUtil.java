@@ -6,14 +6,14 @@ import java.util.UUID;
 
 public class TicketDataUtil {
 
-    protected String playerUUID, world, staffUUID, comment, message;
+    protected String playerUUID, world, staffUUID, comment, message, server;
     protected int ticketID, x, y, z, notified;
     protected Double yaw, pitch;
     protected long timestamp;
     protected ticketStatus status;
 
 
-    public TicketDataUtil(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified) {
+    public TicketDataUtil(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified, String server) {
         this.ticketID = ticketID;
         this.playerUUID = playerUUID;
         this.staffUUID = staffUUID;
@@ -28,6 +28,7 @@ public class TicketDataUtil {
         this.message = message;
         this.status = status;
         this.notified = notified;
+        this.server = server;
     }
 
     public int getTicketID() {
@@ -114,4 +115,11 @@ public class TicketDataUtil {
         this.playerUUID = String.valueOf(uuid);
     }
 
+    public String getServer() {
+        return server;
+    }
+
+    public void setServer(String server) {
+        this.server = server;
+    }
 }

@@ -25,7 +25,7 @@ public class unban implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         final User user = args.<Player>getOne("playername").get();
-        final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getPlayerData());
+        final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getDataStore().getPlayerData());
 
         for (PlayerData pData : playerData) {
             if (pData.getPlayerUUID().equals(user.getUniqueId())) {
@@ -34,7 +34,7 @@ public class unban implements CommandExecutor {
                 }
                 pData.setBannedStatus(0);
                 try {
-                    plugin.saveData();
+                    plugin.getDataStore().updatePlayerData(pData);
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new CommandException(Messages.getErrorUnbanUser(user.getName()));
