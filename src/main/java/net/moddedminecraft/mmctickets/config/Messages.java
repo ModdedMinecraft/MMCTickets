@@ -70,6 +70,7 @@ public class Messages {
     private static String errorTicketClaim = "&cTicket #{0} is already claimed by {1}.";
     private static String errorTicketUnclaim = "&cTicket #{0} is claimed by {1}.";
     private static String errorUserNotExist = "&cThe specified user {0} does not exist or contains invalid characters.";
+    private static String errorTicketServer = "&cTicket #{0} was opened on another server.";
 
     //teleport
     private static String teleportToTicket = "&9Teleported to ticket #{0}.";
@@ -156,6 +157,7 @@ public class Messages {
         errorTicketClaim = check(messages.getNode("error", "ticket-claim"), errorTicketClaim).getString();
         errorTicketUnclaim = check(messages.getNode("error", "ticket-unclaim"), errorTicketUnclaim).getString();
         errorUserNotExist = check(messages.getNode("error", "user-not-exist"), errorUserNotExist).getString();
+        errorTicketServer = check(messages.getNode("error", "ticket-server"), errorTicketServer).getString();
 
         //teleport
         teleportToTicket = check(messages.getNode("teleport", "to-ticket"), teleportToTicket).getString();
@@ -516,5 +518,9 @@ public class Messages {
 
     public static String getYesButtonHover() {
         return yesButtonHover;
+    }
+
+    public static Text getErrorTicketServer(int ticketID) {
+        return parse (errorTicketServer, ticketID);
     }
 }

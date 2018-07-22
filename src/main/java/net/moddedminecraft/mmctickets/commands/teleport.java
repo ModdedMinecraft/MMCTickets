@@ -3,6 +3,7 @@ package net.moddedminecraft.mmctickets.commands;
 
 import com.flowpowered.math.vector.Vector3d;
 import net.moddedminecraft.mmctickets.Main;
+import net.moddedminecraft.mmctickets.config.Config;
 import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import org.spongepowered.api.Sponge;
@@ -42,12 +43,16 @@ public class teleport implements CommandExecutor {
             boolean ticketExist = false;
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
-                    ticketExist = true;
-                    World world = Sponge.getServer().getWorld(ticket.getWorld()).get();
-                    Location loc = new Location(world, ticket.getX(), ticket.getY(), ticket.getZ());
-                    Vector3d vect = new Vector3d(ticket.getPitch(), ticket.getYaw(), 0);
-                    player.setLocationAndRotation(loc, vect);
-                    player.sendMessage(Messages.getTeleportToTicket(ticketID));
+                    if (ticket.getServer().equalsIgnoreCase(Config.server)) {
+                        ticketExist = true;
+                        World world = Sponge.getServer().getWorld(ticket.getWorld()).get();
+                        Location loc = new Location(world, ticket.getX(), ticket.getY(), ticket.getZ());
+                        Vector3d vect = new Vector3d(ticket.getPitch(), ticket.getYaw(), 0);
+                        player.setLocationAndRotation(loc, vect);
+                        player.sendMessage(Messages.getTeleportToTicket(ticketID));
+                    } else {
+                        throw new CommandException(Messages.getErrorTicketServer(ticketID));
+                    }
                 }
             }
             if (!ticketExist) {
