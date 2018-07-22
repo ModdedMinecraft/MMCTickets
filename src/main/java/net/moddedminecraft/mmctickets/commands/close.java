@@ -63,7 +63,7 @@ public class close implements CommandExecutor {
                     }
                     if (commentOP.isPresent()) {
                         String comment = commentOP.get();
-                        plugin.getDataStore().getTicket(ticketID).ifPresent(tData -> tData.setComment(comment));
+                        ticket.setComment(comment);
                     }
                     ticket.setStatus(Closed);
                     ticket.setStaffUUID(uuid.toString());
