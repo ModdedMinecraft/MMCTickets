@@ -346,6 +346,10 @@ public class Main {
 
     @Deprecated
     public TicketData getTicket(int ticketID) {
-        return getDataStore().getTicket(ticketID).get();
+        if (getDataStore().getTicket(ticketID).isPresent()) {
+            return getDataStore().getTicket(ticketID).get();
+        }
+        return null;
     }
+
 }
