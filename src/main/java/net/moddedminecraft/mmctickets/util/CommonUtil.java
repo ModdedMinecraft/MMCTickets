@@ -2,6 +2,7 @@ package net.moddedminecraft.mmctickets.util;
 
 
 import net.moddedminecraft.mmctickets.Main;
+import net.moddedminecraft.mmctickets.config.Config;
 import net.moddedminecraft.mmctickets.config.Permissions;
 import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.ticketStatus;
@@ -75,6 +76,13 @@ public class CommonUtil {
             }
         }
         return false;
+    }
+
+    public static String checkTicketServer(String server) {
+        if (server.equalsIgnoreCase(Config.server)) {
+            return "&a" + server;
+        }
+        return "&c" + server;
     }
 
     public static String getTicketStatusColour(ticketStatus ticketIDStatus){
