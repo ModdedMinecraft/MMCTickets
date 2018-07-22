@@ -244,8 +244,8 @@ public final class MYSQLDataStore implements IDataStore  {
             ds.setDriverClassName("org.mariadb.jdbc.Driver");
             ds.setJdbcUrl("jdbc:mariadb://"
                     + Config.mysqlHost
-                    + Config.mysqlPort
-                    + Config.mysqlDatabase);
+                    + ":" + Config.mysqlPort
+                    + "/" +  Config.mysqlDatabase);
             ds.addDataSourceProperty("user", Config.mysqlUser);
             ds.addDataSourceProperty("password", Config.mysqlPass);
             ds.setConnectionTimeout(1000);
