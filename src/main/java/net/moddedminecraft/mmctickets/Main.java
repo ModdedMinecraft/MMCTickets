@@ -73,7 +73,6 @@ public class Main {
     @Listener
     public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
         Sponge.getEventManager().registerListeners(this, new EventListener(this));
-        //convertOldData();
 
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(TicketData.class), new TicketSerializer());
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(PlayerData.class), new PlayerDataSerializer());
@@ -81,7 +80,6 @@ public class Main {
         config = new Config(this);
         messages = new Messages(this);
         loadCommands();
-        //loadData();
     }
 
     @Listener
@@ -341,10 +339,6 @@ public class Main {
         return TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy);
     }
 
-    public String fromLegacyS(String legacy) {
-        return String.valueOf(TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy));
-    }
-
     @Deprecated
     public List<TicketData> getTickets() {
         return getDataStore().getTicketData();
@@ -354,51 +348,4 @@ public class Main {
     public TicketData getTicket(int ticketID) {
         return getDataStore().getTicket(ticketID).get();
     }
-
-    /*
-    private void convertOldData() throws IOException {
-        Path path = this.ConfigDir.resolve("TicketData.conf");
-        if (path.toFile().exists()) {
-            Charset charset = StandardCharsets.UTF_8;
-            String content = new String(Files.readAllBytes(path), charset);
-            if (content.contains("status=0") || content.contains("status=1") || content.contains("status=2") || content.contains("status=3")) {
-                content = content.replaceAll("status=0", "status=Open");
-                content = content.replaceAll("status=1", "status=Claimed");
-                content = content.replaceAll("status=2", "status=Held");
-                content = content.replaceAll("status=3", "status=Closed");
-                Files.write(path, content.getBytes(charset));
-            }
-            if (content.contains("name") || content.contains("staffname")) {
-                content = content.replaceAll("staffname", "staffUUID");
-                content = content.replaceAll("staffUUID=\"\"", "staffUUID=\"00000000-0000-0000-0000-000000000000\"");
-                content = content.replaceAll("name", "playerUUID");
-                Files.write(path, content.getBytes(charset));
-            }
-        }
-    }
-
-
-    private void checkOldNames() {
-        final List<TicketData> tickets = new ArrayList<TicketData>(getTickets());
-        Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
-        Boolean save = false;
-        for (TicketData ticket : tickets) {
-            if (!ticket.getOldPlayer().matches("[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}")) {
-                ticket.setPlayerUUID(userStorage.get().get(ticket.getOldPlayer()).get().getUniqueId());
-                save = true;
-            }
-            if (!ticket.getOldStaffname().matches("[0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}")) {
-                ticket.setStaffUUID(userStorage.get().get(ticket.getOldStaffname()).get().getUniqueId().toString());
-                save = true;
-            }
-        }
-        if (save) {
-            try {
-                saveData();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    */
 }
