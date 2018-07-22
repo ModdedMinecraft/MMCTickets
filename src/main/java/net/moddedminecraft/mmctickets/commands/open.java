@@ -41,6 +41,9 @@ public class open implements CommandExecutor {
         Player player = (Player) src;
         UUID uuid = player.getUniqueId();
 
+        if (Config.server.isEmpty()) {
+            throw new CommandException(Messages.getErrorGen("Server name inside config is not set"));
+        }
         if (plugin.getWaitTimer().contains(src.getName())) {
             throw new CommandException(Messages.getTicketTooFast(Config.delayTimer));
         }
