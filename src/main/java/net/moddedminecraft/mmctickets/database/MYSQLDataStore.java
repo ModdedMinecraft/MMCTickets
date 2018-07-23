@@ -35,7 +35,7 @@ public final class MYSQLDataStore implements IDataStore  {
             return false;
         }
         try (Connection connection = getConnection()) {
-            connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.h2Prefix + "tickets ("
+            connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.mysqlPrefix + "tickets ("
                     + " ticketid INTEGER NOT NULL PRIMARY KEY,"
                     + " playeruuid VARCHAR(60) NOT NULL,"
                     + " staffuuid VARCHAR(60) NOT NULL,"
@@ -53,7 +53,7 @@ public final class MYSQLDataStore implements IDataStore  {
                     + " server VARCHAR(100) NOT NULL"
                     + ");");
 
-            connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.h2Prefix + "playerdata ("
+            connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS " + Config.mysqlPrefix + "playerdata ("
                     + "uuid VARCHAR(36) NOT NULL PRIMARY KEY, "
                     + "playername VARCHAR(36) NOT NULL, "
                     + "banned INTEGER NOT NULL"
@@ -72,7 +72,7 @@ public final class MYSQLDataStore implements IDataStore  {
         List<TicketData> ticketList = new ArrayList<>();
 
         try (Connection connection = getConnection()) {
-            ResultSet rs = connection.createStatement().executeQuery("SELECT * FROM " + Config.h2Prefix + "tickets");
+            ResultSet rs = connection.createStatement().executeQuery("SELECT * FROM " + Config.mysqlPrefix + "tickets");
             while (rs.next()) {
                 TicketData ticketData = new TicketData(
                         rs.getInt("ticketid"),
@@ -105,7 +105,7 @@ public final class MYSQLDataStore implements IDataStore  {
         List<PlayerData> playerList = new ArrayList<>();
 
         try (Connection connection = getConnection()) {
-            ResultSet rs = connection.createStatement().executeQuery("SELECT * FROM " + Config.h2Prefix + "playerdata");
+            ResultSet rs = connection.createStatement().executeQuery("SELECT * FROM " + Config.mysqlPrefix + "playerdata");
             while (rs.next()) {
                 PlayerData playerData = new PlayerData(
                         UUID.fromString(rs.getString("uuid")),
@@ -116,7 +116,7 @@ public final class MYSQLDataStore implements IDataStore  {
             }
             return playerList;
         } catch (SQLException ex) {
-            plugin.getLogger().info("H2: Couldn't read playerdata from H2 database.", ex);
+            plugin.getLogger().info("MySQL: Couldn't read playerdata from MySQL database.", ex);
             return new ArrayList<>();
         }
     }
@@ -150,7 +150,7 @@ public final class MYSQLDataStore implements IDataStore  {
     @Override
     public boolean addTicketData(TicketData ticketData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO " + Config.h2Prefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO " + Config.mysqlPrefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             statement.setInt(1, ticketData.getTicketID());
             statement.setString(2, ticketData.getPlayerUUID().toString());
             statement.setString(3, ticketData.getStaffUUID().toString());
@@ -176,7 +176,7 @@ public final class MYSQLDataStore implements IDataStore  {
     @Override
     public boolean addPlayerData(PlayerData playerData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO " + Config.h2Prefix + "playerdata VALUES (?, ?, ?);");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO " + Config.mysqlPrefix + "playerdata VALUES (?, ?, ?);");
             statement.setString(1, playerData.getPlayerUUID().toString());
             statement.setString(2, playerData.getPlayerName());
             statement.setInt(3, playerData.getBannedStatus());
@@ -190,7 +190,7 @@ public final class MYSQLDataStore implements IDataStore  {
     @Override
     public boolean updateTicketData(TicketData ticketData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + Config.h2Prefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + Config.mysqlPrefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             statement.setInt(1, ticketData.getTicketID());
             statement.setString(2, ticketData.getPlayerUUID().toString());
             statement.setString(3, ticketData.getStaffUUID().toString());
@@ -216,7 +216,7 @@ public final class MYSQLDataStore implements IDataStore  {
     @Override
     public boolean updatePlayerData(PlayerData playerData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + Config.h2Prefix + "playerdata VALUES (?, ?, ?);");
+            PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + Config.mysqlPrefix + "playerdata VALUES (?, ?, ?);");
             statement.setString(1, playerData.getPlayerUUID().toString());
             statement.setString(2, playerData.getPlayerName());
             statement.setInt(3, playerData.getBannedStatus());
@@ -233,7 +233,7 @@ public final class MYSQLDataStore implements IDataStore  {
             ResultSet rs = md.getColumns(null, null, tableName, columnName);
             return rs.next();
         } catch (SQLException ex) {
-            plugin.getLogger().error("H2: Error checking if column exists.", ex);
+            plugin.getLogger().error("MySQL: Error checking if column exists.", ex);
         }
         return false;
     }
