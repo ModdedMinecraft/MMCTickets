@@ -208,7 +208,9 @@ public class read implements CommandExecutor {
                             contents.add(plugin.fromLegacy("&eOpened by: " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID())));
                             contents.add(plugin.fromLegacy("&eWhen: " + CommonUtil.getTimeAgo(ticket.getTimestamp())));
                             contents.add(plugin.fromLegacy("&eServer: " + CommonUtil.checkTicketServer(ticket.getServer())));
-                            contents.add(send.build());
+                            if (!ticket.getPlayerUUID().toString().equals("00000000-0000-0000-0000-000000000000")) {
+                                contents.add(send.build());
+                            }
                             contents.add(plugin.fromLegacy("&7" + ticket.getMessage()));
                         }
                     }

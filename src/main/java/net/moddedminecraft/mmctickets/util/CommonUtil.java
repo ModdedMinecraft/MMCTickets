@@ -132,6 +132,10 @@ public class CommonUtil {
     }
 
     public static String getNameFromUUID(UUID uuid) {
+        if (uuid.toString().equals("00000000-0000-0000-0000-000000000000")) {
+            return "Console";
+        }
+
         Optional<Player> onlinePlayer = Sponge.getServer().getPlayer(uuid);
         if (onlinePlayer.isPresent()) {
             return Sponge.getServer().getPlayer(uuid).get().getName();
