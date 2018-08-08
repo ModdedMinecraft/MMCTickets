@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 
-@Plugin(id = "mmctickets", name = "MMCTickets", version = "2.0.1", description = "A real time ticket system")
+@Plugin(id = "mmctickets", name = "MMCTickets", version = "2.0.2", description = "A real time ticket system")
 public class Main {
 
     @Inject
