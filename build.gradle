@@ -1,3 +1,7 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
+}
+
 apply plugin: 'java'
 apply plugin: 'maven'
 
@@ -15,13 +19,22 @@ tasks.withType(JavaCompile) {
 
 
 repositories {
-        
      maven { url "https://mvnrepository.com/artifact/org.projectlombok/lombok" }
      maven { url "http://repo.spongepowered.org/maven" }
      maven { url "http://repo.maven.apache.org/maven2" }
+     maven { url "https://repo.codemc.org/repository/maven-public" }
 }
+
 dependencies {
     compile group: 'com.zaxxer', name: 'HikariCP', version:'3.1.0'
+    compile group: 'org.bstats', name: 'bstats-sponge', version:'1.4'
     compileOnly group: 'org.projectlombok', name: 'lombok', version:'1.18.0'
     compileOnly group: 'org.spongepowered', name: 'spongeapi', version:'7.1.0-SNAPSHOT'
+}
+
+shadowJar {
+    dependencies {
+        include(dependency("org.bstats:bstats-sponge:1.4"))
+    }
+    classifier = ''
 }

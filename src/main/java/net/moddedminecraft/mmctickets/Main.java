@@ -19,6 +19,7 @@ import net.moddedminecraft.mmctickets.util.CommonUtil;
 import net.moddedminecraft.mmctickets.util.UpdateChecker;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
+import org.bstats.sponge.Metrics2;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
@@ -50,7 +51,7 @@ public class Main {
     private Logger logger;
 
     @Inject
-    private Metrics metrics;
+    private Metrics2 metrics;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
