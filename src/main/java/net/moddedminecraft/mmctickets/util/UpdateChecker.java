@@ -68,21 +68,33 @@ public class UpdateChecker {
             }
 
             String[] recSplit = recommendedVersion.split("[.]", 3);
+            String[] curSplit = currentVersion.split("[.]", 3);
+
+            if (recSplit.length == 0 || curSplit.length == 0) {
+                plugin.getLogger().info("Update check failed. Version number was not found?");
+                return;
+            }
+
             int recMajor = Integer.parseInt(recSplit[0]);
             int recMinor = Integer.parseInt(recSplit[1]);
             int recPatch = Integer.parseInt(recSplit[2]);
 
-            String[] curSplit = currentVersion.split("[.]", 3);
             int curMajor = Integer.parseInt(curSplit[0]);
             int curMinor = Integer.parseInt(curSplit[1]);
             int curPatch = Integer.parseInt(curSplit[2]);
 
             if (recPatch > curPatch && recMinor >= curMinor && recMajor >= curMajor) {
-                plugin.getLogger().info(Messages.getPluginOutdated(recommendedVersion).toPlain());
+                String text1 = Messages.getChatprefix().toPlain();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
+                plugin.getLogger().info(text1 + text2);
             } else if (recPatch <= curPatch && recMinor > curMinor && recMajor >= curMajor) {
-                plugin.getLogger().info(Messages.getPluginOutdated(recommendedVersion).toPlain());
+                String text1 = Messages.getChatprefix().toPlain();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
+                plugin.getLogger().info(text1 + text2);
             } else if (recPatch <= curPatch && recMinor <= curMinor && recMajor > curMajor) {
-                plugin.getLogger().info(Messages.getPluginOutdated(recommendedVersion).toPlain());
+                String text1 = Messages.getChatprefix().toPlain();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
+                plugin.getLogger().info(text1 + text2);
             }
         }
     }
@@ -96,11 +108,17 @@ public class UpdateChecker {
             }
 
             String[] recSplit = recommendedVersion.split("[.]", 3);
+            String[] curSplit = currentVersion.split("[.]", 3);
+
+            if (recSplit.length == 0 || curSplit.length == 0) {
+                plugin.getLogger().info("Update check failed. Version number was not found?");
+                return;
+            }
+
             int recMajor = Integer.parseInt(recSplit[0]);
             int recMinor = Integer.parseInt(recSplit[1]);
             int recPatch = Integer.parseInt(recSplit[2]);
 
-            String[] curSplit = currentVersion.split("[.]", 3);
             int curMajor = Integer.parseInt(curSplit[0]);
             int curMinor = Integer.parseInt(curSplit[1]);
             int curPatch = Integer.parseInt(curSplit[2]);
