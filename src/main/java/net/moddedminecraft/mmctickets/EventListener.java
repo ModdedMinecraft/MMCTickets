@@ -5,6 +5,7 @@ import net.moddedminecraft.mmctickets.config.Permissions;
 import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.data.ticketStatus;
+import net.moddedminecraft.mmctickets.util.CommonUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -28,9 +29,11 @@ public class EventListener {
         //If the playerdata for the player exists, Check if they have changed their name.
         Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
             public void run() {
+                boolean exists = false;
                 final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getDataStore().getPlayerData());
                 for (PlayerData pData : playerData) {
                     if (pData.getPlayerUUID().equals(player.getUniqueId()) && !pData.getPlayerName().equals(player.getName())) {
+                        exists = true;
                         pData.setPlayerName(player.getName());
                         try {
                             plugin.getDataStore().updatePlayerData(pData);
@@ -38,6 +41,9 @@ public class EventListener {
                             e.printStackTrace();
                         }
                     }
+                }
+                if (!exists) {
+                    CommonUtil.checkPlayerData(plugin, player);
                 }
             }
         }).delay(15, TimeUnit.SECONDS).name("mmctickets-s-checkUserNameOnLogin").submit(this.plugin);

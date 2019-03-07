@@ -44,7 +44,7 @@ public class unclaim implements CommandExecutor {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
                     if (!ticket.getStaffUUID().equals(uuid) && ticket.getStatus() == Claimed && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
-                        throw new CommandException(Messages.getErrorTicketUnclaim(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
+                        throw new CommandException(Messages.getErrorTicketUnclaim(ticket.getTicketID(), CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                     }
                     if (ticket.getStatus() == Open) {
                         throw new CommandException(Messages.getTicketNotClaimed(ticket.getTicketID()));

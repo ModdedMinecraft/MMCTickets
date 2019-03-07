@@ -45,7 +45,7 @@ public class claim implements CommandExecutor {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
                     if (!ticket.getStaffUUID().equals(uuid) && ticket.getStatus() == Claimed && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
-                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
+                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                     }
                     if (ticket.getStaffUUID().equals(uuid) && ticket.getStatus() == Claimed) {
                         throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), "you"));

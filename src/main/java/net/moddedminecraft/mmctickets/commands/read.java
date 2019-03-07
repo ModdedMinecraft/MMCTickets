@@ -58,14 +58,14 @@ public class read implements CommandExecutor {
                     int totalTickets = 0;
                     for (TicketData ticket : tickets) {
                         if (Config.hideOffline) {
-                            if (CommonUtil.checkUserOnline(CommonUtil.getNameFromUUID(ticket.getPlayerUUID()))) {
+                            if (CommonUtil.checkUserOnline(CommonUtil.getPlayerNameFromData(plugin, ticket.getPlayerUUID()))) {
                                 if (ticket.getStatus() == Claimed || ticket.getStatus() == Open) {
                                     String online = CommonUtil.isUserOnline(ticket.getPlayerUUID());
                                     totalTickets++;
                                     Text.Builder send = Text.builder();
                                     String status = "";
                                     if (ticket.getStatus() == Claimed) status = "&eClaimed - ";
-                                    send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID()) + " &6on " + CommonUtil.checkTicketServer(ticket.getServer()) + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
+                                    send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getPlayerNameFromData(plugin, ticket.getPlayerUUID()) + " &6on " + CommonUtil.checkTicketServer(ticket.getServer()) + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                                     send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                                     send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
                                     contents.add(send.build());
@@ -78,7 +78,7 @@ public class read implements CommandExecutor {
                                 Text.Builder send = Text.builder();
                                 String status = "";
                                 if (ticket.getStatus() == Claimed) status = "&eClaimed - ";
-                                send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID()) + " &6on " + CommonUtil.checkTicketServer(ticket.getServer()) + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
+                                send.append(plugin.fromLegacy(status + "&6#" + ticket.getTicketID() + " " + CommonUtil.getTimeAgo(ticket.getTimestamp()) + " by " + online + CommonUtil.getPlayerNameFromData(plugin, ticket.getPlayerUUID()) + " &6on " + CommonUtil.checkTicketServer(ticket.getServer()) + " &6- &7" + CommonUtil.shortenMessage(ticket.getMessage())));
                                 send.onClick(TextActions.runCommand("/ticket read " + ticket.getTicketID()));
                                 send.onHover(TextActions.showText(plugin.fromLegacy("Click here to get more details for ticket #" + ticket.getTicketID())));
                                 contents.add(send.build());
@@ -198,14 +198,14 @@ public class read implements CommandExecutor {
                             }
                             if (!ticket.getStaffUUID().toString().equals("00000000-0000-0000-0000-000000000000")) {
                                 if (ticket.getStatus() == Claimed)
-                                    contents.add(plugin.fromLegacy("&eClaimed by: &7" + CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
+                                    contents.add(plugin.fromLegacy("&eClaimed by: &7" + CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                                 else if (ticket.getStatus() == Closed)
-                                    contents.add(plugin.fromLegacy("&eHandled by: &7" + CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
+                                    contents.add(plugin.fromLegacy("&eHandled by: &7" + CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                             }
                             if (!ticket.getComment().isEmpty()) {
                                 contents.add(plugin.fromLegacy("&eComment: &7" + ticket.getComment()));
                             }
-                            contents.add(plugin.fromLegacy("&eOpened by: " + online + CommonUtil.getNameFromUUID(ticket.getPlayerUUID())));
+                            contents.add(plugin.fromLegacy("&eOpened by: " + online + CommonUtil.getPlayerNameFromData(plugin, ticket.getPlayerUUID())));
                             contents.add(plugin.fromLegacy("&eWhen: " + CommonUtil.getTimeAgo(ticket.getTimestamp())));
                             contents.add(plugin.fromLegacy("&eServer: " + CommonUtil.checkTicketServer(ticket.getServer())));
                             if (!ticket.getPlayerUUID().toString().equals("00000000-0000-0000-0000-000000000000")) {

@@ -50,7 +50,7 @@ public class hold implements CommandExecutor {
                         src.sendMessage(Messages.getErrorTicketlreadyHold());
                     }
                     if (ticket.getStatus() == Claimed && !ticket.getStaffUUID().equals(uuid)) {
-                        src.sendMessage(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
+                        src.sendMessage(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                     }
                     ticket.setStatus(Held);
                     ticket.setStaffUUID(UUID.fromString("00000000-0000-0000-0000-000000000000").toString());

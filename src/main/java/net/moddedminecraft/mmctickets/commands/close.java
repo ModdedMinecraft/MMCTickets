@@ -59,7 +59,7 @@ public class close implements CommandExecutor {
                         throw new CommandException(Messages.getErrorTicketAlreadyClosed());
                     }
                     if (ticket.getStatus() == Claimed && !ticket.getStaffUUID().equals(uuid) && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
-                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
+                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                     }
                     if (commentOP.isPresent()) {
                         String comment = commentOP.get();

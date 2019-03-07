@@ -43,7 +43,7 @@ public class reopen implements CommandExecutor {
                         throw new CommandException(Messages.getErrorTicketNotClosed(ticketID));
                     }
                     if (ticket.getStatus() == Claimed) {
-                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
+                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                     }
                     ticket.setStatus(Open);
                     ticket.setStaffUUID(UUID.fromString("00000000-0000-0000-0000-000000000000").toString());

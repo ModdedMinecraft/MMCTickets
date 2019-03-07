@@ -44,7 +44,7 @@ public class assign implements CommandExecutor {
                         src.sendMessage(Messages.getErrorTicketAlreadyClosed());
                     }
                     if (ticket.getStatus() == Claimed && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
-                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
+                        throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                     }
                     ticket.setStatus(Claimed);
                     ticket.setStaffUUID(user.getUniqueId().toString());
@@ -56,12 +56,12 @@ public class assign implements CommandExecutor {
                         e.printStackTrace();
                     }
 
-                    CommonUtil.notifyOnlineStaff(Messages.getTicketAssign(CommonUtil.getNameFromUUID(ticket.getStaffUUID()), ticket.getTicketID()));
+                    CommonUtil.notifyOnlineStaff(Messages.getTicketAssign(CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID()), ticket.getTicketID()));
 
                     Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getPlayerUUID());
                     if (ticketPlayerOP.isPresent()) {
                         Player ticketPlayer = ticketPlayerOP.get();
-                        ticketPlayer.sendMessage(Messages.getTicketAssignUser(ticket.getTicketID(), CommonUtil.getNameFromUUID(ticket.getStaffUUID())));
+                        ticketPlayer.sendMessage(Messages.getTicketAssignUser(ticket.getTicketID(), CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                     }
                     return CommandResult.success();
                 }
