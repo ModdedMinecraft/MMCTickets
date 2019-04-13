@@ -9,6 +9,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
@@ -30,7 +31,7 @@ public class staff implements CommandExecutor {
         String separator = Messages.getStaffListSeperator();
 
         for(Player player : Sponge.getServer().getOnlinePlayers()) {
-            if(player.hasPermission(Permissions.STAFF) && (!player.get(Keys.VANISH).isPresent()) {
+            if(player.hasPermission(Permissions.STAFF) && (!player.get(Keys.VANISH).isPresent())) {
                 staff.append("&e" +player.getName());
                 staff.append(separator);
             }
