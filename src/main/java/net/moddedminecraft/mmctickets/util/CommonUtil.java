@@ -98,7 +98,11 @@ public class CommonUtil {
     public static void notifyOnlineStaff(Text message) {
         for(Player player : Sponge.getServer().getOnlinePlayers()){
             if(player.hasPermission(Permissions.STAFF)) {
-                player.sendMessage(message);
+                Text.Builder send = Text.builder();
+                send.append(message);
+                send.onClick(TextActions.runCommand("/ticket check"));
+                send.onHover(TextActions.showText(Text.of("Click here to get a list of all open tickets")));
+                player.sendMessage(send.build());
             }
         }
     }

@@ -65,6 +65,7 @@ public class UpdateChecker {
                 main();
             } catch (Exception e) {
                 plugin.getLogger().info("Update check failed. URL Invalid.");
+                return;
             }
 
             String[] recSplit = recommendedVersion.split("[.]", 3);
