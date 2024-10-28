@@ -10,7 +10,7 @@
       "name": "MMCTickets",
       "entrypoint": "net.moddedminecraft.mmctickets.Main",
       "description": "MMCTickets is a simple and easy to use tickets management system.",
-      "version": "2.1.0",
+      "version": "3.0.0",
       "branding": {},
       "links": {
         "source": "https://github.com/ModdedMinecraft/MMCTickets",
@@ -31,7 +31,7 @@
         },
         {
           "id": "spongeapi",
-          "version": "8.0.0",
+          "version": "8.2.0",
           "load-order": "after",
           "optional": false
         },

@@ -6,7 +6,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 group = 'net.moddedminecraft'
-version = '2.1.0-API-8'
+version = '3.0.0-API-8'
 
 description = """MMCTickets"""
 
