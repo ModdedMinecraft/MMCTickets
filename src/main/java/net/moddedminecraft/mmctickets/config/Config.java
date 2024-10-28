@@ -27,7 +27,7 @@ public class Config {
     public static Boolean titleNotification;
 
     public static int minWords;
-    public static int delayTimer; //TODO
+    public static int delayTimer;
     public static int maxTickets;
     public static Boolean preventDuplicates;
 

@@ -41,7 +41,8 @@ public final class MYSQLDataStore implements IDataStore  {
                     + " staffuuid VARCHAR(60) NOT NULL,"
                     + " comment VARCHAR(700) NOT NULL,"
                     + " timestamp BIGINT NOT NULL,"
-                    + " world VARCHAR(100) NOT NULL,"
+                    + " worldnamespace VARCHAR(100) NOT NULL,"
+                    + " worldvalue VARCHAR(100) NOT NULL,"
                     + " coordx INTEGER NOT NULL,"
                     + " coordy INTEGER NOT NULL,"
                     + " coordz INTEGER NOT NULL,"
@@ -80,7 +81,8 @@ public final class MYSQLDataStore implements IDataStore  {
                         rs.getString("staffuuid"),
                         rs.getString("comment"),
                         rs.getInt("timestamp"),
-                        rs.getString("world"),
+                        rs.getString("worldnamespace"),
+                        rs.getString("worldvalue"),
                         rs.getInt("coordx"),
                         rs.getInt("coordy"),
                         rs.getInt("coordz"),
@@ -150,22 +152,23 @@ public final class MYSQLDataStore implements IDataStore  {
     @Override
     public boolean addTicketData(TicketData ticketData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO " + Config.mysqlPrefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO " + Config.mysqlPrefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             statement.setInt(1, ticketData.getTicketID());
             statement.setString(2, ticketData.getPlayerUUID().toString());
             statement.setString(3, ticketData.getStaffUUID().toString());
             statement.setString(4, ticketData.getComment());
             statement.setLong(5, ticketData.getTimestamp());
-            statement.setString(6, ticketData.getWorld());
-            statement.setInt(7, ticketData.getX());
-            statement.setInt(8, ticketData.getY());
-            statement.setInt(9, ticketData.getZ());
-            statement.setDouble(10, ticketData.getYaw());
-            statement.setDouble(11, ticketData.getPitch());
-            statement.setString(12, ticketData.getMessage());
-            statement.setString(13, ticketData.getStatus().toString());
-            statement.setInt(14, ticketData.getNotified());
-            statement.setString(15, ticketData.getServer());
+            statement.setString(6, ticketData.getWorldNamespace());
+            statement.setString(7, ticketData.getWorldValue());
+            statement.setInt(8, ticketData.getX());
+            statement.setInt(9, ticketData.getY());
+            statement.setInt(10, ticketData.getZ());
+            statement.setDouble(11, ticketData.getYaw());
+            statement.setDouble(12, ticketData.getPitch());
+            statement.setString(13, ticketData.getMessage());
+            statement.setString(14, ticketData.getStatus().toString());
+            statement.setInt(15, ticketData.getNotified());
+            statement.setString(16, ticketData.getServer());
             return statement.executeUpdate() > 0;
         } catch (SQLException ex) {
             plugin.getLogger().error("MySQL: Error adding ticketdata", ex);
@@ -190,22 +193,23 @@ public final class MYSQLDataStore implements IDataStore  {
     @Override
     public boolean updateTicketData(TicketData ticketData) {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + Config.mysqlPrefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement statement = connection.prepareStatement("REPLACE INTO " + Config.mysqlPrefix + "tickets VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
             statement.setInt(1, ticketData.getTicketID());
             statement.setString(2, ticketData.getPlayerUUID().toString());
             statement.setString(3, ticketData.getStaffUUID().toString());
             statement.setString(4, ticketData.getComment());
             statement.setLong(5, ticketData.getTimestamp());
-            statement.setString(6, ticketData.getWorld());
-            statement.setInt(7, ticketData.getX());
-            statement.setInt(8, ticketData.getY());
-            statement.setInt(9, ticketData.getZ());
-            statement.setDouble(10, ticketData.getYaw());
-            statement.setDouble(11, ticketData.getPitch());
-            statement.setString(12, ticketData.getMessage());
-            statement.setString(13, ticketData.getStatus().toString());
-            statement.setInt(14, ticketData.getNotified());
-            statement.setString(15, ticketData.getServer());
+            statement.setString(6, ticketData.getWorldNamespace());
+            statement.setString(7, ticketData.getWorldValue());
+            statement.setInt(8, ticketData.getX());
+            statement.setInt(9, ticketData.getY());
+            statement.setInt(10, ticketData.getZ());
+            statement.setDouble(11, ticketData.getYaw());
+            statement.setDouble(12, ticketData.getPitch());
+            statement.setString(13, ticketData.getMessage());
+            statement.setString(14, ticketData.getStatus().toString());
+            statement.setInt(15, ticketData.getNotified());
+            statement.setString(16, ticketData.getServer());
             return statement.executeUpdate() > 0;
         } catch (SQLException ex) {
             plugin.getLogger().error("MySQL: Error updating ticketdata", ex);

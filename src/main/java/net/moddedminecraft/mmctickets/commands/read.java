@@ -145,7 +145,7 @@ public class read implements CommandExecutor {
                             }
                             ticketStatus = CommonUtil.getTicketStatusColour(ticket.getStatus());
                             String online = CommonUtil.isUserOnline(ticket.getPlayerUUID());
-                            Optional<ServerWorld> worldOptional = Sponge.server().worldManager().world(ResourceKey.minecraft(ticket.getWorld()));
+                            Optional<ServerWorld> worldOptional = Sponge.server().worldManager().world(ResourceKey.builder().namespace(ticket.getWorldNamespace()).value(ticket.getWorldValue()).build());
 
                             TextComponent.@NotNull Builder action = Component.text();
 
@@ -212,7 +212,7 @@ public class read implements CommandExecutor {
 
 
                             TextComponent.@NotNull Builder send = Component.text();
-                            send.append(plugin.fromLegacy("&a" + ticket.getWorld() + "&e x:&a" + ticket.getX() + "&e y:&a" + ticket.getY() + "&e z:&a" + ticket.getZ()));
+                            send.append(plugin.fromLegacy("&a" + ticket.getWorldValue() + "&e x:&a" + ticket.getX() + "&e y:&a" + ticket.getY() + "&e z:&a" + ticket.getZ()));
                             if (subject.hasPermission(Permissions.COMMAND_TICKET_TELEPORT) && ticket.getServer().equalsIgnoreCase(Config.server)) {
                                 send.hoverEvent(HoverEvent.showText(Messages.getTicketOnHoverTeleportTo()));
                                 worldOptional.ifPresent(world ->
@@ -261,7 +261,6 @@ public class read implements CommandExecutor {
             Vector3d vect = new Vector3d(pitch, yaw, 0);
             source.setLocationAndRotation(loc, vect);
             source.sendMessage(Messages.getTeleportToTicket(ticketID));
-            //TODO fix teleport click
         };
     }
 }

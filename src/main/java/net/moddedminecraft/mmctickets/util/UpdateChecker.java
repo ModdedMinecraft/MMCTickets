@@ -97,7 +97,6 @@ public class UpdateChecker {
                 String text1 = Messages.getChatprefix().toString();
                 String text2 = Messages.getPluginOutdated(recommendedVersion).toString();
                 plugin.getLogger().info(text1 + text2);
-                //TODO TEST log text
             }
         }
     }
@@ -138,7 +137,6 @@ public class UpdateChecker {
                 String text1 = Messages.getChatprefix().toString();
                 String text2 = Messages.getPluginOutdated(recommendedVersion).toString();
                 player.sendMessage(Component.text(text1 + text2));
-                //TODO TEST text
             }
         }
     }

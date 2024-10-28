@@ -6,20 +6,21 @@ import java.util.UUID;
 
 public class TicketDataUtil {
 
-    protected String playerUUID, world, staffUUID, comment, message, server;
+    protected String playerUUID, worldnamespace, worldvalue, staffUUID, comment, message, server;
     protected int ticketID, x, y, z, notified;
     protected Double yaw, pitch;
     protected long timestamp;
     protected ticketStatus status;
 
 
-    public TicketDataUtil(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified, String server) {
+    public TicketDataUtil(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String worldnamespace, String worldvalue, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified, String server) {
         this.ticketID = ticketID;
         this.playerUUID = playerUUID;
         this.staffUUID = staffUUID;
         this.comment = comment;
         this.timestamp = timestamp;
-        this.world = world;
+        this.worldnamespace = worldnamespace;
+        this.worldvalue = worldvalue;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -59,8 +60,12 @@ public class TicketDataUtil {
         return timestamp;
     }
 
-    public String getWorld() {
-        return world;
+    public String getWorldNamespace() {
+        return worldnamespace;
+    }
+
+    public String getWorldValue() {
+        return worldvalue;
     }
 
     public int getX() {

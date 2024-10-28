@@ -267,7 +267,7 @@ public class Main {
                 Command.builder()
                         .shortDescription(Component.text("Ticket base command, Displays help"))
                         .executor(new ticket(this))
-                        .addChild(staffCMD, "staff") //TODO Make own command /stafflist too
+                        .addChild(staffCMD, "staff")
                         .addChild(ticketBanCMD, "ban")
                         .addChild(ticketOpenCMD, "open")
                         .addChild(ticketReadCMD, "read", "check")

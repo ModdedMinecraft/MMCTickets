@@ -49,7 +49,7 @@ public class teleport implements CommandExecutor {
                 if (ticket.getTicketID() == ticketID) {
                     if (ticket.getServer().equalsIgnoreCase(Config.server)) {
                         ticketExist = true;
-                        ServerWorld world = Sponge.server().worldManager().world(ResourceKey.builder().namespace(ticket.getWorld()).build()).get();
+                        ServerWorld world = Sponge.server().worldManager().world(ResourceKey.builder().namespace(ticket.getWorldNamespace()).value(ticket.getWorldValue()).build()).get();
                         ServerLocation loc = world.location(ticket.getX(), ticket.getY(), ticket.getZ());
                         Vector3d vector = new Vector3d(ticket.getPitch(), ticket.getYaw(), 0);
                         player.setLocationAndRotation(loc, vector);

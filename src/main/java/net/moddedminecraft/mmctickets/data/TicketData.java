@@ -11,8 +11,8 @@ import java.lang.reflect.Type;
 
 public class TicketData extends TicketDataUtil {
 
-    public TicketData(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String world, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified, String server) {
-        super(ticketID, playerUUID, staffUUID, comment, timestamp, world, x, y, z, yaw, pitch, message, status, notified,server);
+    public TicketData(int ticketID, String playerUUID, String staffUUID, String comment, long timestamp, String worldnamespace, String worldvalue, int x, int y, int z, Double yaw, Double pitch, String message, ticketStatus status, int notified, String server) {
+        super(ticketID, playerUUID, staffUUID, comment, timestamp, worldnamespace, worldvalue, x, y, z, yaw, pitch, message, status, notified, server);
     }
 
     public static class TicketSerializer implements TypeSerializer<TicketData> {
@@ -25,7 +25,8 @@ public class TicketData extends TicketDataUtil {
                     data.node("staffUUID").getString(),
                     data.node("comment").getString(),
                     data.node("timestamp").getInt(),
-                    data.node("world").getString(),
+                    data.node("worldnamespace").getString(),
+                    data.node("worldvalue").getString(),
                     data.node("x").getInt(),
                     data.node("y").getInt(),
                     data.node("z").getInt(),
@@ -45,7 +46,8 @@ public class TicketData extends TicketDataUtil {
                 data.node("staffUUID").set(ticket.staffUUID);
                 data.node("comment").set(ticket.comment);
                 data.node("timestamp").set(ticket.timestamp);
-                data.node("world").set(ticket.world);
+                data.node("worldnamespace").set(ticket.worldnamespace);
+                data.node("worldvalue").set(ticket.worldvalue);
                 data.node("x").set(ticket.x);
                 data.node("y").set(ticket.y);
                 data.node("z").set(ticket.z);
