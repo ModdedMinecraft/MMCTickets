@@ -95,7 +95,7 @@ public class open implements CommandExecutor {
                         "00000000-0000-0000-0000-000000000000",
                         "",
                         System.currentTimeMillis() / 1000,
-                        player.world().key().namespace(),
+                        player.world().key().namespace(), //TODO Fix world naming
                         player.serverLocation().blockX(),
                         player.serverLocation().blockY(),
                         player.serverLocation().blockZ(),

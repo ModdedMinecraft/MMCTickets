@@ -261,6 +261,7 @@ public class read implements CommandExecutor {
             Vector3d vect = new Vector3d(pitch, yaw, 0);
             source.setLocationAndRotation(loc, vect);
             source.sendMessage(Messages.getTeleportToTicket(ticketID));
+            //TODO fix teleport click
         };
     }
 }
