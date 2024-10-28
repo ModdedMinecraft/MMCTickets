@@ -2,11 +2,12 @@ package net.moddedminecraft.mmctickets.data;
 
 import com.google.common.reflect.TypeToken;
 import net.moddedminecraft.mmctickets.util.PlayerDataUtil;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
+import org.spongepowered.configurate.serialize.TypeSerializer;
 
-import java.util.List;
+import java.lang.reflect.Type;
 import java.util.UUID;
 
 public class PlayerData extends PlayerDataUtil {
@@ -16,22 +17,22 @@ public class PlayerData extends PlayerDataUtil {
     }
 
     public static class PlayerDataSerializer implements TypeSerializer<PlayerData> {
-        @SuppressWarnings("serial")
-        final public static TypeToken<List<PlayerData>> token = new TypeToken<List<PlayerData>>() {};
 
         @Override
-        public PlayerData deserialize(TypeToken<?> token, ConfigurationNode node) throws ObjectMappingException {
+        public PlayerData deserialize(Type type, ConfigurationNode node) {
             return new PlayerData(
-                    UUID.fromString(node.getNode("uuid").getString()),
-                    node.getNode("name").getString(),
-                    node.getNode("bannedstatus").getInt());
+                    UUID.fromString(node.node("uuid").getString()),
+                    node.node("name").getString(),
+                    node.node("bannedstatus").getInt());
         }
 
         @Override
-        public void serialize(TypeToken<?> token, PlayerData playerData, ConfigurationNode node) throws ObjectMappingException {
-            node.getNode("uuid").setValue(playerData.playerUUID.toString());
-            node.getNode("name").setValue(playerData.playerName);
-            node.getNode("bannedstatus").setValue(playerData.bannedStatus);
+        public void serialize(Type type, @Nullable PlayerData obj, ConfigurationNode node) throws SerializationException {
+            if (obj != null) {
+                node.node("uuid").set(obj.playerUUID.toString());
+                node.node("name").set(obj.playerName);
+                node.node("bannedstatus").set(obj.bannedStatus);
+            }
         }
     }
 }

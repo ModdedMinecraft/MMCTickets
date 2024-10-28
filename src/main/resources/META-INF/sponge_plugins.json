@@ -1,0 +1,53 @@
+{
+  "loader": {
+    "name": "java_plain",
+    "version": "1.0"
+  },
+  "license": "GPL-3.0",
+  "plugins": [
+    {
+      "id": "mmctickets",
+      "name": "MMCTickets",
+      "entrypoint": "net.moddedminecraft.mmctickets.Main",
+      "description": "MMCTickets is a simple and easy to use tickets management system.",
+      "version": "2.1.0",
+      "branding": {},
+      "links": {
+        "source": "https://github.com/ModdedMinecraft/MMCTickets",
+        "issues": "https://github.com/ModdedMinecraft/MMCTickets/issues"
+      },
+      "contributors": [
+        {
+          "name": "Leelawd",
+          "description": "Lead Developer"
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "localeapi",
+          "version": "2.6.0",
+          "load-order": "after",
+          "optional": false
+        },
+        {
+          "id": "spongeapi",
+          "version": "8.0.0",
+          "load-order": "after",
+          "optional": false
+        },
+        {
+          "id": "h2driver",
+          "version": "1.0.0",
+          "load-order": "after",
+          "optional": false
+        },
+        {
+          "id": "mysqldriver",
+          "version": "1.0.0",
+          "load-order": "after",
+          "optional": true
+        }
+      ]
+    }
+  ]
+}

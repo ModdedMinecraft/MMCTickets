@@ -6,13 +6,15 @@ import net.moddedminecraft.mmctickets.config.Permissions;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.profile.GameProfileManager;
+import org.spongepowered.api.service.permission.Subject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +31,13 @@ public class assign implements CommandExecutor {
     }
 
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final int ticketID = args.<Integer>getOne("ticketID").get();
-        final User user = args.<Player>getOne("player").get();
+    public CommandResult execute(CommandContext context) throws CommandException {
+        Parameter.Value<Integer> ticketIDParameter = Parameter.integerNumber().key("ticketID").build();
+        Parameter.Value<ServerPlayer> playerParameter = Parameter.player().key("player").build();
+
+        final int ticketID = context.requireOne(ticketIDParameter);
+        final ServerPlayer user = context.requireOne(playerParameter);
+        final Subject subject = context.cause().subject();
 
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
@@ -41,24 +47,24 @@ public class assign implements CommandExecutor {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
                     if (ticket.getStatus() == Closed) {
-                        src.sendMessage(Messages.getErrorTicketAlreadyClosed());
+                        throw new CommandException(Messages.getErrorTicketAlreadyClosed());
                     }
-                    if (ticket.getStatus() == Claimed && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
+                    if (ticket.getStatus() == Claimed && !subject.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
                         throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                     }
                     ticket.setStatus(Claimed);
-                    ticket.setStaffUUID(user.getUniqueId().toString());
+                    ticket.setStaffUUID(user.uniqueId().toString());
 
                     try {
                         plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
-                        src.sendMessage(Messages.getErrorGen("Unable to assign " + user.getName() + " to ticket"));
                         e.printStackTrace();
+                        throw new CommandException(Messages.getErrorGen("Unable to assign " + user.name() + " to ticket"));
                     }
 
                     CommonUtil.notifyOnlineStaff(Messages.getTicketAssign(CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID()), ticket.getTicketID()));
 
-                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getPlayerUUID());
+                    Optional<ServerPlayer> ticketPlayerOP = Sponge.server().player(ticket.getPlayerUUID());
                     if (ticketPlayerOP.isPresent()) {
                         Player ticketPlayer = ticketPlayerOP.get();
                         ticketPlayer.sendMessage(Messages.getTicketAssignUser(ticket.getTicketID(), CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));

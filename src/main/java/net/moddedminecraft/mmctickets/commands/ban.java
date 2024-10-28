@@ -4,13 +4,14 @@ import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,30 +25,28 @@ public class ban implements CommandExecutor {
     }
 
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final User user = args.<Player>getOne("playername").get();
+    public CommandResult execute(CommandContext context) throws CommandException {
+        Parameter.Value<ServerPlayer> playerParameter = Parameter.player().key("playername").build();
         final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getDataStore().getPlayerData());
 
-        if (!user.getPlayer().isPresent()) {
-            throw new CommandException(Messages.getErrorGen("Unable to get player"));
-        } else {
-            for (PlayerData pData : playerData) {
-                CommonUtil.checkPlayerData(plugin, user.getPlayer().get());
-                if (pData.getPlayerUUID().equals(user.getUniqueId())) {
-                    if (pData.getBannedStatus() == 1) {
-                        throw new CommandException(Messages.getErrorBannedAlready(user.getName()));
-                    }
-                    pData.setBannedStatus(1);
-                    try {
-                        plugin.getDataStore().updatePlayerData(pData);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        throw new CommandException(Messages.getErrorBanUser(user.getName()));
-                    }
-                    return CommandResult.success();
+        final ServerPlayer user = context.requireOne(playerParameter);
+
+        for (PlayerData pData : playerData) {
+            CommonUtil.checkPlayerData(plugin, user);
+            if (pData.getPlayerUUID().equals(user.uniqueId())) {
+                if (pData.getBannedStatus() == 1) {
+                    throw new CommandException(Messages.getErrorBannedAlready(user.name()));
                 }
+                pData.setBannedStatus(1);
+                try {
+                    plugin.getDataStore().updatePlayerData(pData);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new CommandException(Messages.getErrorBanUser(user.name()));
+                }
+                return CommandResult.success();
             }
         }
-        throw new CommandException(Messages.getErrorUserNotExist(user.getName()));
+        throw new CommandException(Messages.getErrorUserNotExist(user.name()));
     }
 }

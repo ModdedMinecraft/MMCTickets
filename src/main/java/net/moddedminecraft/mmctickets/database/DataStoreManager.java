@@ -85,6 +85,7 @@ public final class DataStoreManager {
         try {
             dataStore = dataStores.get(dataStoreId).getConstructor(Main.class).newInstance(this.plugin);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | SecurityException e) {
+            e.printStackTrace();
             throw new RuntimeException("Couldn't instantiate data store " + dataStoreId + " " + e);
         }
     }

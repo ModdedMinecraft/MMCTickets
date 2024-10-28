@@ -1,20 +1,21 @@
 package net.moddedminecraft.mmctickets.commands;
 
 
-import com.flowpowered.math.vector.Vector3d;
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Config;
 import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.data.TicketData;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,14 +29,17 @@ public class teleport implements CommandExecutor {
     }
 
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final int ticketID = args.<Integer>getOne("ticketID").get();
+    public CommandResult execute(CommandContext context) throws CommandException {
+        Parameter.Value<Integer> ticketIDParameter = Parameter.integerNumber().key("ticketID").build();
+
+        final int ticketID = context.requireOne(ticketIDParameter);
+
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
 
-        if (!(src instanceof Player)) {
+        if (!(context.cause().root() instanceof ServerPlayer)) {
             throw new CommandException(Messages.getErrorGen("Only players can use this command"));
         }
-        Player player = (Player) src;
+        ServerPlayer player = (ServerPlayer) context.cause().root();
 
         if (tickets.isEmpty()) {
             throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
@@ -45,10 +49,10 @@ public class teleport implements CommandExecutor {
                 if (ticket.getTicketID() == ticketID) {
                     if (ticket.getServer().equalsIgnoreCase(Config.server)) {
                         ticketExist = true;
-                        World world = Sponge.getServer().getWorld(ticket.getWorld()).get();
-                        Location loc = new Location(world, ticket.getX(), ticket.getY(), ticket.getZ());
-                        Vector3d vect = new Vector3d(ticket.getPitch(), ticket.getYaw(), 0);
-                        player.setLocationAndRotation(loc, vect);
+                        ServerWorld world = Sponge.server().worldManager().world(ResourceKey.builder().namespace(ticket.getWorld()).build()).get();
+                        ServerLocation loc = world.location(ticket.getX(), ticket.getY(), ticket.getZ());
+                        Vector3d vector = new Vector3d(ticket.getPitch(), ticket.getYaw(), 0);
+                        player.setLocationAndRotation(loc, vector);
                         player.sendMessage(Messages.getTeleportToTicket(ticketID));
                     } else {
                         throw new CommandException(Messages.getErrorTicketServer(ticketID));

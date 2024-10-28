@@ -1,11 +1,12 @@
-package net.moddedminecraft.mmctickets.util;
+/*package net.moddedminecraft.mmctickets.util;
 
 import com.google.gson.Gson;
+import net.kyori.adventure.text.Component;
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Config;
 import net.moddedminecraft.mmctickets.config.Messages;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -85,17 +86,18 @@ public class UpdateChecker {
             int curPatch = Integer.parseInt(curSplit[2]);
 
             if (recPatch > curPatch && recMinor >= curMinor && recMajor >= curMajor) {
-                String text1 = Messages.getChatprefix().toPlain();
-                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
+                String text1 = Messages.getChatprefix().toString();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toString();
                 plugin.getLogger().info(text1 + text2);
             } else if (recPatch <= curPatch && recMinor > curMinor && recMajor >= curMajor) {
-                String text1 = Messages.getChatprefix().toPlain();
-                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
+                String text1 = Messages.getChatprefix().toString();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toString();
                 plugin.getLogger().info(text1 + text2);
             } else if (recPatch <= curPatch && recMinor <= curMinor && recMajor > curMajor) {
-                String text1 = Messages.getChatprefix().toPlain();
-                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
+                String text1 = Messages.getChatprefix().toString();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toString();
                 plugin.getLogger().info(text1 + text2);
+                //TODO TEST log text
             }
         }
     }
@@ -125,18 +127,19 @@ public class UpdateChecker {
             int curPatch = Integer.parseInt(curSplit[2]);
 
             if (recPatch > curPatch && recMinor >= curMinor && recMajor >= curMajor) {
-                String text1 = Messages.getChatprefix().toPlain();
-                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
-                player.sendMessage(Text.of(text1 + text2));
+                String text1 = Messages.getChatprefix().toString();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toString();
+                player.sendMessage(Component.text(text1 + text2));
             } else if (recPatch <= curPatch && recMinor > curMinor && recMajor >= curMajor) {
-                String text1 = Messages.getChatprefix().toPlain();
-                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
-                player.sendMessage(Text.of(text1 + text2));
+                String text1 = Messages.getChatprefix().toString();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toString();
+                player.sendMessage(Component.text(text1 + text2));
             } else if (recPatch <= curPatch && recMinor <= curMinor && recMajor > curMajor) {
-                String text1 = Messages.getChatprefix().toPlain();
-                String text2 = Messages.getPluginOutdated(recommendedVersion).toPlain();
-                player.sendMessage(Text.of(text1 + text2));
+                String text1 = Messages.getChatprefix().toString();
+                String text2 = Messages.getPluginOutdated(recommendedVersion).toString();
+                player.sendMessage(Component.text(text1 + text2));
+                //TODO TEST text
             }
         }
     }
-}
+}*/

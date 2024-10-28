@@ -1,18 +1,18 @@
 package net.moddedminecraft.mmctickets.commands;
 
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.config.Permissions;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +24,17 @@ public class staff implements CommandExecutor {
         plugin = instance;
     }
 
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        PaginationService paginationService = Sponge.getServiceManager().provide(PaginationService.class).get();
-        List<Text> staffList = new ArrayList<>();
+    public CommandResult execute(CommandContext context) throws CommandException {
+        Audience audience = context.cause().audience();
+
+        PaginationService paginationService = Sponge.serviceProvider().provide(PaginationService.class).get();
+        List<Component> staffList = new ArrayList<>();
         StringBuilder staff = new StringBuilder();
         String separator = Messages.getStaffListSeperator();
 
-        for(Player player : Sponge.getServer().getOnlinePlayers()) {
-            if(player.hasPermission(Permissions.STAFF) && (!player.get(Keys.VANISH).filter(value -> value).isPresent())) {
-                staff.append("&e" +player.getName());
+        for(ServerPlayer player : Sponge.server().onlinePlayers()) {
+            if(player.hasPermission(Permissions.STAFF) && (!player.get(Keys.VANISH_STATE).isPresent())) {
+                staff.append("&e" + player.name());
                 staff.append(separator);
             }
         }
@@ -50,7 +52,7 @@ public class staff implements CommandExecutor {
                 .title(Messages.getStaffListTitle())
                 .contents(staffList)
                 .padding(Messages.getStaffListPadding())
-                .sendTo(src);
+                .sendTo(audience);
         return CommandResult.success();
     }
 }

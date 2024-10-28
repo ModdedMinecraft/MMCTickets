@@ -1,7 +1,8 @@
 package net.moddedminecraft.mmctickets;
 
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.moddedminecraft.mmctickets.commands.*;
 import net.moddedminecraft.mmctickets.commands.subcommands.readClosed;
 import net.moddedminecraft.mmctickets.commands.subcommands.readHeld;
@@ -16,42 +17,37 @@ import net.moddedminecraft.mmctickets.data.TicketData.TicketSerializer;
 import net.moddedminecraft.mmctickets.database.DataStoreManager;
 import net.moddedminecraft.mmctickets.database.IDataStore;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
-import net.moddedminecraft.mmctickets.util.UpdateChecker;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
-//import org.bstats.sponge.Metrics2;
-import org.slf4j.Logger;
+//import net.moddedminecraft.mmctickets.util.UpdateChecker;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandManager;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.GameReloadEvent;
-import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.RefreshGameEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.configurate.serialize.TypeSerializerCollection;
+import org.spongepowered.plugin.PluginContainer;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 
-@Plugin(id = "mmctickets", name = "MMCTickets", version = "2.0.8", description = "A real time ticket system")
+@Plugin("mmctickets")
 public class Main {
 
-    @Inject
-    private Logger logger;
-
-    /*@Inject
-    private Metrics2 metrics;*/
+    public static final Logger logger = LogManager.getLogger("MMCTickets");
 
     @Inject
     @DefaultConfig(sharedRoot = false)
@@ -64,53 +60,55 @@ public class Main {
     public Config config;
     public Messages messages;
 
-    private CommandManager cmdManager = Sponge.getCommandManager();
-
     private ArrayList<String> waitTimer;
     private DataStoreManager dataStoreManager;
 
-    public UpdateChecker updatechecker;
+    //public UpdateChecker updatechecker;
+
+    public final PluginContainer container;
+
+    @Inject
+    public Main(final PluginContainer container) {
+        this.container = container;
+    }
 
     @Listener
-    public void Init(GameInitializationEvent event) throws IOException, ObjectMappingException {
-        Sponge.getEventManager().registerListeners(this, new EventListener(this));
-
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(TicketData.class), new TicketSerializer());
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(PlayerData.class), new PlayerDataSerializer());
+    public void onServerAboutStart(ConstructPluginEvent event) throws IOException {
+        Sponge.eventManager().registerListeners(container, new EventListener(this));
+        TypeSerializerCollection.builder().register(TicketData.class, new TicketSerializer());
+        TypeSerializerCollection.builder().register(PlayerData.class, new PlayerDataSerializer());
 
         config = new Config(this);
         messages = new Messages(this);
-        loadCommands();
-    }
-
-    @Listener
-    public void onServerAboutStart(GameAboutToStartServerEvent event) {
-        dataStoreManager = new DataStoreManager(this);
-        if (dataStoreManager.load()) {
-            getLogger().info("MMCTickets datastore Loaded");
-        } else {
-            getLogger().error("Unable to load a datastore please check your Console/Config!");
-        }
+        //loadCommands();
     }
 
         @Listener
-    public void onServerStart(GameStartedServerEvent event) {
-            getLogger().info("MMCTickets Loaded");
-            getLogger().info("Tickets loaded: " + getDataStore().getTicketData().size());
-            getLogger().info("Notifications loaded: " + getDataStore().getNotifications().size());
-            getLogger().info("PlayerData loaded: " + getDataStore().getPlayerData().size());
+    public void onServerStart(StartedEngineEvent<Server> event) {
+            dataStoreManager = new DataStoreManager(this);
+            loadDataStore();
+
+            for (String s : Arrays.asList(
+                    "MMCTickets Loaded",
+                    "Tickets loaded: " + getDataStore().getTicketData().size(),
+                    "Notifications loaded: " + getDataStore().getNotifications().size(),
+                    "PlayerData loaded: " + getDataStore().getPlayerData().size())
+            ) {
+                getLogger().info(s);
+            }
 
             this.waitTimer = new ArrayList<String>();
 
-            updatechecker = new UpdateChecker(this, Sponge.getPluginManager().getPlugin("mmctickets").get().getVersion().get());
-            updatechecker.startUpdateCheck();
+            //TODO Fix update checker
+            //updatechecker = new UpdateChecker(this, Sponge.pluginManager().plugin("mmctickets").get().metadata().version().toString());
+            //updatechecker.startUpdateCheck();
 
             //start ticket nag timer
             nagTimer();
     }
 
     @Listener
-    public void onPluginReload(GameReloadEvent event) throws IOException, ObjectMappingException {
+    public void onPluginReload(RefreshGameEvent event) throws IOException {
         this.config = new Config(this);
         this.messages = new Messages(this);
         dataStoreManager = new DataStoreManager(this);
@@ -129,166 +127,192 @@ public class Main {
         this.dataStoreManager = dataStoreManager;
     }
 
-    private void loadCommands() {
-        // /stafflist
-        CommandSpec staffList = CommandSpec.builder()
-                .description(Text.of("List online staff members"))
+    @Listener
+    public void onRegisterSpongeCommand(final RegisterCommandEvent<Command.Parameterized> event) {
+        // /ticket staff
+        Command.Parameterized staffCMD = Command.builder()
+                .shortDescription(Component.text("Display list of staff online"))
                 .executor(new staff(this))
                 .build();
 
         // /ticket read self
-        CommandSpec readSelf = CommandSpec.builder()
-                .description(Text.of("Display a list of all tickets the player owns"))
+        Command.Parameterized readSelfCMD = Command.builder()
+                .shortDescription(Component.text("Display a list of all tickets the player owns"))
                 .executor(new readSelf(this))
                 .build();
 
         // /ticket read closed
-        CommandSpec readClosed = CommandSpec.builder()
-                .description(Text.of("Display a list of all closed tickets"))
+        Command.Parameterized readClosedCMD = Command.builder()
+                .shortDescription(Component.text("Display a list of all closed tickets"))
                 .executor(new readClosed(this))
                 .permission(Permissions.COMMAND_TICKET_READ_ALL)
                 .build();
 
         // /ticket read held
-        CommandSpec readHeld = CommandSpec.builder()
-                .description(Text.of("Display a list of all held tickets"))
+        Command.Parameterized readHeldCMD = Command.builder()
+                .shortDescription(Component.text("Display a list of all held tickets"))
                 .executor(new readHeld(this))
                 .permission(Permissions.COMMAND_TICKET_READ_ALL)
                 .build();
 
         // /ticket read (ticketID)
-        CommandSpec ticketRead = CommandSpec.builder()
-                .description(Text.of("Read all ticket or give more detail of a specific ticket"))
+        Command.Parameterized ticketReadCMD = Command.builder()
+                .shortDescription(Component.text("Read all ticket or give more detail of a specific ticket"))
                 .executor(new read(this))
-                .child(readClosed, "closed")
-                .child(readHeld, "held")
-                .child(readSelf, "self")
-                .arguments(GenericArguments.optional(GenericArguments.integer(Text.of("ticketID"))))
+                .addChild(readClosedCMD, "closed")
+                .addChild(readHeldCMD, "held")
+                .addChild(readSelfCMD, "self")
+                .addParameters(Parameter.integerNumber().key("ticketID").optional().build())
                 .build();
 
-        // /ticket close (ticketID) (comment)
-        CommandSpec ticketClose = CommandSpec.builder()
-                .description(Text.of("Close a ticket"))
+        // /ticket close [ticketID] (comment)
+        Command.Parameterized ticketCloseCMD = Command.builder()
+                .shortDescription(Component.text("Close a ticket"))
                 .executor(new close(this))
-                .arguments(GenericArguments.integer(Text.of("ticketID")),
-                        GenericArguments.optional(GenericArguments.remainingJoinedStrings(Text.of("comment"))))
+                .addParameters(Parameter.integerNumber().key("ticketID").build(),
+                        Parameter.remainingJoinedStrings().key("comment").optional().build())
                 .build();
 
-        // /ticket open
-        CommandSpec ticketOpen = CommandSpec.builder()
-                .description(Text.of("Open a ticket"))
+        // /ticket open [Message]
+        Command.Parameterized ticketOpenCMD = Command.builder()
+                .shortDescription(Component.text("Open a ticket"))
                 .executor(new open(this))
-                .arguments(GenericArguments.remainingJoinedStrings(Text.of("message")))
+                .addParameters(Parameter.remainingJoinedStrings().key("message").build())
                 .permission(Permissions.COMMAND_TICKET_OPEN)
                 .build();
 
-        // /ticket ban (username)
-        CommandSpec ticketBan = CommandSpec.builder()
-                .description(Text.of("Ban a player from being able to create new tickets"))
+        // /ticket ban [username]
+        Command.Parameterized ticketBanCMD = Command.builder()
+                .shortDescription(Component.text("Ban a player from being able to create new tickets"))
                 .executor(new ban(this))
-                .arguments(GenericArguments.user(Text.of("playername")))
+                .addParameters(Parameter.player().key("playername").build())
                 .permission(Permissions.COMMAND_TICKET_BAN)
                 .build();
 
-        // /ticket unban (username)
-        CommandSpec ticketUnban = CommandSpec.builder()
-                .description(Text.of("Unban a player from being able to create new tickets"))
+        // /ticket unban [username]
+        Command.Parameterized ticketUnbanCMD = Command.builder()
+                .shortDescription(Component.text("Unban a player from being able to create new tickets"))
                 .executor(new unban(this))
-                .arguments(GenericArguments.user(Text.of("playername")))
+                .addParameters(Parameter.player().key("playername").build())
                 .permission(Permissions.COMMAND_TICKET_BAN)
                 .build();
 
         // /ticket reload
-        CommandSpec ticketReload = CommandSpec.builder()
-                .description(Text.of("Reload ticket and player data."))
+        Command.Parameterized ticketReloadCMD = Command.builder()
+                .shortDescription(Component.text("Reload ticket and player data."))
                 .executor(new reload(this))
                 .permission(Permissions.COMMAND_RELOAD)
                 .build();
 
-        // /ticket claim (ticketID)
-        CommandSpec ticketClaim = CommandSpec.builder()
-                .description(Text.of("Claim a ticket"))
+        // /ticket claim [ticketID]
+        Command.Parameterized ticketClaimCMD = Command.builder()
+                .shortDescription(Component.text("Claim a ticket"))
                 .executor(new claim(this))
-                .arguments(GenericArguments.integer(Text.of("ticketID")))
+                .addParameters(Parameter.integerNumber().key("ticketID").build())
                 .permission(Permissions.COMMAND_TICKET_CLAIM)
                 .build();
 
-        // /ticket unclaim (ticketID)
-        CommandSpec ticketUnclaim = CommandSpec.builder()
-                .description(Text.of("Unclaim a ticket"))
+        // /ticket unclaim [ticketID]
+        Command.Parameterized ticketUnclaimCMD = Command.builder()
+                .shortDescription(Component.text("Unclaim a ticket"))
                 .executor(new unclaim(this))
-                .arguments(GenericArguments.integer(Text.of("ticketID")))
+                .addParameters(Parameter.integerNumber().key("ticketID").build())
                 .permission(Permissions.COMMAND_TICKET_UNCLAIM)
                 .build();
 
-        // /ticket reopen (ticketID)
-        CommandSpec ticketReopen = CommandSpec.builder()
-                .description(Text.of("Reopen a ticket"))
+        // /ticket reopen [ticketID]
+        Command.Parameterized ticketReopenCMD = Command.builder()
+                .shortDescription(Component.text("Reopen a ticket"))
                 .executor(new reopen(this))
-                .arguments(GenericArguments.integer(Text.of("ticketID")))
+                .addParameters(Parameter.integerNumber().key("ticketID").build())
                 .permission(Permissions.COMMAND_TICKET_REOPEN)
                 .build();
 
-        // /ticket assign (ticketID) (player)
-        CommandSpec ticketAssign = CommandSpec.builder()
-                .description(Text.of("Unclaim a ticket"))
+        // /ticket assign [ticketID] [player]
+        Command.Parameterized ticketAssignCMD = Command.builder()
+                .shortDescription(Component.text("Unclaim a ticket"))
                 .executor(new assign(this))
-                .arguments(GenericArguments.integer(Text.of("ticketID")),
-                        GenericArguments.user(Text.of("player")))
+                .addParameters(Parameter.integerNumber().key("ticketID").build(),
+                        Parameter.player().key("playername").build())
                 .permission(Permissions.COMMAND_TICKET_ASSIGN)
                 .build();
 
-        // /ticket hold (ticketID)
-        CommandSpec ticketHold = CommandSpec.builder()
-                .description(Text.of("Put a ticket on hold"))
+        // /ticket hold [ticketID]
+        Command.Parameterized ticketHoldCMD = Command.builder()
+                .shortDescription(Component.text("Put a ticket on hold"))
                 .executor(new hold(this))
-                .arguments(GenericArguments.integer(Text.of("ticketID")))
+                .addParameters(Parameter.integerNumber().key("ticketID").build())
                 .permission(Permissions.COMMAND_TICKET_HOLD)
                 .build();
 
-        // /ticket comment (ticketID) (comment)
-        CommandSpec ticketComment = CommandSpec.builder()
-                .description(Text.of("Open a ticket"))
+        // /ticket comment [ticketID] [comment]
+        Command.Parameterized ticketCommentCMD = Command.builder()
+                .shortDescription(Component.text("Open a ticket"))
                 .executor(new comment(this))
-                .arguments(GenericArguments.integer(Text.of("ticketID")),
-                        GenericArguments.remainingJoinedStrings(Text.of("comment")))
+                .addParameters(Parameter.integerNumber().key("ticketID").build(),
+                        Parameter.remainingJoinedStrings().key("comment").build())
                 .permission(Permissions.COMMAND_TICKET_COMMENT)
                 .build();
 
-        // /ticket teleport (ticketID)
-        CommandSpec ticketTeleport = CommandSpec.builder()
-                .description(Text.of("Teleport to a ticket"))
+        // /ticket teleport [ticketID]
+        Command.Parameterized ticketTeleportCMD = Command.builder()
+                .shortDescription(Component.text("Teleport to a ticket"))
                 .executor(new teleport(this))
-                .arguments(GenericArguments.integer(Text.of("ticketID")))
+                .addParameters(Parameter.integerNumber().key("ticketID").build())
                 .permission(Permissions.COMMAND_TICKET_TELEPORT)
                 .build();
-
+        
         // /ticket
-        CommandSpec ticketBase = CommandSpec.builder()
-                .description(Text.of("Ticket base command, Displays help"))
-                .executor(new ticket(this))
-                .child(ticketOpen, "open")
-                .child(ticketRead, "read", "check")
-                .child(ticketClose, "close", "complete")
-                .child(ticketBan, "ban")
-                .child(ticketUnban, "unban")
-                .child(ticketReload, "reload")
-                .child(ticketClaim, "claim")
-                .child(ticketUnclaim, "unclaim")
-                .child(ticketReopen, "reopen")
-                .child(ticketAssign, "assign")
-                .child(ticketHold, "hold")
-                .child(ticketComment, "comment")
-                .child(ticketTeleport, "teleport", "tp")
-                .build();
+        event.register(this.container,
+                Command.builder()
+                        .shortDescription(Component.text("Ticket base command, Displays help"))
+                        .executor(new ticket(this))
+                        .addChild(staffCMD, "staff") //TODO Make own command /stafflist too
+                        .addChild(ticketBanCMD, "ban")
+                        .addChild(ticketOpenCMD, "open")
+                        .addChild(ticketReadCMD, "read", "check")
+                        .addChild(ticketCloseCMD, "close", "complete")
+                        .addChild(ticketUnbanCMD, "unban")
+                        .addChild(ticketReloadCMD, "reload")
+                        .addChild(ticketClaimCMD, "claim")
+                        .addChild(ticketUnclaimCMD, "unclaim")
+                        .addChild(ticketHoldCMD, "hold")
+                        .addChild(ticketCommentCMD, "comment")
+                        .addChild(ticketTeleportCMD, "teleport", "tp")
+                        .addChild(ticketAssignCMD, "assign")
+                        .addChild(ticketReopenCMD, "reopen")
+                        .build(), "ticket"
+        );
 
-        cmdManager.register(this, ticketOpen, "modreq");
-        cmdManager.register(this, ticketRead, "check");
-        cmdManager.register(this, ticketBase, "ticket");
-        cmdManager.register(this, staffList, "stafflist");
+        // /stafflist
+        event.register(this.container,
+                Command.builder()
+                        .shortDescription(Component.text("Display list of staff online"))
+                        .executor(new staff(this))
+                        .build(), "stafflist"
+        );
+        // /modreq [Message]
+        event.register(this.container,Command.builder()
+                .shortDescription(Component.text("Open a ticket"))
+                .executor(new open(this))
+                .addParameters(Parameter.remainingJoinedStrings().key("message").build())
+                .permission(Permissions.COMMAND_TICKET_OPEN)
+                .build(), "modreq"
+        );
+
+        // /check (ticketID)
+        event.register(this.container,Command.builder()
+                .shortDescription(Component.text("Read all ticket or give more detail of a specific ticket"))
+                .executor(new read(this))
+                .addChild(readClosedCMD, "closed")
+                .addChild(readHeldCMD, "held")
+                .addChild(readSelfCMD, "self")
+                .addParameters(Parameter.integerNumber().key("ticketID").optional().build())
+                .build(), "check"
+        );
     }
 
-    public Logger getLogger() {
+    public org.apache.logging.log4j.Logger getLogger() {
         return logger;
     }
 
@@ -298,7 +322,7 @@ public class Main {
 
     public void nagTimer() {
         if(Config.nagTimer > 0){
-            Sponge.getScheduler().createSyncExecutor(this).scheduleWithFixedDelay(new Runnable() {
+            Sponge.asyncScheduler().executor(container).scheduleWithFixedDelay(new Runnable() {
                 @Override
                 public void run() {
                     final List<TicketData> tickets = new ArrayList<TicketData>(getDataStore().getTicketData());
@@ -336,8 +360,12 @@ public class Main {
         return this.waitTimer;
     }
 
-    public Text fromLegacy(String legacy) {
-        return TextSerializers.FORMATTING_CODE.deserializeUnchecked(legacy);
+    public Component fromLegacy(String legacy) {
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(legacy);
+    }
+
+    public Component clearDecoration(String decoration) {
+        return decoration == null ? Component.empty() : LegacyComponentSerializer.legacyAmpersand().deserialize(decoration);
     }
 
     @Deprecated

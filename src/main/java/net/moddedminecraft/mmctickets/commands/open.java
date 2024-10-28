@@ -7,12 +7,14 @@ import net.moddedminecraft.mmctickets.data.PlayerData;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.world.DefaultWorldKeys;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,21 +34,20 @@ public class open implements CommandExecutor {
     }
 
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final String message = args.<String>getOne("message").get();
+    public CommandResult execute(CommandContext context) throws CommandException {
 
-        /*if (!(src instanceof Player)) {
-            throw new CommandException(Messages.getErrorGen("Only players can run this command"));
-        }*/
+        Parameter.Value<String> messageParameter = Parameter.remainingJoinedStrings().key("message").build();
 
-        if (src instanceof Player) {
-            Player player = (Player) src;
-            UUID uuid = player.getUniqueId();
+        final String message = context.requireOne(messageParameter);
+
+        if (context.cause().root() instanceof ServerPlayer) {
+            ServerPlayer player = (ServerPlayer) context.cause().root();
+            UUID uuid = player.uniqueId();
 
             if (Config.server.isEmpty()) {
                 throw new CommandException(Messages.getErrorGen("Server name inside config is not set"));
             }
-            if (plugin.getWaitTimer().contains(src.getName())) {
+            if (plugin.getWaitTimer().contains(player.name())) {
                 throw new CommandException(Messages.getTicketTooFast(Config.delayTimer));
             }
             final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
@@ -83,7 +84,7 @@ public class open implements CommandExecutor {
 
             final List<PlayerData> playerData = new ArrayList<PlayerData>(plugin.getDataStore().getPlayerData());
             for (PlayerData pData : playerData) {
-                if (pData.getPlayerName().equals(src.getName()) && pData.getBannedStatus() == 1) {
+                if (pData.getPlayerName().equals(player.name()) && pData.getBannedStatus() == 1) {
                     throw new CommandException(Messages.getErrorBanned());
                 }
             }
@@ -91,15 +92,15 @@ public class open implements CommandExecutor {
             try {
                 plugin.getDataStore().addTicketData(new TicketData(ticketID,
                         String.valueOf(uuid),
-                        UUID.fromString("00000000-0000-0000-0000-000000000000").toString(),
+                        "00000000-0000-0000-0000-000000000000",
                         "",
                         System.currentTimeMillis() / 1000,
-                        player.getWorld().getName(),
-                        player.getLocation().getBlockX(),
-                        player.getLocation().getBlockY(),
-                        player.getLocation().getBlockZ(),
-                        player.getHeadRotation().getX(),
-                        player.getHeadRotation().getY(),
+                        player.world().key().namespace(),
+                        player.serverLocation().blockX(),
+                        player.serverLocation().blockY(),
+                        player.serverLocation().blockZ(),
+                        player.headDirection().x(),
+                        player.headDirection().y(),
                         message,
                         Open,
                         0,
@@ -107,10 +108,10 @@ public class open implements CommandExecutor {
 
                 player.sendMessage(Messages.getTicketOpenUser(ticketID));
                 if (Config.staffNotification) {
-                    CommonUtil.notifyOnlineStaffOpen(Messages.getTicketOpen(player.getName(), ticketID), ticketID);
+                    CommonUtil.notifyOnlineStaffOpen(Messages.getTicketOpen(player.name(), ticketID), ticketID);
                 }
                 if (Config.titleNotification) {
-                    CommonUtil.notifyOnlineStaffTitle(Messages.getTicketTitleNotification(player.getName(), ticketID));
+                    CommonUtil.notifyOnlineStaffTitle(Messages.getTicketTitleNotification(player.name(), ticketID));
                 }
                 if (Config.soundNotification) {
                     CommonUtil.notifyOnlineStaffSound();
@@ -119,15 +120,16 @@ public class open implements CommandExecutor {
                 player.sendMessage(Messages.getErrorGen("Data was not saved correctly."));
                 e.printStackTrace();
             }
-            plugin.getWaitTimer().add(src.getName());
+            plugin.getWaitTimer().add(player.name());
 
-            Sponge.getScheduler().createTaskBuilder().execute(new Runnable() {
+            //Sponge.server().scheduler().submit();
+            Task.builder().execute(new Runnable() {
                 @Override
                 public void run() {
-                    plugin.getWaitTimer().removeAll(Collections.singleton(src.getName()));
+                    plugin.getWaitTimer().removeAll(Collections.singleton(player.name()));
+                    plugin.getLogger().info("Removed " + player.name() + " from open wait list"); //TODO Test
                 }
-            }).delay(Config.delayTimer, TimeUnit.SECONDS).name("mmctickets-s-openTicketWaitTimer").submit(this.plugin);
-
+            }).delay(Config.delayTimer, TimeUnit.SECONDS);
             return CommandResult.success();
         } else {
             if (Config.server.isEmpty()) {
@@ -143,7 +145,7 @@ public class open implements CommandExecutor {
                         UUID.fromString("00000000-0000-0000-0000-000000000000").toString(),
                         "",
                         System.currentTimeMillis() / 1000,
-                        Sponge.getServer().getDefaultWorldName(),
+                        Sponge.server().worldManager().world(DefaultWorldKeys.DEFAULT).get().toString(),
                         0,
                         0,
                         0,
@@ -154,7 +156,7 @@ public class open implements CommandExecutor {
                         0,
                         Config.server));
 
-                src.sendMessage(Messages.getTicketOpenUser(ticketID));
+                context.cause().audience().sendMessage(Messages.getTicketOpenUser(ticketID));
                 if (Config.staffNotification) {
                     CommonUtil.notifyOnlineStaffOpen(Messages.getTicketOpen("Console", ticketID), ticketID);
                 }
@@ -165,10 +167,9 @@ public class open implements CommandExecutor {
                     CommonUtil.notifyOnlineStaffSound();
                 }
             } catch (Exception e) {
-                src.sendMessage(Messages.getErrorGen("Data was not saved correctly."));
+                context.cause().audience().sendMessage(Messages.getErrorGen("Data was not saved correctly."));
                 e.printStackTrace();
             }
-
             return CommandResult.success();
         }
     }

@@ -1,6 +1,12 @@
 package net.moddedminecraft.mmctickets.util;
 
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.title.Title;
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Config;
 import net.moddedminecraft.mmctickets.config.Permissions;
@@ -9,14 +15,14 @@ import net.moddedminecraft.mmctickets.data.ticketStatus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.profile.GameProfileManager;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import static net.moddedminecraft.mmctickets.data.ticketStatus.*;
 
@@ -61,8 +67,8 @@ public class CommonUtil {
     }
 
     public static String isUserOnline(UUID uuid){
-        for(Player player : Sponge.getServer().getOnlinePlayers()){
-            if(uuid.equals(player.getUniqueId())) {
+        for(ServerPlayer player : Sponge.server().onlinePlayers()){
+            if(uuid.equals(player.uniqueId())) {
                 return "&a";
             }
         }
@@ -70,8 +76,8 @@ public class CommonUtil {
     }
 
     public static boolean checkUserOnline(String name){
-        for(Player player : Sponge.getServer().getOnlinePlayers()){
-            if(name.equals(player.getName())) {
+        for(ServerPlayer player : Sponge.server().onlinePlayers()){
+            if(name.equals(player.name())) {
                 return true;
             }
         }
@@ -95,42 +101,47 @@ public class CommonUtil {
         return ticketStatus;
     }
 
-    public static void notifyOnlineStaff(Text message) {
-        for(Player player : Sponge.getServer().getOnlinePlayers()){
+    public static void notifyOnlineStaff(Component message) {
+        for(ServerPlayer player : Sponge.server().onlinePlayers()){
             if(player.hasPermission(Permissions.STAFF)) {
-                Text.Builder send = Text.builder();
-                send.append(message);
-                send.onClick(TextActions.runCommand("/ticket check"));
-                send.onHover(TextActions.showText(Text.of("Click here to get a list of all open tickets")));
-                player.sendMessage(send.build());
+                Component clickableText = message
+                        .clickEvent(ClickEvent.runCommand("/ticket check"))
+                        .hoverEvent(HoverEvent.showText(Component.text("Click here to get a list of all open tickets")));
+                player.sendMessage(clickableText);
             }
         }
     }
 
-    public static void notifyOnlineStaffOpen(Text message, int ticketID) {
-        for(Player player : Sponge.getServer().getOnlinePlayers()){
+    public static void notifyOnlineStaffOpen(Component message, int ticketID) {
+        for(ServerPlayer player : Sponge.server().onlinePlayers()){
             if(player.hasPermission(Permissions.STAFF)) {
-                Text.Builder send = Text.builder();
-                send.append(message);
-                send.onClick(TextActions.runCommand("/ticket check " + ticketID));
-                send.onHover(TextActions.showText(Text.of("Click here to get more details for ticket #" + ticketID)));
-                player.sendMessage(send.build());
+                Component clickableText = message
+                        .clickEvent(ClickEvent.runCommand("/ticket check " + ticketID))
+                        .hoverEvent(HoverEvent.showText(Component.text("Click here to get more details for ticket #" + ticketID)));
+                player.sendMessage(clickableText);
             }
         }
     }
 
-    public static void notifyOnlineStaffTitle(Text message) {
-        for(Player player : Sponge.getServer().getOnlinePlayers()){
+    public static void notifyOnlineStaffTitle(Component message) {
+        for(ServerPlayer player : Sponge.server().onlinePlayers()){
             if(player.hasPermission(Permissions.STAFF)) {
-                player.sendTitle(Title.builder().subtitle(message).fadeIn(20).fadeOut(20).stay(40).build());
+                Title title = Title.title(message, Component.empty(), Title.Times.times(Duration.ofSeconds(20),Duration.ofSeconds(40),Duration.ofSeconds(20)));
+                player.showTitle(title);
             }
         }
     }
 
     public static void notifyOnlineStaffSound() {
-        for (Player player : Sponge.getServer().getOnlinePlayers()) {
+        for (ServerPlayer player : Sponge.server().onlinePlayers()) {
+
+            Sound note = Sound.sound()
+                    .volume(2)
+                    .type(SoundTypes.BLOCK_NOTE_BLOCK_PLING)
+                    .build();
+
             if (player.hasPermission(Permissions.STAFF)) {
-                player.playSound(SoundTypes.BLOCK_NOTE_PLING, player.getLocation().getPosition(), 2);
+                player.playSound(note, player.location().position());
             }
         }
     }
@@ -148,16 +159,16 @@ public class CommonUtil {
         return userStorage.get().get(uuid).get().getName();
     }*/
 
-    public static void checkPlayerData(Main plugin, Player player) {
+    public static void checkPlayerData(Main plugin, ServerPlayer player) {
         List<PlayerData> playerData = plugin.getDataStore().getPlayerData();
         boolean exists = false;
         for (PlayerData pData : playerData) {
-            if (pData.getPlayerUUID().equals(player.getUniqueId())) {
+            if (pData.getPlayerUUID().equals(player.uniqueId())) {
                 exists = true;
             }
         }
         if (!exists) {
-            plugin.getDataStore().addPlayerData(new PlayerData(player.getUniqueId(), player.getName(), 0));
+            plugin.getDataStore().addPlayerData(new PlayerData(player.uniqueId(), player.name(), 0));
         }
     }
 
@@ -165,7 +176,6 @@ public class CommonUtil {
         if (uuid.toString().equals("00000000-0000-0000-0000-000000000000")) {
             return "Console";
         }
-
         List<PlayerData> playerData = plugin.getDataStore().getPlayerData();
         for (PlayerData pData : playerData) {
             if (pData.getPlayerUUID().equals(uuid)) {
@@ -175,12 +185,12 @@ public class CommonUtil {
         return "Unavailable";
     }
 
-    public static UUID getUUIDFromName(String name) {
-        Optional<Player> onlinePlayer = Sponge.getServer().getPlayer(name);
+    /*public static UUID getUUIDFromName(String name) throws ExecutionException, InterruptedException {
+        Optional<ServerPlayer> onlinePlayer = Sponge.server().player(name);
         if (onlinePlayer.isPresent()) {
-            return Sponge.getServer().getPlayer(name).get().getUniqueId();
+            return Sponge.server().player(name).get().uniqueId();
         }
-        Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
-        return userStorage.get().get(name).get().getUniqueId();
-    }
+        GameProfileManager profileManager = Sponge.server().gameProfileManager();
+        return profileManager.profile(name).get().uuid();
+    }*/
 }

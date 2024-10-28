@@ -1,14 +1,14 @@
 package net.moddedminecraft.mmctickets.config;
 
+import net.kyori.adventure.text.Component;
 import net.moddedminecraft.mmctickets.Main;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -22,7 +22,7 @@ public class Messages {
     public static ConfigurationLoader<CommentedConfigurationNode> messageLoader;
     public static CommentedConfigurationNode messages;
 
-    public Messages(Main main) throws IOException, ObjectMappingException {
+    public Messages(Main main) throws IOException {
         plugin = main;
         String language = Config.language;
         checkLangAssetFiles();
@@ -31,7 +31,7 @@ public class Messages {
             plugin.getLogger().warn("Localization was not found");
         }
 
-        messageLoader = HoconConfigurationLoader.builder().setPath(defaultMessage).build();
+        messageLoader = HoconConfigurationLoader.builder().path(defaultMessage).build();
         messages = messageLoader.load();
         messageCheck();
     }
@@ -126,94 +126,94 @@ public class Messages {
         }
 
         //actions
-        claimButton = check(messages.getNode("action", "claim-button"), claimButton).getString();
-        claimButtonHover = check(messages.getNode("action", "claim-button-hover"), claimButtonHover).getString();
-        unclaimButton = check(messages.getNode("action", "unclaim-button"), unclaimButton).getString();
-        unclaimButtonHover = check(messages.getNode("action", "unclaim-button-hover"), unclaimButtonHover).getString();
-        closeButton = check(messages.getNode("action", "close-button"), closeButton).getString();
-        closeButtonHover = check(messages.getNode("action", "close-button-hover"), closeButtonHover).getString();
-        reopenButton = check(messages.getNode("action", "reopen-button"), reopenButton).getString();
-        reopenButtonHover = check(messages.getNode("action", "reopen-button-hover"), reopenButtonHover).getString();
-        commentButton = check(messages.getNode("action", "comment-button"), commentButton).getString();
-        commentButtonHover = check(messages.getNode("action", "comment-button-hover"), commentButtonHover).getString();
-        holdButton = check(messages.getNode("action", "hold-button"), holdButton).getString();
-        holdButtonHover = check(messages.getNode("action", "hold-button-hover"), holdButtonHover).getString();
-        yesButton = check(messages.getNode("action", "yes-button"), yesButton).getString();
-        yesButtonHover = check(messages.getNode("action", "yes-button-hover"), yesButtonHover).getString();
+        claimButton = check(messages.node("action", "claim-button"), claimButton).getString();
+        claimButtonHover = check(messages.node("action", "claim-button-hover"), claimButtonHover).getString();
+        unclaimButton = check(messages.node("action", "unclaim-button"), unclaimButton).getString();
+        unclaimButtonHover = check(messages.node("action", "unclaim-button-hover"), unclaimButtonHover).getString();
+        closeButton = check(messages.node("action", "close-button"), closeButton).getString();
+        closeButtonHover = check(messages.node("action", "close-button-hover"), closeButtonHover).getString();
+        reopenButton = check(messages.node("action", "reopen-button"), reopenButton).getString();
+        reopenButtonHover = check(messages.node("action", "reopen-button-hover"), reopenButtonHover).getString();
+        commentButton = check(messages.node("action", "comment-button"), commentButton).getString();
+        commentButtonHover = check(messages.node("action", "comment-button-hover"), commentButtonHover).getString();
+        holdButton = check(messages.node("action", "hold-button"), holdButton).getString();
+        holdButtonHover = check(messages.node("action", "hold-button-hover"), holdButtonHover).getString();
+        yesButton = check(messages.node("action", "yes-button"), yesButton).getString();
+        yesButtonHover = check(messages.node("action", "yes-button-hover"), yesButtonHover).getString();
 
         //errors
-        errorGeneral = check(messages.getNode("error", "general"), errorGeneral).getString();
-        errorIncorrectUsage = check(messages.getNode("error", "incorrect-usage"), errorIncorrectUsage).getString();
-        errorBanned = check(messages.getNode("error", "banned"), errorBanned).getString();
-        errorBannedAlready = check(messages.getNode("error", "banned-already"), errorBannedAlready).getString();
-        errorBanUser = check(messages.getNode("error", "ban-user"), errorBanUser).getString();
-        errorUnbanUser = check(messages.getNode("error", "unban-user"), errorUnbanUser).getString();
-        errorNotBanned = check(messages.getNode("error", "not-banned"), errorNotBanned).getString();
-        errorPermission = check(messages.getNode("error", "permission"), errorPermission).getString();
-        errorTicketAlreadyClosed = check(messages.getNode("error", "ticket-already-closed"), errorTicketAlreadyClosed).getString();
-        errorTicketNotClosed = check(messages.getNode("error", "ticket-not-closed"), errorTicketNotClosed).getString();
-        errorTicketlreadyHold = check(messages.getNode("error", "ticket-already-on-hold"), errorTicketlreadyHold).getString();
-        errorTicketOwner = check(messages.getNode("error", "ticket-owner"), errorTicketOwner).getString();
-        errorTicketClaim = check(messages.getNode("error", "ticket-claim"), errorTicketClaim).getString();
-        errorTicketUnclaim = check(messages.getNode("error", "ticket-unclaim"), errorTicketUnclaim).getString();
-        errorUserNotExist = check(messages.getNode("error", "user-not-exist"), errorUserNotExist).getString();
-        errorTicketServer = check(messages.getNode("error", "ticket-server"), errorTicketServer).getString();
+        errorGeneral = check(messages.node("error", "general"), errorGeneral).getString();
+        errorIncorrectUsage = check(messages.node("error", "incorrect-usage"), errorIncorrectUsage).getString();
+        errorBanned = check(messages.node("error", "banned"), errorBanned).getString();
+        errorBannedAlready = check(messages.node("error", "banned-already"), errorBannedAlready).getString();
+        errorBanUser = check(messages.node("error", "ban-user"), errorBanUser).getString();
+        errorUnbanUser = check(messages.node("error", "unban-user"), errorUnbanUser).getString();
+        errorNotBanned = check(messages.node("error", "not-banned"), errorNotBanned).getString();
+        errorPermission = check(messages.node("error", "permission"), errorPermission).getString();
+        errorTicketAlreadyClosed = check(messages.node("error", "ticket-already-closed"), errorTicketAlreadyClosed).getString();
+        errorTicketNotClosed = check(messages.node("error", "ticket-not-closed"), errorTicketNotClosed).getString();
+        errorTicketlreadyHold = check(messages.node("error", "ticket-already-on-hold"), errorTicketlreadyHold).getString();
+        errorTicketOwner = check(messages.node("error", "ticket-owner"), errorTicketOwner).getString();
+        errorTicketClaim = check(messages.node("error", "ticket-claim"), errorTicketClaim).getString();
+        errorTicketUnclaim = check(messages.node("error", "ticket-unclaim"), errorTicketUnclaim).getString();
+        errorUserNotExist = check(messages.node("error", "user-not-exist"), errorUserNotExist).getString();
+        errorTicketServer = check(messages.node("error", "ticket-server"), errorTicketServer).getString();
 
         //teleport
-        teleportToTicket = check(messages.getNode("teleport", "to-ticket"), teleportToTicket).getString();
+        teleportToTicket = check(messages.node("teleport", "to-ticket"), teleportToTicket).getString();
 
         //tickets
-        ticketAssign = check(messages.getNode("ticket", "assign"), ticketAssign).getString();
-        ticketAssignUser = check(messages.getNode("ticket", "assign-user"), ticketAssignUser).getString();
-        ticketCommentedit = check(messages.getNode("ticket", "comment-edit"), ticketCommentedit).getString();
-        ticketComment = check(messages.getNode("ticket", "comment"), ticketComment).getString();
-        ticketCommentUser = check(messages.getNode("ticket", "comment-user"), ticketCommentUser).getString();
-        ticketClaim = check(messages.getNode("ticket", "claim"), ticketClaim).getString();
-        ticketClaimUser = check(messages.getNode("ticket", "claim-user"), ticketClaimUser).getString();
-        ticketClose = check(messages.getNode("ticket", "close"), ticketClose).getString();
-        ticketCloseOffline = check(messages.getNode("ticket", "close-offline"), ticketCloseOffline).getString();
-        ticketCloseOfflineMulti = check(messages.getNode("ticket", "close-offline-multi"), ticketCloseOfflineMulti).getString();
-        ticketCloseUser = check(messages.getNode("ticket", "close-user"), ticketCloseUser).getString();
-        ticketDuplicate = check(messages.getNode("ticket", "duplicate"), ticketDuplicate).getString();
-        ticketOpen = check(messages.getNode("ticket", "open"), ticketOpen).getString();
-        ticketOpenUser = check(messages.getNode("ticket", "open-user"), ticketOpenUser).getString();
-        ticketTitleNotification = check(messages.getNode("ticket", "open-title-notification"), ticketTitleNotification).getString();
-        ticketOnHoverTeleportTo = check(messages.getNode("ticket", "on-hover-teleport-to"), ticketOnHoverTeleportTo).getString();
-        ticketReadNone = check(messages.getNode("ticket", "read-none"), ticketReadNone).getString();
-        ticketReadNoneSelf = check(messages.getNode("ticket", "read-none-self"), ticketReadNoneSelf).getString();
-        ticketReadNoneClosed = check(messages.getNode("ticket", "read-none-closed"), ticketReadNoneClosed).getString();
-        ticketReadNoneHeld = check(messages.getNode("ticket", "read-none-held"), ticketReadNoneHeld).getString();
-        ticketHold = check(messages.getNode("ticket", "hold"), ticketHold).getString();
-        ticketHoldUser = check(messages.getNode("ticket", "hold-user"), ticketHoldUser).getString();
-        ticketUnresolved = check(messages.getNode("ticket", "unresolved"), ticketUnresolved).getString();
-        ticketUnresolvedHeld = check(messages.getNode("ticket", "unresolved-held"), ticketUnresolvedHeld).getString();
-        ticketUnclaim = check(messages.getNode("ticket", "unclaim"), ticketUnclaim).getString();
-        ticketUnclaimUser = check(messages.getNode("ticket", "unclaim-user"), ticketUnclaimUser).getString();
-        ticketNotExist = check(messages.getNode("ticket", "not-exist"), ticketNotExist).getString();
-        ticketNotClaimed = check(messages.getNode("ticket", "not-claimed"), ticketNotClaimed).getString();
-        ticketNotOpen = check(messages.getNode("ticket", "not-open"), ticketNotOpen).getString();
-        ticketReopen = check(messages.getNode("ticket", "reopen"), ticketReopen).getString();
-        ticketReopenUser = check(messages.getNode("ticket", "reopen-user"), ticketReopenUser).getString();
-        ticketTooShort = check(messages.getNode("ticket", "too-short"), ticketTooShort).getString();
-        ticketTooMany = check(messages.getNode("ticket", "too-many"), ticketTooMany).getString();
-        ticketTooFast = check(messages.getNode("ticket", "too-fast"), ticketTooFast).getString();
+        ticketAssign = check(messages.node("ticket", "assign"), ticketAssign).getString();
+        ticketAssignUser = check(messages.node("ticket", "assign-user"), ticketAssignUser).getString();
+        ticketCommentedit = check(messages.node("ticket", "comment-edit"), ticketCommentedit).getString();
+        ticketComment = check(messages.node("ticket", "comment"), ticketComment).getString();
+        ticketCommentUser = check(messages.node("ticket", "comment-user"), ticketCommentUser).getString();
+        ticketClaim = check(messages.node("ticket", "claim"), ticketClaim).getString();
+        ticketClaimUser = check(messages.node("ticket", "claim-user"), ticketClaimUser).getString();
+        ticketClose = check(messages.node("ticket", "close"), ticketClose).getString();
+        ticketCloseOffline = check(messages.node("ticket", "close-offline"), ticketCloseOffline).getString();
+        ticketCloseOfflineMulti = check(messages.node("ticket", "close-offline-multi"), ticketCloseOfflineMulti).getString();
+        ticketCloseUser = check(messages.node("ticket", "close-user"), ticketCloseUser).getString();
+        ticketDuplicate = check(messages.node("ticket", "duplicate"), ticketDuplicate).getString();
+        ticketOpen = check(messages.node("ticket", "open"), ticketOpen).getString();
+        ticketOpenUser = check(messages.node("ticket", "open-user"), ticketOpenUser).getString();
+        ticketTitleNotification = check(messages.node("ticket", "open-title-notification"), ticketTitleNotification).getString();
+        ticketOnHoverTeleportTo = check(messages.node("ticket", "on-hover-teleport-to"), ticketOnHoverTeleportTo).getString();
+        ticketReadNone = check(messages.node("ticket", "read-none"), ticketReadNone).getString();
+        ticketReadNoneSelf = check(messages.node("ticket", "read-none-self"), ticketReadNoneSelf).getString();
+        ticketReadNoneClosed = check(messages.node("ticket", "read-none-closed"), ticketReadNoneClosed).getString();
+        ticketReadNoneHeld = check(messages.node("ticket", "read-none-held"), ticketReadNoneHeld).getString();
+        ticketHold = check(messages.node("ticket", "hold"), ticketHold).getString();
+        ticketHoldUser = check(messages.node("ticket", "hold-user"), ticketHoldUser).getString();
+        ticketUnresolved = check(messages.node("ticket", "unresolved"), ticketUnresolved).getString();
+        ticketUnresolvedHeld = check(messages.node("ticket", "unresolved-held"), ticketUnresolvedHeld).getString();
+        ticketUnclaim = check(messages.node("ticket", "unclaim"), ticketUnclaim).getString();
+        ticketUnclaimUser = check(messages.node("ticket", "unclaim-user"), ticketUnclaimUser).getString();
+        ticketNotExist = check(messages.node("ticket", "not-exist"), ticketNotExist).getString();
+        ticketNotClaimed = check(messages.node("ticket", "not-claimed"), ticketNotClaimed).getString();
+        ticketNotOpen = check(messages.node("ticket", "not-open"), ticketNotOpen).getString();
+        ticketReopen = check(messages.node("ticket", "reopen"), ticketReopen).getString();
+        ticketReopenUser = check(messages.node("ticket", "reopen-user"), ticketReopenUser).getString();
+        ticketTooShort = check(messages.node("ticket", "too-short"), ticketTooShort).getString();
+        ticketTooMany = check(messages.node("ticket", "too-many"), ticketTooMany).getString();
+        ticketTooFast = check(messages.node("ticket", "too-fast"), ticketTooFast).getString();
 
         //staff
-        staffListSeperator = check(messages.getNode("staff", "list-separator"), staffListSeperator).getString();
-        staffListTitle = check(messages.getNode("staff", "list-title"), staffListTitle).getString();
-        staffListEmpty = check(messages.getNode("staff", "list-empty"), staffListEmpty).getString();
-        staffListPadding = check(messages.getNode("staff", "list-padding"), staffListPadding).getString();
+        staffListSeperator = check(messages.node("staff", "list-separator"), staffListSeperator).getString();
+        staffListTitle = check(messages.node("staff", "list-title"), staffListTitle).getString();
+        staffListEmpty = check(messages.node("staff", "list-empty"), staffListEmpty).getString();
+        staffListPadding = check(messages.node("staff", "list-padding"), staffListPadding).getString();
 
         //plugin
-        pluginOutdated = check(messages.getNode("plugin", "outdated"), pluginOutdated).getString();
+        pluginOutdated = check(messages.node("plugin", "outdated"), pluginOutdated).getString();
 
         messageLoader.save(messages);
 
     }
 
-    private CommentedConfigurationNode check(CommentedConfigurationNode node, Object defaultValue) {
-        if (node.isVirtual()) {
-            node.setValue(defaultValue);
+    private CommentedConfigurationNode check(CommentedConfigurationNode node, Object defaultValue) throws SerializationException {
+        if (node.virtual()) {
+            node.set(defaultValue);
         }
         return node;
     }
@@ -229,78 +229,82 @@ public class Messages {
 
         for (String asset : assets) {
             if (!Files.exists(plugin.ConfigDir.resolve("localization/" +asset))) {
-                if (Sponge.getAssetManager().getAsset(plugin, asset).isPresent()) {
-                    Sponge.getAssetManager().getAsset(plugin, asset).get().copyToFile(plugin.ConfigDir.resolve("localization/" +asset));
+                InputStream stream = Main.class.getClassLoader().getResourceAsStream(asset);
+                if (stream != null) {
+                    Files.copy(stream, plugin.ConfigDir.resolve("localization/" +asset));
                 }
+                //Sponge.getAssetManager().getAsset(plugin, asset).get()
+                        //.copyToFile(plugin.ConfigDir.resolve("localization/" +asset));
+
             }
         }
     }
 
-    private static Text parse(String key, Object ... params){
+    private static Component parse(String key, Object ... params){
         return plugin.fromLegacy(MessageFormat.format(key, params));
     }
 
-    public static Text getChatprefix() {
+    public static Component getChatprefix() {
         return parse(chatprefix);
     }
 
-    public static Text getErrorBanned() {
+    public static Component getErrorBanned() {
         return parse(errorBanned);
     }
 
-    public static Text getErrorBannedAlready(String playerName) {
+    public static Component getErrorBannedAlready(String playerName) {
         return parse(errorBannedAlready, playerName);
     }
 
-    public static Text getErrorBanUser(String playerName) {
+    public static Component getErrorBanUser(String playerName) {
         return parse(errorBanUser, playerName);
     }
 
-    public static Text getErrorGen(String text) {
+    public static Component getErrorGen(String text) {
         return parse(errorGeneral, text);
     }
 
-    public static Text getErrorIncorrectUsage(String text) {
+    public static Component getErrorIncorrectUsage(String text) {
         return parse(errorIncorrectUsage, text);
     }
 
-    public static Text getErrorNotBanned(String playerName) {
+    public static Component getErrorNotBanned(String playerName) {
         return parse(errorNotBanned, playerName);
     }
 
-    public static Text getErrorPermission(String permission) {
+    public static Component getErrorPermission(String permission) {
         return parse(errorPermission, permission);
     }
 
-    public static Text getErrorTicketAlreadyClosed() {
+    public static Component getErrorTicketAlreadyClosed() {
         return parse(errorTicketAlreadyClosed);
     }
 
-    public static Text getErrorTicketlreadyHold() {
+    public static Component getErrorTicketlreadyHold() {
         return parse(errorTicketlreadyHold);
     }
 
-    public static Text getErrorTicketClaim(int ticketID, String staffName) {
+    public static Component getErrorTicketClaim(int ticketID, String staffName) {
         return parse(errorTicketClaim, ticketID, staffName);
     }
 
-    public static Text getErrorTicketNotClosed(int ticketID) {
+    public static Component getErrorTicketNotClosed(int ticketID) {
         return parse(errorTicketNotClosed, ticketID);
     }
 
-    public static Text getErrorTicketOwner() {
+    public static Component getErrorTicketOwner() {
         return parse(errorTicketOwner);
     }
 
-    public static Text getErrorTicketUnclaim(int ticketID, String staffName) {
+    public static Component getErrorTicketUnclaim(int ticketID, String staffName) {
         return parse(errorTicketUnclaim, ticketID, staffName);
     }
 
-    public static Text getErrorUnbanUser(String playerName) {
+    public static Component getErrorUnbanUser(String playerName) {
         return parse(errorUnbanUser, playerName);
     }
 
-    public static Text getErrorUserNotExist(String playerName) {
+    public static Component getErrorUserNotExist(String playerName) {
         return parse(errorUserNotExist, playerName);
     }
 
@@ -308,155 +312,155 @@ public class Messages {
         return staffListSeperator;
     }
 
-    public static Text getStaffListTitle() {
+    public static Component getStaffListTitle() {
         return parse(staffListTitle);
     }
 
-    public static Text getStaffListEmpty() {
+    public static Component getStaffListEmpty() {
         return parse(staffListEmpty);
     }
 
-    public static Text getTeleportToTicket(int ticketID) {
+    public static Component getTeleportToTicket(int ticketID) {
         return parse(teleportToTicket, ticketID);
     }
 
-    public static Text getTicketAssign(String staffName, int ticketID) {
+    public static Component getTicketAssign(String staffName, int ticketID) {
         return parse(ticketAssign, staffName, ticketID);
     }
 
-    public static Text getTicketAssignUser(int ticketID, String staffName) {
+    public static Component getTicketAssignUser(int ticketID, String staffName) {
         return parse(ticketAssignUser, ticketID, staffName);
     }
 
-    public static Text getPluginOutdated(String version) {
+    public static Component getPluginOutdated(String version) {
         return parse(pluginOutdated, version);
     }
 
-    public static Text getStaffListPadding() {
+    public static Component getStaffListPadding() {
         return parse(staffListPadding);
     }
 
-    public static Text getTicketClaim(String staffName, int ticketID) {
+    public static Component getTicketClaim(String staffName, int ticketID) {
         return parse(ticketClaim, staffName, ticketID);
     }
 
-    public static Text getTicketClaimUser(String staffName, int ticketID) {
+    public static Component getTicketClaimUser(String staffName, int ticketID) {
         return parse(ticketClaimUser, staffName, ticketID);
     }
 
-    public static Text getTicketClose(int ticketID, String staffName) {
+    public static Component getTicketClose(int ticketID, String staffName) {
         return parse(ticketClose, ticketID, staffName);
     }
 
-    public static Text getTicketCloseOffline() {
+    public static Component getTicketCloseOffline() {
         return parse(ticketCloseOffline);
     }
 
-    public static Text getTicketCloseOfflineMulti(int ticketsNum, String command) {
+    public static Component getTicketCloseOfflineMulti(int ticketsNum, String command) {
         return parse(ticketCloseOfflineMulti, ticketsNum, command);
     }
 
-    public static Text getTicketCloseUser(int ticketID, String staffName) {
+    public static Component getTicketCloseUser(int ticketID, String staffName) {
         return parse(ticketCloseUser, ticketID, staffName);
     }
 
-    public static Text getTicketDuplicate() {
+    public static Component getTicketDuplicate() {
         return parse(ticketDuplicate);
     }
 
-    public static Text getTicketHold(int ticketID, String staffName) {
+    public static Component getTicketHold(int ticketID, String staffName) {
         return parse(ticketHold, ticketID, staffName);
     }
 
-    public static Text getTicketOnHoverTeleportTo() {
+    public static Component getTicketOnHoverTeleportTo() {
         return parse(ticketOnHoverTeleportTo);
     }
 
-    public static Text getTicketHoldUser(int ticketID, String staffName) {
+    public static Component getTicketHoldUser(int ticketID, String staffName) {
         return parse(ticketHoldUser, ticketID, staffName);
     }
 
-    public static Text getTicketNotClaimed(int ticketID) {
+    public static Component getTicketNotClaimed(int ticketID) {
         return parse(ticketNotClaimed, ticketID);
     }
 
-    public static Text getTicketNotExist(int ticketID) {
+    public static Component getTicketNotExist(int ticketID) {
         return parse(ticketNotExist, ticketID);
     }
 
-    public static Text getTicketOpen(String playerName, int ticketID) {
+    public static Component getTicketOpen(String playerName, int ticketID) {
         return parse(ticketOpen, playerName, ticketID);
     }
 
-    public static Text getTicketOpenUser(int ticketID) {
+    public static Component getTicketOpenUser(int ticketID) {
         return parse(ticketOpenUser, ticketID);
     }
 
-    public static Text getTicketReadNone() {
+    public static Component getTicketReadNone() {
         return parse(ticketReadNone);
     }
 
-    public static Text getTicketNotOpen(int ticketID) {
+    public static Component getTicketNotOpen(int ticketID) {
         return parse(ticketNotOpen, ticketID);
     }
 
-    public static Text getTicketReadNoneClosed() {
+    public static Component getTicketReadNoneClosed() {
         return parse(ticketReadNoneClosed);
     }
 
-    public static Text getTicketReadNoneHeld() {
+    public static Component getTicketReadNoneHeld() {
         return parse(ticketReadNoneHeld);
     }
 
-    public static Text getTicketReadNoneSelf() {
+    public static Component getTicketReadNoneSelf() {
         return parse(ticketReadNoneSelf);
     }
 
-    public static Text getTicketTitleNotification(String playerName, int ticketID) {
+    public static Component getTicketTitleNotification(String playerName, int ticketID) {
         return parse(ticketTitleNotification, playerName, ticketID);
     }
 
-    public static Text getTicketReopen(String staffName, int ticketID) {
+    public static Component getTicketReopen(String staffName, int ticketID) {
         return parse(ticketReopen, staffName, ticketID);
     }
 
-    public static Text getTicketReopenUser(String staffName, int ticketID) {
+    public static Component getTicketReopenUser(String staffName, int ticketID) {
         return parse(ticketReopenUser, staffName, ticketID);
     }
 
-    public static Text getTicketTooFast(int seconds) {
+    public static Component getTicketTooFast(int seconds) {
         return parse(ticketTooFast, seconds);
     }
 
-    public static Text getTicketTooMany() {
+    public static Component getTicketTooMany() {
         return parse(ticketTooMany);
     }
 
-    public static Text getTicketTooShort(int minWords) {
+    public static Component getTicketTooShort(int minWords) {
         return parse(ticketTooShort, minWords);
     }
 
-    public static Text getTicketUnclaim(String staffName, int ticketID) {
+    public static Component getTicketUnclaim(String staffName, int ticketID) {
         return parse(ticketUnclaim, staffName, ticketID);
     }
 
-    public static Text getTicketUnclaimUser(String staffName, int ticketID) {
+    public static Component getTicketUnclaimUser(String staffName, int ticketID) {
         return parse(ticketUnclaimUser, staffName, ticketID);
     }
 
-    public static Text getTicketUnresolved(int totalTickets, String command) {
+    public static Component getTicketUnresolved(int totalTickets, String command) {
         return parse(ticketUnresolved, totalTickets, command);
     }
 
-    public static Text getTicketUnresolvedHeld(int totalOpenTickets, int totalHeldTickets, String command) {
+    public static Component getTicketUnresolvedHeld(int totalOpenTickets, int totalHeldTickets, String command) {
         return parse(ticketUnresolvedHeld, totalOpenTickets, totalHeldTickets, command);
     }
 
-    public static Text getTicketComment(int ticketID, String staffName) {
+    public static Component getTicketComment(int ticketID, String staffName) {
         return parse(ticketComment, ticketID, staffName);
     }
 
-    public static Text getTicketCommentUser(int ticketID) {
+    public static Component getTicketCommentUser(int ticketID) {
         return parse(ticketCommentUser, ticketID);
     }
 
@@ -512,7 +516,7 @@ public class Messages {
         return yesButton;
     }
 
-    public static Text getTicketCommentedit(int ticketID) {
+    public static Component getTicketCommentedit(int ticketID) {
         return parse(ticketCommentedit, ticketID);
     }
 
@@ -520,7 +524,7 @@ public class Messages {
         return yesButtonHover;
     }
 
-    public static Text getErrorTicketServer(int ticketID) {
+    public static Component getErrorTicketServer(int ticketID) {
         return parse (errorTicketServer, ticketID);
     }
 }

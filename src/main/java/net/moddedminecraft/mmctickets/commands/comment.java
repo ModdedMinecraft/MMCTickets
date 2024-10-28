@@ -1,19 +1,25 @@
 package net.moddedminecraft.mmctickets.commands;
 
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.moddedminecraft.mmctickets.Main;
 import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.config.Permissions;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.adventure.SpongeComponents;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.service.permission.Subject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,15 +38,28 @@ public class comment implements CommandExecutor {
     }
 
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final int ticketID = args.<Integer>getOne("ticketID").get();
-        final String comment = args.<String>getOne("comment").get();
+    public CommandResult execute(CommandContext context) throws CommandException {
+        Parameter.Value<Integer> ticketIDParameter = Parameter.integerNumber().key("ticketID").build();
+        Parameter.Value<String> commentParameter = Parameter.remainingJoinedStrings().key("comment").build();
+
+        final int ticketID = context.requireOne(ticketIDParameter);
+        final String comment = context.requireOne(commentParameter);
 
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
+
+        Subject subject = context.cause().subject();
+        Audience audience = context.cause().audience();
+
+        ServerPlayer player = null;
         UUID uuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
-        if (src instanceof Player) {
-            Player player = (Player) src;
-            uuid = player.getUniqueId();
+
+        if (context.cause().root() instanceof ServerPlayer) {
+            player = (ServerPlayer) context.cause().root();
+            uuid = player.uniqueId();
+        }
+        String staffName = "Console";
+        if (player != null) {
+            staffName = player.name();
         }
 
         if (tickets.isEmpty()) {
@@ -48,19 +67,19 @@ public class comment implements CommandExecutor {
         } else {
             for (TicketData ticket : tickets) {
                 if (ticket.getTicketID() == ticketID) {
-                    if (!ticket.getStaffUUID().equals(uuid) && ticket.getStatus() == Claimed && !src.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
+                    if (!ticket.getStaffUUID().equals(uuid) && ticket.getStatus() == Claimed && !subject.hasPermission(Permissions.CLAIMED_TICKET_BYPASS)) {
                         throw new CommandException(Messages.getErrorTicketClaim(ticket.getTicketID(), CommonUtil.getPlayerNameFromData(plugin, ticket.getStaffUUID())));
                     }
                     if (!ticket.getComment().isEmpty()) {
-                        if (src.hasPermission(Permissions.COMMAND_TICKET_EDIT_COMMENT)) {
-                            Text.Builder action = Text.builder();
-                            action.append(Text.builder()
+                        if (subject.hasPermission(Permissions.COMMAND_TICKET_EDIT_COMMENT)) {
+                            TextComponent.@NotNull Builder action = Component.text();
+                            action.append(Component.text()
                                     .append(plugin.fromLegacy(Messages.getYesButton()))
-                                    .onHover(TextActions.showText(plugin.fromLegacy(Messages.getYesButtonHover())))
-                                    .onClick(TextActions.executeCallback(changeTicketComment(ticketID, comment, src.getName())))
+                                    .hoverEvent(HoverEvent.showText(plugin.fromLegacy(Messages.getYesButtonHover())))
+                                    .clickEvent(SpongeComponents.executeCallback(changeTicketComment(ticketID, comment, staffName)))
                                     .build());
-                            src.sendMessage(Messages.getTicketCommentedit(ticketID));
-                            src.sendMessage(action.build());
+                            audience.sendMessage(Messages.getTicketCommentedit(ticketID));
+                            audience.sendMessage(action.build());
                             return CommandResult.success();
                         } else {
                             throw new CommandException(Messages.getErrorGen("There is already a comment on this ticket."));
@@ -71,17 +90,17 @@ public class comment implements CommandExecutor {
                     try {
                         plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
-                        src.sendMessage(Messages.getErrorGen("Unable to comment on ticket"));
+                        audience.sendMessage(Messages.getErrorGen("Unable to comment on ticket"));
                         e.printStackTrace();
                     }
 
-                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getPlayerUUID());
+                    Optional<ServerPlayer> ticketPlayerOP = Sponge.server().player(ticket.getPlayerUUID());
                     if (ticketPlayerOP.isPresent()) {
-                        Player ticketPlayer = ticketPlayerOP.get();
-                        ticketPlayer.sendMessage(Messages.getTicketComment(ticket.getTicketID(), src.getName()));
+                        ServerPlayer ticketPlayer = ticketPlayerOP.get();
+                        ticketPlayer.sendMessage(Messages.getTicketComment(ticket.getTicketID(), staffName));
                     }
 
-                    src.sendMessage(Messages.getTicketCommentUser(ticket.getTicketID()));
+                    audience.sendMessage(Messages.getTicketCommentUser(ticket.getTicketID()));
 
                     return CommandResult.success();
                 }
@@ -90,7 +109,7 @@ public class comment implements CommandExecutor {
         }
     }
 
-    private Consumer<CommandSource> changeTicketComment(int ticketID, String comment, String name) {
+    private Consumer<CommandCause> changeTicketComment(int ticketID, String comment, String name) {
         return consumer -> {
             final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
             for (TicketData ticket : tickets) {
@@ -100,17 +119,17 @@ public class comment implements CommandExecutor {
                     try {
                         plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
-                        consumer.sendMessage(Messages.getErrorGen("Unable to comment on ticket"));
+                        consumer.audience().sendMessage(Messages.getErrorGen("Unable to comment on ticket"));
                         e.printStackTrace();
                     }
 
-                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getPlayerUUID());
+                    Optional<ServerPlayer> ticketPlayerOP = Sponge.server().player(ticket.getPlayerUUID());
                     if (ticketPlayerOP.isPresent()) {
-                        Player ticketPlayer = ticketPlayerOP.get();
+                        ServerPlayer ticketPlayer = ticketPlayerOP.get();
                         ticketPlayer.sendMessage(Messages.getTicketComment(ticket.getTicketID(), name));
                     }
 
-                    consumer.sendMessage(Messages.getTicketCommentUser(ticket.getTicketID()));
+                    consumer.audience().sendMessage(Messages.getTicketCommentUser(ticket.getTicketID()));
                 }
             }
         };

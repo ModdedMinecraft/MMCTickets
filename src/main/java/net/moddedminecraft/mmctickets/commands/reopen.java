@@ -5,12 +5,12 @@ import net.moddedminecraft.mmctickets.config.Messages;
 import net.moddedminecraft.mmctickets.data.TicketData;
 import net.moddedminecraft.mmctickets.util.CommonUtil;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandExecutor;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +29,19 @@ public class reopen implements CommandExecutor {
     }
 
     @Override
-    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        final int ticketID = args.<Integer>getOne("ticketID").get();
+    public CommandResult execute(CommandContext context) throws CommandException {
+        Parameter.Value<Integer> ticketIDParameter = Parameter.integerNumber().key("ticketID").build();
+
+        final int ticketID = context.requireOne(ticketIDParameter);
 
         final List<TicketData> tickets = new ArrayList<TicketData>(plugin.getDataStore().getTicketData());
+
+        String staffName = "Console";
+        if (context.cause().root() instanceof ServerPlayer) {
+            ServerPlayer player = (ServerPlayer) context.cause().root();
+            staffName = player.name();
+        }
+
 
         if (tickets.isEmpty()) {
             throw new CommandException(Messages.getErrorGen("Tickets list is empty."));
@@ -53,16 +62,16 @@ public class reopen implements CommandExecutor {
                     try {
                         plugin.getDataStore().updateTicketData(ticket);
                     } catch (Exception e) {
-                        src.sendMessage(Messages.getErrorGen("Unable to reopen ticket"));
                         e.printStackTrace();
+                        throw new CommandException(Messages.getErrorGen("Unable to reopen ticket"));
                     }
 
-                    CommonUtil.notifyOnlineStaff(Messages.getTicketReopen(src.getName(), ticket.getTicketID()));
+                    CommonUtil.notifyOnlineStaff(Messages.getTicketReopen(staffName, ticket.getTicketID()));
 
-                    Optional<Player> ticketPlayerOP = Sponge.getServer().getPlayer(ticket.getPlayerUUID());
+                    Optional<ServerPlayer> ticketPlayerOP = Sponge.server().player(ticket.getPlayerUUID());
                     if (ticketPlayerOP.isPresent()) {
-                        Player ticketPlayer = ticketPlayerOP.get();
-                        ticketPlayer.sendMessage(Messages.getTicketReopenUser(src.getName(), ticket.getTicketID()));
+                        ServerPlayer ticketPlayer = ticketPlayerOP.get();
+                        ticketPlayer.sendMessage(Messages.getTicketReopenUser(staffName, ticket.getTicketID()));
                     }
                     return CommandResult.success();
                 }
