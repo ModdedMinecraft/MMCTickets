@@ -1,6 +1,5 @@
 package net.moddedminecraft.mmctickets.data;
 
-import com.google.common.reflect.TypeToken;
 import net.moddedminecraft.mmctickets.util.PlayerDataUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;

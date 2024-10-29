@@ -312,7 +312,7 @@ public class Main {
         );
     }
 
-    public org.apache.logging.log4j.Logger getLogger() {
+    public Logger getLogger() {
         return logger;
     }
 

@@ -123,14 +123,13 @@ public class open implements CommandExecutor {
             }
             plugin.getWaitTimer().add(player.name());
 
-            //Sponge.server().scheduler().submit();
-            Task.builder().execute(new Runnable() {
+            Sponge.asyncScheduler().executor(plugin.container).schedule(new Runnable() {
                 @Override
                 public void run() {
                     plugin.getWaitTimer().removeAll(Collections.singleton(player.name()));
-                    plugin.getLogger().info("Removed " + player.name() + " from open wait list"); //TODO Test
+                    plugin.getLogger().info("Removed " + player.name() + " from open wait list");
                 }
-            }).delay(Config.delayTimer, TimeUnit.SECONDS);
+            }, Config.delayTimer, TimeUnit.SECONDS);
             return CommandResult.success();
         } else {
             if (Config.server.isEmpty()) {

@@ -6,6 +6,8 @@ import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.serialize.SerializationException;
+import sawfowl.localeapi.LocaleAPIMain;
+import sawfowl.localeapi.api.LocaleAPI;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -219,12 +221,15 @@ public class Messages {
     }
 
     private void checkLangAssetFiles() throws IOException {
+
         if (!Files.isDirectory(plugin.ConfigDir.resolve("localization"))) {
             Files.createDirectory(plugin.ConfigDir.resolve("localization"));
         }
         String[] assets = {
                 "messages_EN.conf",
-                "messages_DE.conf"
+                "messages_DE.conf",
+                "messages_IT.conf",
+                "messages_RU.conf"
         };
 
         for (String asset : assets) {
