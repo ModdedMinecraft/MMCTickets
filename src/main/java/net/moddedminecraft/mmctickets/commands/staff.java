@@ -33,7 +33,7 @@ public class staff implements CommandExecutor {
         String separator = Messages.getStaffListSeperator();
 
         for(ServerPlayer player : Sponge.server().onlinePlayers()) {
-            if(player.hasPermission(Permissions.STAFF) && (!player.get(Keys.VANISH_STATE).isPresent())) {
+            if(player.hasPermission(Permissions.STAFF) && (!player.get(Keys.VANISH_STATE).get().invisible())) {
                 staff.append("&e" + player.name());
                 staff.append(separator);
             }
